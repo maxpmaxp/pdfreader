@@ -1,6 +1,3 @@
-from typing import List
-
-from .types import IndirectObject, ObjRef
 from .xref import XRef
 
 
@@ -13,9 +10,6 @@ class Header(object):
 
     def __repr__(self):
         return "<PDF Header:v={self.version} (major={self.major}, minor={self.minor})>".format(self=self)
-
-
-Body = List[IndirectObject]
 
 
 class Trailer(object):

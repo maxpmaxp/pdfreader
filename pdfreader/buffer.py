@@ -88,6 +88,9 @@ class Buffer(object):
 
 
     """
+
+    state_attrs = ('offset', 'block_size', 'last_block_size', 'last_block_offset', 'index', 'data')
+
     def __init__(self, fileobj, offset, block_size=1024):
         self.fileobj = BytesIO(fileobj) if isinstance(fileobj, bytes) else fileobj
         self.offset = offset
@@ -97,6 +100,7 @@ class Buffer(object):
         self.index = None
         self.data = b''
         self.reset(offset)
+        self.stack = []
 
     def _read_forward(self):
         offset = self.last_block_offset + self.block_size
@@ -172,12 +176,17 @@ class Buffer(object):
 
     @property
     def is_eof(self):
-        try:
-            _ = self.current
-            res = False
-        except EOFException:
-            res = True
-        return res
+        return self.current is None
+
+    def push_state(self):
+        state = {a: getattr(self, a) for a in self.state_attrs}
+        self.stack.append(state)
+
+    def pop_state(self):
+        state = self.stack.pop()
+        for k, v in state.items():
+            setattr(self, k, v)
+        self.fileobj.seek(self.last_block_offset)
 
 
 if __name__ == "__main__":

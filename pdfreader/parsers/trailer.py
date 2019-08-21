@@ -1,11 +1,12 @@
-from ..constants import EOL, SP, SPACES
+from ..buffer import Buffer
+from ..constants import EOL, SP
 from ..exceptions import EOFException, TokenNotFound, ParserException
 from ..filestructure import Trailer
 from ..xref import XRef
-from .base import BaseParser
+from .base import PDFParser
 
 
-class TrailerParser(BaseParser):
+class TrailerParser(Buffer):
     """
     Acrobat viewers require only that the header appear somewhere within the last 1024 bytes of the file
     """
@@ -33,29 +34,6 @@ class TrailerParser(BaseParser):
         # xref may come as indirect object
         raise NotImplementedError()
 
-    def gen_lines_forward(self):
-        state = 'start'
-        line = b""
-        while True:
-            try:
-                ch = self.next()
-            except EOFException:
-                break
-            if state == "start":
-                if ch in EOL:
-                    continue
-                else:
-                    state = 'in-line'
-                    line += ch
-            elif state == 'in-line':
-                if ch in EOL:
-                    yield line
-                    line = b""
-                    state = 'start'
-                else:
-                    line = ch + line
-        yield line
-
     def gen_lines_backward(self):
         state = 'start'
         line = b""
@@ -80,39 +58,7 @@ class TrailerParser(BaseParser):
         yield line
 
     def find_xref_offset(self):
-        """ locate xref offset
 
-            >>> from io import BytesIO
-            >>> f = BytesIO(b'%PDF-1.6\\nxref\\nblablabla\\nstartxref\\n9\\n%%EOF')
-            >>> p = TrailerParser(f)
-            >>> p.find_xref_offset()
-            9
-
-            >>> from io import BytesIO
-            >>> f = BytesIO(b'%PDF-1.6\\nxref\\nblablabla\\nstartxref\\r%comment\\n9\\n%comment\\n%%EOF')
-            >>> p = TrailerParser(f)
-            >>> p.find_xref_offset()
-            9
-
-            >>> from io import BytesIO
-            >>> f = BytesIO(b'%PDF-1.6\\nxref\\nblablabla\\nstartxref\\r%comment\\nXXX\\n%comment\\n%%EOF')
-            >>> p = TrailerParser(f)
-            >>> p.find_xref_offset()
-            Traceback (most recent call last):
-            ...
-            pdfreader.exceptions.TokenNotFound: wrong startxref size
-
-
-            >>> from io import BytesIO
-            >>> f = BytesIO(b'%PDF-1.6\\nxref\\nblablabla\\r%comment\\n9\\n%comment\\n%%EOF')
-            >>> p = TrailerParser(f)
-            >>> p.find_xref_offset()
-            Traceback (most recent call last):
-            ...
-            pdfreader.exceptions.TokenNotFound: startxref
-
-
-        """
         self.locate_eof()
         xref_offset = None
         for line in self.gen_lines_backward():
@@ -130,44 +76,7 @@ class TrailerParser(BaseParser):
                 raise TokenNotFound('startxref')
         return xref_offset
 
-    def locate_eof(self):
-        """ sets buffer pointer to the last byte before EOF
 
-            >>> from io import BytesIO
-            >>> f = BytesIO(b'%PDF-1.6\\nblablabla\\n%%EOF')
-            >>> TrailerParser(f).locate_eof()
-            True
-
-            >>> from io import BytesIO
-            >>> f = BytesIO(b'%PDF-1.6\\nblablabla\\n%%EOF ')
-            >>> TrailerParser(f).locate_eof()
-            True
-
-            >>> f = BytesIO(b'%IPS-Adobe-1.3 PDF-1.6\\nblablabla\\n%%EOF\\r\\n%comment')
-            >>> TrailerParser(f).locate_eof()
-            True
-
-            Test missing header and one out of 1024 leading bytes
-
-            >>> f = BytesIO(b'\\n%PDF-1.5\\nblablabla\\n%%EOF\\n'  +b' '*1020)
-            >>> TrailerParser(f).locate_eof()
-            Traceback (most recent call last):
-            ...
-            pdfreader.exceptions.TokenNotFound: b'%%EOF'
-
-
-            >>> f = BytesIO(b'\\nblablabla'*100)
-            >>> TrailerParser(f).locate_eof()
-            Traceback (most recent call last):
-            ...
-            pdfreader.exceptions.TokenNotFound: b'%%EOF'
-        """
-        for line in self.gen_lines_backward():
-            if len(self.data) > self.block_size:
-                break
-            if line.startswith(self.EOF):
-                return True
-        raise TokenNotFound(self.EOF)
 
     def locate_token(self, data, token):
         """ Returns offset of the token starting from the end of data.
@@ -177,7 +86,7 @@ class TrailerParser(BaseParser):
         assert isinstance(token, bytes)
 
 
-class RegularXrefParser(BaseParser):
+class RegularXrefParser(PDFParser):
     """ Parses xref represented directly
     """
 
@@ -216,38 +125,6 @@ class RegularXrefParser(BaseParser):
             while self.current not in EOL:
                 self.next()
 
-    def range(self):
-        # read first object number
-        d1 = b''
-        while self.current != SP:
-            d1 += self.next()
-
-        # skip space
-        self.next()
-
-        # read number of entities
-        d2 = b''
-        while self.current not in EOL:
-            d2 += self.next()
-
-        try:
-            d1, d2 = int(d1), int(d2)
-        except ValueError:
-            raise ParserException("Wrong xref range")
-
-        return d1, d2
-
-    def entry(self):
-        data = b"".join([self.next() for _ in range(20)]).strip()
-        offset, gen, flag = data.split(b" ", 2)
-        try:
-            offset, gen = int(offset), int(gen)
-            flag = flag.decode("utf-8")
-            if flag not in ('n', 'f'):
-                raise ValueError()
-        except ValueError:
-            raise ParserException("Wrong xref entry: {}".format(data))
-        return offset, gen, flag
 
 
 if __name__ == "__main__":

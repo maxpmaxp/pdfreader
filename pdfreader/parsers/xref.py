@@ -1,10 +1,10 @@
 from ..constants import EOL, SP, NULL, TAB
 from ..exceptions import TokenNotFound, ParserException
 from ..xref import XRef
-from .base import BaseParser
+from .base import PDFParser
 
 
-class RegularXrefParser(BaseParser):
+class RegularXrefParser(PDFParser):
     """ Parses xref represented directly
 
         >>> s = b'''xref

@@ -52,7 +52,7 @@ class Comment(str):
     """ % Some PDF Comment """
 
 
-class ObjRef(object):
+class IndirectReference(object):
     def __init__(self, number, generation):
         """ 10 0 R """
         assert isinstance(number, int)
@@ -60,6 +60,9 @@ class ObjRef(object):
 
         self.num = number
         self.gen = generation
+
+    def __repr__(self):
+        return "<IndirectReference:n={self.num},g={self.gen}>".format(self=self)
 
 
 class IndirectObject(object):
@@ -72,7 +75,7 @@ class IndirectObject(object):
         assert isinstance(generation, int) and generation >= 0
         assert isinstance(value,
                           (type(null), Boolean, Integer, Real, Array, Dictionary, String, Name, HexString, Stream,
-                           ObjRef))
+                           IndirectReference))
         self.num = number
         self.gen = generation
         self.val = value
