@@ -1,27 +1,23 @@
 import re
 
-from ..buffer import Buffer
-from ..constants import WHITESPACE_CODES, WHITESPACES, EOL, DELIMITERS, CR, LF, SP, STRING_ESCAPED
-from ..exceptions import ParserException
-from ..types import *
-from ..filestructure import *
+from .buffer import Buffer
+from .constants import WHITESPACE_CODES, WHITESPACES, EOL, DELIMITERS, CR, LF, SP, STRING_ESCAPED
+from .exceptions import ParserException
+from .types import *
+from .filestructure import *
 
 
 class PDFParser(Buffer):
-
     PDF_HEADERS = (re.compile(b"%PDF-(\d\.\d)"), re.compile(b"%IPS-Adobe-\d\.\d PDF-(\d\.\d)"))
 
     def __init__(self, fileobj, offset=0):
         super(PDFParser, self).__init__(fileobj, offset)
-        header = None
-        trailer = None
-        objects = dict() # (number, gen) -> objects
-        xref = None
 
     def parse(self):
         raise NotImplementedError()
 
     def on_parser_error(self, message):
+        # ToDo: display parsing context here
         raise ParserException(message)
 
     @staticmethod
@@ -147,7 +143,7 @@ class PDFParser(Buffer):
         """
         false token
 
-        
+
         >>> s = b'false'
         >>> PDFParser(s, 0).false()
         False
@@ -165,7 +161,7 @@ class PDFParser(Buffer):
 
     def comment(self):
         """
-        
+
         >>> s = b'%any occurance of %-sign outside of string or stream until EOL (not including) is a comment\\n'
         >>> PDFParser(s, 0).comment()
         '%any occurance of %-sign outside of string or stream until EOL (not including) is a comment'
@@ -185,7 +181,7 @@ class PDFParser(Buffer):
 
     def numeric(self):
         """
-        
+
         >>> s = b'0'
         >>> PDFParser(s, 0).numeric()
         0
@@ -340,7 +336,7 @@ class PDFParser(Buffer):
 
     def dictionary(self):
         """
-        
+
         >>> s = b'<<>>'
         >>> PDFParser(s, 0).dictionary()
         {}
@@ -419,12 +415,12 @@ class PDFParser(Buffer):
         >>> PDFParser(s, 0).hexstring()
         '01020A0B'
 
-        
+
         >>> s = b'<0>'
         >>> PDFParser(s, 0).hexstring()
         '00'
 
-        
+
         >>> s = b'<01 AA FF 1>'
         >>> PDFParser(s, 0).hexstring()
         '01AAFF10'
@@ -462,14 +458,14 @@ class PDFParser(Buffer):
 
     def array(self):
         """
-        
+
         >>> s = b'[]'
         >>> PDFParser(s, 0).array()
         []
 
-        >>> s = b'[-1.5 <AABBCC> (Regular string) <</Name /Value>>]'
+        >>> s = b'[-1.5 <AABBCC> (Regular string) <</Name /Value>> 0 10 5 R]'
         >>> PDFParser(s, 0).array()
-        [Decimal('-1.5'), 'AABBCC', 'Regular string', {'Name': 'Value'}]
+        [Decimal('-1.5'), 'AABBCC', 'Regular string', {'Name': 'Value'}, 0, <IndirectReference:n=10,g=5>]
 
         """
         if self.current != b'[':
@@ -480,7 +476,7 @@ class PDFParser(Buffer):
         while self.current != b']':
             array.append(self.object())
             self.maybe_spaces_or_comments()
-        self.next() # skip enclosing bracket
+        self.next()  # skip enclosing bracket
         return array
 
     def string(self):
@@ -689,7 +685,7 @@ class PDFParser(Buffer):
             if m:
                 return Header(m.groups()[0], offset=m.start())
         self.on_parser_error("No PDF header found")
-        
+
     def pdf_trailer(self):
         xref_offset = self.xref_offset()
         self.reset(xref_offset)
@@ -797,10 +793,8 @@ class PDFParser(Buffer):
             raise ParserException("Wrong xref entry: {}".format(data))
         return offset, gen, flag
 
-
     def indirect_xref(self):
         pass
-
 
     def seek_eof(self):
         """ sets buffer pointer to the last byte before EOF
@@ -895,4 +889,5 @@ class PDFParser(Buffer):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
