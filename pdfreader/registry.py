@@ -18,15 +18,16 @@ class Registry(object):
     def is_registered(self, n, gen):
         return (n, gen) in self.known_indirect_objects
 
-    def register(self, obj, b_offset=None, e_offset=None):
-        if not self.is_registered(obj.num, obj.gen):
+    def register(self, obj, b_offset=None, e_offset=None, force=False):
+        if force or not self.is_registered(obj.num, obj.gen):
             key = obj.num, obj.gen
             self.known_indirect_objects[key] = obj.val
             self.indirect_object_offsets[key] = (b_offset, e_offset)
-            logging.info("Indirect object registered: {key} -> {val}".format(key=key, val=obj.val))
+            logging.debug("Indirect object registered: {key} -> {val}".format(key=key, val=obj.val))
 
             if isinstance(obj.val, Stream):
                 if obj.val.get("Type") == "ObjStm":
+                    logging.debug("Registering ObjStm {}".format(key))
                     self.register_object_stream(obj.val)
 
     def get(self, n, gen):
@@ -53,3 +54,4 @@ class Registry(object):
             val = parser.object()
             # generation is always 0 for compressed objects
             self.register(IndirectObject(num, 0, val))
+            logging.debug("Compressed object registered {} {}".format(num, 0))

@@ -3,8 +3,9 @@ import re
 from .buffer import Buffer
 from .constants import WHITESPACE_CODES, WHITESPACES, EOL, DELIMITERS, CR, LF, SP, STRING_ESCAPED, DEFAULT_ENCODING
 from .exceptions import ParserException
+from .objects import Trailer, StartXRef
 from .types import *
-from .filestructure import Header, Trailer
+from .filestructure import PDFHeader, PDFTrailer
 from .xref import XRef, XRefEntry
 
 
@@ -14,7 +15,6 @@ class PDFParser(Buffer):
 
     def __init__(self, fileobj, offset=0):
         super(PDFParser, self).__init__(fileobj, offset)
-
 
     def on_parser_error(self, message):
         # ToDo: display parsing context here
@@ -421,8 +421,13 @@ class PDFParser(Buffer):
         if ch != LF:
             self.on_parser_error("Wrong stream newline: [CR]LF expected")
         data = self.read(length)
-        self.eol()
-
+        # According to the spec EOL should be afterthe data and before endstream
+        # But some files do not follow this.
+        #
+        # See data/leesoil-cases-2.pdf
+        #
+        # self.eol()
+        self.maybe_spaces()
         token = self.read(9)
         if token != b'endstream':
             self.on_parser_error("endstream expected")
@@ -608,11 +613,11 @@ class PDFParser(Buffer):
         return val
 
     def numeric_or_indirect_reference(self):
-        self.push_state()
+        state = self.get_state()
         try:
             val = self.indirect_reference()
         except ParserException:
-            self.pop_state()
+            self.set_state(state)
             val = self.numeric()
         return val
 
@@ -625,7 +630,6 @@ class PDFParser(Buffer):
         <IndirectObject:n=12,g=0,v='Brilling'>
 
         """
-        begin_offset = self.current_stream_offset
         num = self.non_negative_int()
         self.maybe_spaces_or_comments()
         gen = self.non_negative_int()
@@ -644,12 +648,11 @@ class PDFParser(Buffer):
             self.on_parser_error("endobj expected")
 
         obj = IndirectObject(num, gen, val)
-        end_offset = self.current_stream_offset
         # handle all known indirect objects
-        self.on_parsed_indirect_object(obj, begin_offset, end_offset)
+        self.on_parsed_indirect_object(obj)
         return obj
 
-    def on_parsed_indirect_object(self, obj, b_offset=None, e_offset=None):
+    def on_parsed_indirect_object(self, obj):
         pass
 
     def indirect_reference(self):
@@ -667,6 +670,21 @@ class PDFParser(Buffer):
         if ch != b'R':
             self.on_parser_error('R keyword expected')
         return IndirectReference(num, gen)
+
+    def startxref(self):
+        """ Can be in the doc body if any incremental updates done
+
+            >>> s = b'''startxref
+            ...     0'''
+            >>> PDFParser(s, 0).startxref()
+            <StartXRef: 0>
+        """
+        token = self.read(9)
+        if token != b'startxref':
+            self.on_parser_error('startxref expected')
+        self.maybe_spaces_or_comments()
+        offset = self.non_negative_int()
+        return StartXRef(offset)
 
     def pdf_header(self):
         """
@@ -724,7 +742,7 @@ class PDFParser(Buffer):
         for _ in range(size):
             self.prev()
 
-        return Header(m.groups()[0].decode(DEFAULT_ENCODING), offset=self.index + m.start())
+        return PDFHeader(m.groups()[0].decode(DEFAULT_ENCODING), offset=self.index + m.start())
 
     def pdf_trailer(self):
         """
@@ -743,8 +761,8 @@ class PDFParser(Buffer):
             # parse trailer
             # ToDO: parse several xref sections like we do for streams
             self.maybe_spaces_or_comments()
-            tdict = self.trailer()
-            trailer = Trailer([xref], **tdict)
+            t = self.trailer()
+            trailer = PDFTrailer([xref], **t.params)
         else:
             # Assume xref as a stream which may contain liks to the previous xref streams
             last_offset = xref_offset
@@ -763,7 +781,7 @@ class PDFParser(Buffer):
                 all_xrefs.append(xr)
                 stream_log.append(obj.val)
                 last_offset = obj.val.get("Prev")
-            trailer = Trailer(all_xrefs, **tdict)
+            trailer = PDFTrailer(all_xrefs, **tdict)
         return trailer
 
     def trailer(self):
@@ -777,13 +795,13 @@ class PDFParser(Buffer):
             ... >>'''
             >>> p = PDFParser(s, 0)
             >>> p.trailer()
-            {'Size': 22, 'Root': <IndirectReference:n=2,g=0>, 'Info': <IndirectReference:n=1,g=0>, 'ID': ['0102AA', '0102BB']}
+            <Trailer: {'Size': 22, 'Root': <IndirectReference:n=2,g=0>, 'Info': <IndirectReference:n=1,g=0>, 'ID': ['0102AA', '0102BB']}>
         """
         token = self.read(7)
         if token != b'trailer':
             self.on_parser_error("trailer expected")
         self.maybe_spaces_or_comments()
-        return self.dictionary()
+        return Trailer(self.dictionary())
 
     def direct_xref(self):
         """ Parses xref represented directly
@@ -828,6 +846,20 @@ class PDFParser(Buffer):
                 offset, gen, flag = self.xref_entry()
                 xref.add_entry(XRefEntry(number=first_object + i, offset=offset, generation=gen, typ=flag))
         return xref
+
+    def body_element(self):
+        """
+        Indirect object, startxref or trailer
+        """
+        if self.is_digit:
+            obj = self.indirect_object()
+        elif self.current == b's':
+            obj = self.startxref()
+        elif self.current == b't':
+            obj = self.trailer()
+        else:
+            self.on_parser_error("Indirect object, startxref or trailer expected")
+        return obj
 
     def xref_range(self):
         # read first object number
@@ -951,6 +983,17 @@ class PDFParser(Buffer):
         self.maybe_spaces_or_comments()
         offset = self.non_negative_int()
         return offset
+
+
+class RegistryPDFParser(PDFParser):
+
+    def __init__(self, fileobj, registry):
+        super(RegistryPDFParser, self).__init__(fileobj)
+        self.registry = registry
+
+    def on_parsed_indirect_object(self, obj):
+        super(RegistryPDFParser, self).on_parsed_indirect_object(obj)
+        self.registry.register(obj)
 
 
 if __name__ == "__main__":

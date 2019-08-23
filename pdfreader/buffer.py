@@ -178,19 +178,13 @@ class Buffer(object):
     def is_eof(self):
         return self.current is None
 
-    def push_state(self):
-        state = {a: getattr(self, a) for a in self.state_attrs}
-        self.stack.append(state)
+    def get_state(self):
+        return {a: getattr(self, a) for a in self.state_attrs}
 
-    def pop_state(self):
-        state = self.stack.pop()
+    def set_state(self, state):
         for k, v in state.items():
             setattr(self, k, v)
         self.fileobj.seek(self.last_block_offset)
-
-    @property
-    def current_stream_offset(self):
-        return self.last_block_offset + self.index
 
 
 if __name__ == "__main__":

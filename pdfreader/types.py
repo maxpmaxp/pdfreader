@@ -116,6 +116,9 @@ class Stream(object):
         data = self._remove_predictors(data)
         return data
 
+    def __eq__(self, other):
+        return self.dictionary == other.dictionary and self.stream == other.stream
+
 
 class Comment(str):
     """ % Some PDF Comment """
@@ -132,6 +135,9 @@ class IndirectReference(object):
 
     def __repr__(self):
         return "<IndirectReference:n={self.num},g={self.gen}>".format(self=self)
+
+    def __eq__(self, other):
+        return self.num == other.num and self.gen == other.gen
 
 
 class IndirectObject(object):
@@ -156,7 +162,11 @@ class IndirectObject(object):
     def __repr__(self):
         return "<IndirectObject:n={self.num},g={self.gen},v={val}>".format(self=self, val=repr(self.val))
 
+    def __eq__(self, other):
+        return self.num == other.num and self.gen == other.gen
 
 
+PDF_TYPES = (type(null), IndirectReference, IndirectObject, Comment, Stream, Dictionary, Integer, Real, Boolean, Array,
+             String, HexString, Name)
 
-
+ATOMIC_TYPES = (Integer, Real, Boolean, String, HexString, Name, type(null))

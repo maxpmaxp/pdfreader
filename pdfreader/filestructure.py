@@ -1,5 +1,5 @@
 
-class Header(object):
+class PDFHeader(object):
     """ %PDF1.3 """
     def __init__(self, version, offset=None):
         self.version = version
@@ -11,13 +11,15 @@ class Header(object):
             .format(self=self)
 
 
-class Trailer(object):
+class PDFTrailer(object):
     """
         trailer
             << /Size 22 .... >>
         startxref
         16354
         %%EOF
+
+        or a trailer from a stream
     """
     def __init__(self, xrefs, **kwargs):
         self.xrefs = xrefs
