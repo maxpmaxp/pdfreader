@@ -1,3 +1,5 @@
+DEFAULT_ENCODING = "latin-1"
+
 NULL = b'\x00'
 TAB = b'\x09'
 LF = b'\x0a' # \n

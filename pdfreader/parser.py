@@ -1,20 +1,20 @@
 import re
 
 from .buffer import Buffer
-from .constants import WHITESPACE_CODES, WHITESPACES, EOL, DELIMITERS, CR, LF, SP, STRING_ESCAPED
+from .constants import WHITESPACE_CODES, WHITESPACES, EOL, DELIMITERS, CR, LF, SP, STRING_ESCAPED, DEFAULT_ENCODING
 from .exceptions import ParserException
 from .types import *
-from .filestructure import *
+from .filestructure import Header, Trailer
+from .xref import XRef, XRefEntry
 
 
 class PDFParser(Buffer):
-    PDF_HEADERS = (re.compile(b"%PDF-(\d\.\d)"), re.compile(b"%IPS-Adobe-\d\.\d PDF-(\d\.\d)"))
+    PDF_HEADER = re.compile(b"^%PDF-(\d\.\d)", re.MULTILINE)
+    IPS_HEADER = re.compile(b"^%IPS-Adobe-\d\.\d PDF-(\d\.\d)", re.MULTILINE)
 
     def __init__(self, fileobj, offset=0):
         super(PDFParser, self).__init__(fileobj, offset)
 
-    def parse(self):
-        raise NotImplementedError()
 
     def on_parser_error(self, message):
         # ToDo: display parsing context here
@@ -177,7 +177,7 @@ class PDFParser(Buffer):
         while not self.is_eol:
             line += self.next()
         self.eol()
-        return Comment(line.decode("ascii"))
+        return Comment(line.decode(DEFAULT_ENCODING))
 
     def numeric(self):
         """
@@ -249,9 +249,9 @@ class PDFParser(Buffer):
             fpart = b'0'
 
         if is_integer:
-            val = int(ipart.decode("ascii"))
+            val = int(ipart.decode(DEFAULT_ENCODING))
         else:
-            val = Decimal("{}.{}".format(ipart.decode("ascii"), fpart.decode("ascii")))
+            val = Decimal("{}.{}".format(ipart.decode(DEFAULT_ENCODING), fpart.decode(DEFAULT_ENCODING)))
 
         if is_negative:
             val = -val
@@ -304,7 +304,7 @@ class PDFParser(Buffer):
                     code += self.next()
                 if len(code) == 2:
                     # must be exactly 2 characters
-                    token += chr(int(code.decode("ascii"), 16)).encode('ascii')
+                    token += chr(int(code.decode(DEFAULT_ENCODING), 16)).encode(DEFAULT_ENCODING)
                 else:
                     # leave as is
                     token += b'#' + code
@@ -313,7 +313,7 @@ class PDFParser(Buffer):
         if not token:
             self.on_parser_error("Empty /Name found")
 
-        return Name(token.decode("ascii"))
+        return Name(token.decode(DEFAULT_ENCODING))
 
     def dictionary_or_stream_or_hexstring(self):
         if self.current != b"<":
@@ -326,7 +326,7 @@ class PDFParser(Buffer):
             # stream may come after the dict
             self.maybe_spaces_or_comments()
             if self.current == b's':
-                val = self.stream(val)
+                val = self._stream(val)
         elif self.is_hex_digit:
             self.prev()
             val = self.hexstring()
@@ -374,20 +374,39 @@ class PDFParser(Buffer):
             self.on_parser_error("End of dictionary >> expected ")
         return res
 
-    def stream(self, d):
+    def stream(self):
         """
+        Parses stream (dict + binary data)
+
+        >>> s = b'''<<
+        ... /Length 10
+        ... >>
+        ... stream\\r\\n***data***\\nendstream'''
+        >>> PDFParser(s, 0).stream()
+        <Stream:len=10,data=b'***data***'>
+
+        """
+        d = self.dictionary()
+        # binary data comes after dict
+        self.maybe_spaces_or_comments()
+        return self._stream(d)
+
+    def _stream(self, d):
+        """
+        Parses binary data which is part of Stream object itself
+
         >>> d = dict(Length=10)
 
         >>> s = b'stream\\r\\n***data***\\nendstream'
-        >>> PDFParser(s, 0).stream(d).stream
+        >>> PDFParser(s, 0)._stream(d).stream
         b'***data***'
 
         >>> s = b'stream\\n***data***\\r\\nendstream'
-        >>> PDFParser(s, 0).stream(d).stream
+        >>> PDFParser(s, 0)._stream(d).stream
         b'***data***'
 
         >>> s = b'stream\\n***data***\\rendstream'
-        >>> PDFParser(s, 0).stream(d).stream
+        >>> PDFParser(s, 0)._stream(d).stream
         b'***data***'
 
         """
@@ -454,7 +473,7 @@ class PDFParser(Buffer):
         if len(token) % 2:
             # if there is an odd number of digits - the last one should be assumed 0
             token += b'0'
-        return HexString(token.decode('ascii').upper())
+        return HexString(token.decode(DEFAULT_ENCODING).upper())
 
     def array(self):
         """
@@ -549,17 +568,17 @@ class PDFParser(Buffer):
                         val += chr(icode)
                     else:
                         # leave as is
-                        val += "\\" + code.decode("ascii")
+                        val += "\\" + code.decode(DEFAULT_ENCODING)
                 elif ch in EOL:
                     # multiline string - just skip
                     self.eol()
                 else:
                     # unescape or leave as is
-                    val += STRING_ESCAPED.get(ch) or (b"\\" + ch).decode('ascii')
+                    val += STRING_ESCAPED.get(ch) or (b"\\" + ch).decode(DEFAULT_ENCODING)
             elif ch == b')':
                 break
             else:
-                val += ch.decode("ascii")
+                val += ch.decode(DEFAULT_ENCODING)
         return String(val)
 
     def object(self):
@@ -606,6 +625,7 @@ class PDFParser(Buffer):
         <IndirectObject:n=12,g=0,v='Brilling'>
 
         """
+        begin_offset = self.current_stream_offset
         num = self.non_negative_int()
         self.maybe_spaces_or_comments()
         gen = self.non_negative_int()
@@ -623,7 +643,14 @@ class PDFParser(Buffer):
         if token != b"endobj":
             self.on_parser_error("endobj expected")
 
-        return IndirectObject(num, gen, val)
+        obj = IndirectObject(num, gen, val)
+        end_offset = self.current_stream_offset
+        # handle all known indirect objects
+        self.on_parsed_indirect_object(obj, begin_offset, end_offset)
+        return obj
+
+    def on_parsed_indirect_object(self, obj, b_offset=None, e_offset=None):
+        pass
 
     def indirect_reference(self):
         """
@@ -647,21 +674,21 @@ class PDFParser(Buffer):
         2. Acrobat viewers will also accept a header in the form of
         %IPS-Adobe-N.n PDF-M.m
 
-        >>> f = b'%PDF-1.6\\nblablabla'
+        >>> f = b'%PDF-1.6\\nblablablanblablabla'
         >>> PDFParser(f).pdf_header()
-        <PDF Header:v=b'1.6' (major=b'1, minor=6')>
+        <PDF Header:v=1.6 (major=1, minor=6), offset=0)>
 
         >>> f = b'%IPS-Adobe-1.3 PDF-1.6\\nblablabla'
         >>> PDFParser(f).pdf_header()
-        <PDF Header:v=b'1.6' (major=b'1, minor=6')>
+        <PDF Header:v=1.6 (major=1, minor=6), offset=0)>
 
         >>> f = b'%some custom heading\\n%PDF-1.5\\nblablabla'
         >>> PDFParser(f).pdf_header()
-        <PDF Header:v=b'1.5' (major=b'1, minor=5')>
+        <PDF Header:v=1.5 (major=1, minor=5), offset=21)>
 
         >>> f = b'%some custom heading\\n%IPS-Adobe-1.3 PDF-1.6\\nblablabla'
         >>> PDFParser(f).pdf_header()
-        <PDF Header:v=b'1.6' (major=b'1, minor=6')>
+        <PDF Header:v=1.6 (major=1, minor=6), offset=21)>
 
         Test missing header and one out of 1024 leading bytes
 
@@ -680,22 +707,64 @@ class PDFParser(Buffer):
 
         """
         self.reset(0)
-        for r in self.PDF_HEADERS:
-            m = r.search(self.data)
-            if m:
-                return Header(m.groups()[0], offset=m.start())
-        self.on_parser_error("No PDF header found")
+        size = len("%IPS-Adobe-1.3 PDF-1.6") # max header size
+
+        window = self.read(size)
+        n_read = size
+        m = self.PDF_HEADER.search(window) or self.IPS_HEADER.search(window)
+        while m is None and n_read < 1024 and not self.is_eof:
+            window = window[1:] + self.next()
+            n_read += 1
+            m = self.PDF_HEADER.search(window) or self.IPS_HEADER.search(window)
+        else:
+            if m is None:
+                self.on_parser_error("No PDF header found")
+
+        # return current to the beginning of the header
+        for _ in range(size):
+            self.prev()
+
+        return Header(m.groups()[0].decode(DEFAULT_ENCODING), offset=self.index + m.start())
 
     def pdf_trailer(self):
+        """
+
+        #>>> fd = open('data/tyler-or-DocumentFragment.pdf','rb')
+        #>>> fd = open('data/fw8ben.pdf','rb')
+        #>>> fd = open('data/leesoil-cases-2.pdf','rb')
+        #>>> p = PDFParser(fd).pdf_trailer()
+
+        """
         xref_offset = self.xref_offset()
         self.reset(xref_offset)
         if self.current == b'x':
             # parse direct xref
             xref = self.direct_xref()
             # parse trailer
-            # ToDO: normally we should parse trailer right after xref offset
+            # ToDO: parse several xref sections like we do for streams
             self.maybe_spaces_or_comments()
             tdict = self.trailer()
+            trailer = Trailer([xref], **tdict)
+        else:
+            # Assume xref as a stream which may contain liks to the previous xref streams
+            last_offset = xref_offset
+            all_xrefs = []
+            stream_log = []
+            tdict = dict()
+            while last_offset is not None:
+                self.reset(last_offset)
+                obj = self.indirect_object()
+                if not isinstance(obj.val, Stream) or obj.val["Type"] != "XRef":
+                    self.on_parser_error("xref stream expected")
+                if not tdict:
+                    for k in ('Size', 'Prev', 'Root', 'Encrypt', 'Info', 'ID'):
+                        tdict[k] = obj.val.get(k)
+                xr = XRef.from_stream(obj.val)
+                all_xrefs.append(xr)
+                stream_log.append(obj.val)
+                last_offset = obj.val.get("Prev")
+            trailer = Trailer(all_xrefs, **tdict)
+        return trailer
 
     def trailer(self):
         """ Parses trailer represented directly
@@ -744,7 +813,7 @@ class PDFParser(Buffer):
             ... 0000005025 00000 n\\r
             ... trailer ...'''
             >>> PDFParser(s, 0).direct_xref()
-            <XRef:free=1,in_use=20>
+            <XRef:free=1,in_use=20,compressed=0>
 
         """
         token = self.read(4)
@@ -757,7 +826,7 @@ class PDFParser(Buffer):
             self.eol()
             for i in range(n_entries):
                 offset, gen, flag = self.xref_entry()
-                xref.add_entry(offset, first_object + i, gen, flag)
+                xref.add_entry(XRefEntry(number=first_object + i, offset=offset, generation=gen, typ=flag))
         return xref
 
     def xref_range(self):
@@ -792,9 +861,6 @@ class PDFParser(Buffer):
         except ValueError:
             raise ParserException("Wrong xref entry: {}".format(data))
         return offset, gen, flag
-
-    def indirect_xref(self):
-        pass
 
     def seek_eof(self):
         """ sets buffer pointer to the last byte before EOF

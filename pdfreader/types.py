@@ -1,3 +1,5 @@
+import zlib
+
 from decimal import Decimal
 
 null = None
@@ -44,8 +46,75 @@ class Stream(object):
         self.dictionary = info_dict
         self.stream = binary_stream
 
+    def __getitem__(self, item):
+        return self.dictionary.__getitem__(item)
+
+    def get(self, item, default=None):
+        return self.dictionary.get(item, default)
+
     def __len__(self):
         return len(self.stream)
+
+    def __repr__(self):
+        data = self.stream
+        if len(data) > 25:
+            data = (self.stream[:25] + b' ...')
+        return "<Stream:len={},data={}>".format(self.dictionary["Length"], repr(data))
+
+    @property
+    def filtered(self):
+        filters = self.get('Filter')
+        if not filters:
+            return self.stream
+
+        if isinstance(filters, Array):
+            farr = filters
+        elif isinstance(filters, Name):
+            farr = Array()
+            farr.append(filters)
+        else:
+            raise TypeError("Incorrect filter type: {}".format(filters))
+
+        data = self.stream
+        for f in farr:
+            method = getattr(self, "filter_{}".format(f))
+            if method is None:
+                raise ValueError("Unknown filter {}".format(f))
+            data = method(data)
+        return data
+
+    def _remove_predictors(self, data):
+        """ Remove LZW/Flate predictors
+        1 - No prediction
+        2 - TIFF predictor 2
+        10 - PNG None
+        11 - PNG Sub
+        12 - PNG Up
+        13 - PNG Average
+        14 - PNG Paeth
+        15 - PNG Optimum
+        """
+        params = self.get('DecodeParms') or dict()
+        predictor = params.get('Predictor', 1)
+        if predictor == 1:
+            res = data
+        elif predictor == 2:
+            raise ValueError("TIFF prediction not implemented")
+        elif 10 <= predictor <= 15:
+            row_size = params["Columns"] + 1
+            res = b''
+            for i in range(0, len(data), row_size):
+                if data[0] + 10 != predictor:
+                    raise ValueError("Unexpected predictor {}".format(data[0]))
+                res += data[i+1:i+row_size] # skip leading predictor byte
+        else:
+            raise ValueError("Unknown predictor type {}".format(predictor))
+        return res
+
+    def filter_FlateDecode(self, data):
+        data = zlib.decompress(data)
+        data = self._remove_predictors(data)
+        return data
 
 
 class Comment(str):
@@ -79,6 +148,10 @@ class IndirectObject(object):
         self.num = number
         self.gen = generation
         self.val = value
+
+    @property
+    def id(self):
+        return self.num, self.gen
 
     def __repr__(self):
         return "<IndirectObject:n={self.num},g={self.gen},v={val}>".format(self=self, val=repr(self.val))

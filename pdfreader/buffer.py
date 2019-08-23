@@ -160,7 +160,7 @@ class Buffer(object):
                 self._read_forward()
             elif self.index < 0:
                 self._read_backward()
-            res = bytes(chr(self.data[self.index]), 'ascii')
+            res = bytes([self.data[self.index]])
         except EOFException:
             res = None
         return res
@@ -187,6 +187,10 @@ class Buffer(object):
         for k, v in state.items():
             setattr(self, k, v)
         self.fileobj.seek(self.last_block_offset)
+
+    @property
+    def current_stream_offset(self):
+        return self.last_block_offset + self.index
 
 
 if __name__ == "__main__":
