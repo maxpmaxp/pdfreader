@@ -17,7 +17,7 @@ class PDFDocument(object):
 
 import logging
 #logging.basicConfig(filename='pdf.log', filemode='w')
-#logging.getLogger().setLevel("INFO")
+logging.getLogger().setLevel("DEBUG")
 
 from pdfreader import PDFDocument
 #fd = open('data/tyler-or-DocumentFragment.pdf','rb')
@@ -25,7 +25,8 @@ from pdfreader import PDFDocument
 #fd = open('data/leesoil-cases-2.pdf','rb')
 #fd = open('data/ohcrash-02-0005-02-multiunit.pdf','rb')
 #fd = open('data/ohcrash-scanned-case-converted-image.pdf','rb')
-#fd = open('data/PDF32000_2008.pdf','rb')
+#fd = open('data/seattlemuni-cr-charges-brackets','rb')
+fd = open('data/PDF32000_2008.pdf','rb')
 doc = PDFDocument(fd)
 
 
@@ -41,16 +42,7 @@ doc = PDFDocument(fd)
         self.parser.reset(self.header.offset)
         self.brute_force_state = self.parser.get_state()
 
-        # load XRef in-use objects
-        for xref in self.trailer.xrefs:
-            self._load_xref_in_use(xref)
-
-        # load XRef compressed objects
-        for xref in self.trailer.xrefs:
-            self._load_xref_compressed(xref)
-
-        # resolve indirect_links
-        self.root = self.build(self.trailer.root)
+        self.root = self.obj_by_ref(self.trailer.root)
 
     def build(self, obj, visited=None):
         """ replace all object references with objects
@@ -85,21 +77,33 @@ doc = PDFDocument(fd)
             on_return()
         return obj
 
-    def _load_xref_in_use(self, xr):
-        # load in_use objects
-        for xre in xr.in_use.values():
-            try:
-                self.parser.reset(xre.offset)
-                self.parser.indirect_object()
-            except ParserException:
-                pass
-
-    def _load_xref_compressed(self, xr):
-        # load in_use objects
-        for xre in xr.compressed.values():
-            _ = self.locate_object(xre.number, 0)
-
     def locate_object(self, num, gen):
+        """
+        Object lookup order:
+        1. Known objects in registry
+        2. XRefs - try to find and load
+        3. Brute-force reading objects one by one from the file start
+        """
+        # Locate by xref
+        for xref in self.trailer.xrefs:
+            # try to find in-use object
+            xre = xref.in_use.get(num)
+            if xre.generation == gen:
+                try:
+                    self.parser.reset(xre.offset)
+                    self.parser.indirect_object()
+                except ParserException:
+                    pass
+                if self.registry.is_registered(num, gen):
+                    break
+            # Try to find a compressed object
+            xre = xref.compressed.get(num)
+            if xre.generation == gen:
+                # Need to locate Object Stream in order to locate a compressed object
+                self.locate_object(xre.number, xre.generation)
+                if self.registry.is_registered(num, gen):
+                    break
+
         while not self.registry.is_registered(num, gen):
             try:
                 _ = self.next_brute_force_object()
