@@ -67,6 +67,9 @@ class DictBasedObject(Dictionary):
         self._cache = dict()
 
     def __getattr__(self, item):
+       return self[item]
+
+    def __getitem__(self, item):
         if item in self._cache:
             return self._cache[item]
         obj = super(DictBasedObject, self).__getitem__(item)
