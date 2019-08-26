@@ -608,6 +608,48 @@ class BasicTypesParser(Buffer):
             val = self.numeric()
         return val
 
+    def token(self):
+        """ just a token which does not belong to any of PDF types like: def, findresource, ET, BT
+            >>> s = b'def'
+            >>> BasicTypesParser(s, 0).token()
+            'def'
+
+            >>> s = b'T*'
+            >>> BasicTypesParser(s, 0).token()
+            'T*'
+
+            >>> s = b'10T*'
+            >>> BasicTypesParser(s, 0).token()
+            Traceback (most recent call last):
+            ...
+            pdfreader.exceptions.ParserException: Regular non-digit character expected
+        """
+        if not self.is_regular or self.is_digit:
+            self.on_parser_error("Regular non-digit character expected")
+
+        token = b''
+        while self.is_regular:
+            token += self.next()
+        return Token(token.decode(DEFAULT_ENCODING))
+
+    def expected_name(self, value):
+        name = self.name()
+        if name != value:
+            self.on_parser_error("%s expected".format(value))
+        return name
+
+    def expected_token(self, value):
+        token = self.token()
+        if token != value:
+            self.on_parser_error("%s expected".format(value))
+        return token
+
+    def expected_numeric(self, value):
+        n = self.numeric()
+        if n != value:
+            self.on_parser_error("%s expected".format(value))
+        return n
+
 
 if __name__ == "__main__":
     import doctest

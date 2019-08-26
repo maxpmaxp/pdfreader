@@ -183,3 +183,10 @@ PDF_TYPES = (type(null), IndirectReference, IndirectObject, Comment, Stream, Dic
              String, HexString, Name)
 
 ATOMIC_TYPES = (Integer, Real, Boolean, String, HexString, Name, type(null))
+
+
+class Token(String):
+    """ That's not a PDF type itself. We used it to reflect other than PDF types tokens.
+        For example CMap: def, findresource, begin
+    """
+    pass
