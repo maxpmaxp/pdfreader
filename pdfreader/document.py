@@ -4,6 +4,8 @@ from .exceptions import ParserException
 from .registry import Registry
 from .parser import RegistryPDFParser
 from .types import null, IndirectObject, Stream, Array, Dictionary, IndirectReference, ATOMIC_TYPES
+from .objects import obj_factory
+
 
 is_atomic = lambda obj: isinstance(obj, (ATOMIC_TYPES))
 
@@ -20,13 +22,13 @@ import logging
 logging.getLogger().setLevel("DEBUG")
 
 from pdfreader import PDFDocument
-#fd = open('data/tyler-or-DocumentFragment.pdf','rb')
+fd = open('data/tyler-or-DocumentFragment.pdf','rb')
 #fd = open('data/fw8ben.pdf','rb')
 #fd = open('data/leesoil-cases-2.pdf','rb')
 #fd = open('data/ohcrash-02-0005-02-multiunit.pdf','rb')
 #fd = open('data/ohcrash-scanned-case-converted-image.pdf','rb')
 #fd = open('data/seattlemuni-cr-charges-brackets','rb')
-fd = open('data/PDF32000_2008.pdf','rb')
+#fd = open('data/PDF32000_2008.pdf','rb')
 doc = PDFDocument(fd)
 
 
@@ -41,13 +43,11 @@ doc = PDFDocument(fd)
         # save initial state for brute-force objects lookup
         self.parser.reset(self.header.offset)
         self.brute_force_state = self.parser.get_state()
-
         self.root = self.obj_by_ref(self.trailer.root)
 
-    def build(self, obj, visited=None):
+    def build(self, obj, visited=None, lazy=True):
         """ replace all object references with objects
-            leave loops as is
-            works quite long
+            If lazy=False doesn't build subsequent streams
         """
         logging.debug("Buliding {}".format(obj))
         if visited is None:
@@ -62,16 +62,19 @@ doc = PDFDocument(fd)
 
         # resolve subsequent references for Arrays, Dictionaries and Streams
         if isinstance(obj, Array):
-            obj = [(self.build(o, visited) if not is_atomic(o) else o) for o in obj]
+            obj = [self.build(o, visited, lazy) for o in obj]
         elif isinstance(obj, Dictionary):
-            obj = {k: (self.build(o, visited) if not is_atomic(o) else o) for k, o in obj.items()}
+            if not lazy:
+                obj = {k: self.build(o, visited, lazy) for k, o in obj.items()}
+            obj = obj_factory(self, obj)
         elif isinstance(obj, Stream):
-            obj.dictionary = {k: (self.build(o, visited) if not is_atomic(o) else o)
-                              for k, o in obj.dictionary.items()}
+            if not lazy:
+                obj.dictionary = {k: (self.build(o, visited, lazy)) for k, o in obj.dictionary.items()}
+            obj = obj_factory(self, obj)
         elif isinstance(obj, IndirectObject):
             # normally this shouldn't happen, but ponentially we can build it
             logging.warning("Attempt to build an indirect object. Possibly a bug.")
-            obj = self.build(obj.val, visited)
+            obj = self.build(obj.val, visited, lazy)
 
         if on_return:
             on_return()
@@ -88,7 +91,7 @@ doc = PDFDocument(fd)
         for xref in self.trailer.xrefs:
             # try to find in-use object
             xre = xref.in_use.get(num)
-            if xre.generation == gen:
+            if xre and xre.generation == gen:
                 try:
                     self.parser.reset(xre.offset)
                     self.parser.indirect_object()
@@ -98,7 +101,7 @@ doc = PDFDocument(fd)
                     break
             # Try to find a compressed object
             xre = xref.compressed.get(num)
-            if xre.generation == gen:
+            if xre and xre.generation == gen:
                 # Need to locate Object Stream in order to locate a compressed object
                 self.locate_object(xre.number, xre.generation)
                 if self.registry.is_registered(num, gen):
@@ -116,7 +119,18 @@ doc = PDFDocument(fd)
         return obj
 
     def obj_by_ref(self, objref):
-        return self.locate_object(objref.num, objref.gen)
+        obj = self.locate_object(objref.num, objref.gen)
+        return obj_factory(self, obj)
+
+    def deep_obj_by_ref(self, obj, maxdepth=100):
+        counter = maxdepth
+        while isinstance(obj, IndirectObject) and counter:
+            obj = self.obj_by_ref(obj)
+            counter -= 1
+
+        if isinstance(obj, IndirectObject):
+            raise ValueError("Max reference depth exceeded")
+        return obj
 
     def next_brute_force_object(self):
         self.parser.set_state(self.brute_force_state)
@@ -124,3 +138,8 @@ doc = PDFDocument(fd)
         obj = self.parser.body_element() # can be either indirect object, startxref or trailer
         self.brute_force_state = self.parser.get_state() # save state for the next BF
         return obj
+
+    def pages(self):
+        return self.root.Pages.gen_pages()
+
+

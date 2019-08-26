@@ -1,5 +1,6 @@
 import zlib
 
+from copy import copy
 from decimal import Decimal
 
 null = None
@@ -29,7 +30,6 @@ class Stream(object):
         Filter - name or array
         DecodeParams - dict or array
         F - file specification
-        FFilter -
 
     """
 
@@ -60,6 +60,10 @@ class Stream(object):
         if len(data) > 25:
             data = (self.stream[:25] + b' ...')
         return "<Stream:len={},data={}>".format(self.dictionary["Length"], repr(data))
+
+    @property
+    def type(self):
+        return self.get('Type')
 
     @property
     def filtered(self):
@@ -111,6 +115,8 @@ class Stream(object):
             raise ValueError("Unknown predictor type {}".format(predictor))
         return res
 
+    #ToDo: implement more filters
+
     def filter_FlateDecode(self, data):
         data = zlib.decompress(data)
         data = self._remove_predictors(data)
@@ -118,6 +124,13 @@ class Stream(object):
 
     def __eq__(self, other):
         return self.dictionary == other.dictionary and self.stream == other.stream
+
+    @classmethod
+    def from_stream(cls, other):
+        return cls(copy(other.dictionary), copy(other.stream))
+
+    def __getattr__(self, item):
+        return self.dictionary.get(item)
 
 
 class Comment(str):
