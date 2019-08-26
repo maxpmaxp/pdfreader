@@ -1,6 +1,6 @@
 from copy import copy
 
-from .types import Stream, Array, Dictionary
+from .types import Stream, Dictionary
 
 
 class StartXRef(object):

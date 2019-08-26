@@ -2,7 +2,7 @@ import logging
 
 from .exceptions import ParserException
 from .registry import Registry
-from .parser import RegistryPDFParser
+from .parsers import RegistryPDFParser
 from .types import null, IndirectObject, Stream, Array, Dictionary, IndirectReference, ATOMIC_TYPES
 from .objects import obj_factory
 

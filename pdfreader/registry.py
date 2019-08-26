@@ -1,7 +1,7 @@
 import logging
 
-from .parser import PDFParser
-from .types import Stream, IndirectObject
+from .parsers import ObjStmParser
+from .types import Stream
 
 
 class Registry(object):
@@ -38,20 +38,10 @@ class Registry(object):
         return self.known_indirect_objects[key]
 
     def register_object_stream(self, objstm):
-        parser = PDFParser(objstm.filtered)
-        first_offset = objstm["First"]
-        n_objects = objstm["N"]
-        # read 2 * n_objects integers which are pairs (obj_num, obj_offset_relative_to_first)
-        integers = []
+        parser = ObjStmParser(objstm.filtered)
 
-        for i in range(2 * n_objects):
-            parser.maybe_spaces_or_comments()
-            integers.append(parser.non_negative_int())
-
-        for j in range(n_objects):
-            num, offset = integers[2 * j: 2 * j + 2]
-            parser.reset(first_offset + offset)
-            val = parser.object()
+        for obj in parser.objects(objstm["First"], objstm["N"]):
             # generation is always 0 for compressed objects
-            self.register(IndirectObject(num, 0, val))
-            logging.debug("Compressed object registered {} {}".format(num, 0))
+            self.register(obj)
+            logging.debug("Compressed object registered {} {}".format(obj.num, obj.gen))
+
