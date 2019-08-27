@@ -55,9 +55,11 @@ class StreamBasedObject(Stream):
             return self._cache[item]
         obj = super(StreamBasedObject, self).__getattr__(item)
         obj = self.doc.build(obj, lazy=True)
-        hook = super(StreamBasedObject, self).__getattr__('_type__{}'.format(item))
-        if hook and callable(hook):
-            obj = hook(obj)
+        if (isinstance(obj, StreamBasedObject) and not obj.dictionary.get("Type"))\
+            or (isinstance(obj, DictBasedObject) and not obj.get("Type")):
+                hook = super(StreamBasedObject, self).__getattr__('_type__{}'.format(item))
+                if hook and callable(hook):
+                    obj = hook(obj)
         self._cache[item] = obj
         return self._cache[item]
 
@@ -80,9 +82,11 @@ class DictBasedObject(Dictionary):
             return self._cache[item]
         obj = super(DictBasedObject, self).__getitem__(item)
         obj = self.doc.build(obj, lazy=True)
-        hook = getattr(self, '_type__{}'.format(item), None)
-        if hook and callable(hook):
-            obj = hook(obj)
+        if (isinstance(obj, StreamBasedObject) and not obj.dictionary.get("Type"))\
+            or (isinstance(obj, DictBasedObject) and not obj.get("Type")):
+                hook = getattr(self, '_type__{}'.format(item), None)
+                if hook and callable(hook):
+                    obj = hook(obj)
         self._cache[item] = obj
         return self._cache[item]
 
