@@ -1,5 +1,5 @@
 from ..exceptions import ParserException
-from ..types.native import Name, Token
+from ..types.native import Name, Token, Integer, HexString
 from ..types.cmap import CodespaceRanges, MappedCodespaceRanges, CMapResource
 from .base import BasicTypesParser
 
@@ -66,6 +66,14 @@ class CMapParser(BasicTypesParser):
         <MappedCodespaceRanges:ranges=[<MapRange:0-31,1>]>
         >>> cmap.bf_ranges
         <MappedCodespaceRanges:ranges=[]>
+
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-2.txt')
+        >>> cmap = CMapParser(fd).cmap()
+        >>> cmap.name
+        'Adobe-Identity-UCS'
+        >>> len(cmap.bf_ranges.ranges)
+        69
+
         """
         #/CIDInit /ProcSet findresource begin
         self.maybe_spaces_or_comments()
@@ -154,7 +162,9 @@ class CMapParser(BasicTypesParser):
             self.maybe_spaces_or_comments()
             cr_to = self.hexstring()
             self.maybe_spaces_or_comments()
-            cid_from = self.non_negative_int()
+            cid_from = self.object()
+            if not isinstance(cid_from, (HexString, Integer)):
+                self.on_parser_error("Int of Hexstring expected")
             self.maybe_spaces_or_comments()
             res.add(cr_from, cr_to, cid_from)
         self.expected_token("end{}range".format(rangename))

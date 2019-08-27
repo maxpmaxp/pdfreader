@@ -54,8 +54,12 @@ class StreamBasedObject(Stream):
         if item in self._cache:
             return self._cache[item]
         obj = super(StreamBasedObject, self).__getattr__(item)
+        obj = self.doc.build(obj, lazy=True)
+        hook = super(StreamBasedObject, self).__getattr__('_type__{}'.format(item))
+        if hook and callable(hook):
+            obj = hook(obj)
         self._cache[item] = obj
-        return self.doc.build(obj, lazy=True)
+        return self._cache[item]
 
 
 class DictBasedObject(Dictionary):
@@ -67,13 +71,19 @@ class DictBasedObject(Dictionary):
         self._cache = dict()
 
     def __getattr__(self, item):
-       return self[item]
+        if item in self:
+            return self[item]
+        raise AttributeError(item)
 
     def __getitem__(self, item):
         if item in self._cache:
             return self._cache[item]
         obj = super(DictBasedObject, self).__getitem__(item)
-        self._cache[item] = self.doc.build(obj, lazy=True)
+        obj = self.doc.build(obj, lazy=True)
+        hook = getattr(self, '_type__{}'.format(item), None)
+        if hook and callable(hook):
+            obj = hook(obj)
+        self._cache[item] = obj
         return self._cache[item]
 
 
@@ -182,6 +192,9 @@ class OCMD(DictBasedObject):
 class Font(DictBasedObject):
     """ Type = Font
     """
+
+    def _type__ToUnicode(self, obj):
+        return CMap(obj.doc, obj)
 
 
 class Encoding(DictBasedObject):

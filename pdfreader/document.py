@@ -30,7 +30,7 @@ fd = open('samples/seattlemuni-cr-charges-brackets.pdf','rb')
 #fd = open('samples/PDF32000_2008.pdf','rb')
 #fd = open('samples/cumberland-arrests.pdf','rb')
 doc = PDFDocument(fd)
-
+font = doc.root.Pages.Kids[0].Resources.Font['Font_0']
 
         """
 
