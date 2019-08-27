@@ -30,7 +30,11 @@ fd = open('samples/seattlemuni-cr-charges-brackets.pdf','rb')
 #fd = open('samples/PDF32000_2008.pdf','rb')
 #fd = open('samples/cumberland-arrests.pdf','rb')
 doc = PDFDocument(fd)
-font = doc.root.Pages.Kids[0].Resources.Font['Font_0']
+page = doc.root.Pages.Kids[0]
+fonts = doc.root.Pages.Kids[0].Resources.Font
+from pdfreader.parsers.text import TextParser
+p = TextParser(fonts, open("111.txt","rb"))
+p.text()
 
         """
 

@@ -20,10 +20,8 @@ class BasicTypesParser(Buffer):
         self.maybe_spaces()
 
     def maybe_spaces(self):
-        res = b''
         while self.is_whitespace:
-            res += self.next()
-        return res.decode(DEFAULT_ENCODING)
+            self.next()
 
     def maybe_spaces_or_comments(self):
         self.maybe_spaces()
@@ -31,7 +29,7 @@ class BasicTypesParser(Buffer):
         res = ''
         while self.current == b'%':
             comments.append(self.comment())
-            res = self.maybe_spaces()
+            self.maybe_spaces()
         if comments:
             # return multiline comment
             res = Comment("\n".join(comments))
@@ -41,18 +39,16 @@ class BasicTypesParser(Buffer):
         """ EOL is either CR or LF or the both """
         if self.current not in EOL:
             self.on_parser_error("EOL expected")
-        return self.maybe_eol()
+        self.maybe_eol()
 
     def maybe_eol(self):
         """ EOL is either CR or LF or the both except for the streams """
-        res = b''
         if self.current == CR:
-            res += self.next()
+            self.next()
             if self.current == LF:
-                res += self.next()
+                self.next()
         elif self.current == LF:
-            res += self.next()
-        return res.decode(DEFAULT_ENCODING)
+            self.next()
 
     @property
     def is_eol(self):

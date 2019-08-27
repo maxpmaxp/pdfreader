@@ -86,6 +86,9 @@ class CodespaceRanges(object):
         if begin is not None and end is not None:
             self.add(begin, end)
 
+    def __bool__(self):
+        return bool(self.ranges)
+
     def __contains__(self, item):
         """
         >>> cr = CodespaceRanges()

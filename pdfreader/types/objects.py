@@ -90,6 +90,13 @@ class DictBasedObject(Dictionary):
         self._cache[item] = obj
         return self._cache[item]
 
+    def get(self, item, default=None):
+        try:
+            val = self[item]
+        except KeyError:
+            val = default
+        return val
+
 
 def obj_factory(doc, obj):
     if isinstance(obj, Stream):
