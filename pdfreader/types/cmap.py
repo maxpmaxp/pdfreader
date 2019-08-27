@@ -225,6 +225,22 @@ class MappedCodespaceRanges(CodespaceRanges):
         return "<MappedCodespaceRanges:ranges={}>".format(rr)
 
 
+class CMapResource(object):
+
+    def __init__(self, name, codespace_ranges=None, cid_ranges=None, notdef_ranges=None, bf_ranges=None):
+        self.name = name
+        self.codespace_ranges=codespace_ranges
+        self.cid_ranges = cid_ranges
+        self.notdef_ranges = notdef_ranges
+        self.bf_ranges = bf_ranges
+
+    def __repr__(self):
+        return "<CMapResource {self.name}:codespace_ranges={self.codespace_ranges!r}," \
+               "cid_ranges={self.cid_ranges!r}," \
+               "notdef_ranges={self.notdef_ranges!r}," \
+               "bf_ranges={self.bf_ranges!r}>".format(self=self)
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

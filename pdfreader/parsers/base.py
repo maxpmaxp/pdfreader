@@ -580,7 +580,6 @@ class BasicTypesParser(Buffer):
             val = self.name()
         else:
             self.on_parser_error("Unexpected token")
-        self.maybe_spaces_or_comments()
         return val
 
     def indirect_reference(self):
