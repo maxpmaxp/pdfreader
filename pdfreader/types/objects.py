@@ -106,7 +106,7 @@ class PageTreeNode(DictBasedObject):
     """ Type = Pages
     """
 
-    def gen_pages(self, node=None):
+    def pages(self, node=None):
         if node is None:
             node = self
         for child in node.Kids:
@@ -121,7 +121,7 @@ class Page(DictBasedObject):
     """ Type = Page
     """
 
-    def gen_content(self):
+    def contents(self):
         if isinstance(self.Contents, StreamBasedObject):
             yield self.Contents
         else:
@@ -138,6 +138,10 @@ class XObject(StreamBasedObject):
 class CMap(StreamBasedObject):
     """ Type = CMap
     """
+    def __init__(self, *args, **kwargs):
+        super(CMap, self).__init__(*args, **kwargs)
+        from ..parsers.cmap import CMapParser
+        self.resource = CMapParser(self.filtered).cmap()
 
 
 class Metadata(StreamBasedObject):

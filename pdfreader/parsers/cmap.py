@@ -1,5 +1,6 @@
 from ..exceptions import ParserException
-from ..types import Name, Token, CodespaceRanges, MappedCodespaceRanges, CMapResource
+from ..types.native import Name, Token
+from ..types.cmap import CodespaceRanges, MappedCodespaceRanges, CMapResource
 from .base import BasicTypesParser
 
 

@@ -21,14 +21,14 @@ import logging
 logging.getLogger().setLevel("DEBUG")
 
 from pdfreader import PDFDocument
-#fd = open('data/tyler-or-DocumentFragment.pdf','rb')
-#fd = open('data/fw8ben.pdf','rb')
-#fd = open('data/leesoil-cases-2.pdf','rb')
-#fd = open('data/ohcrash-02-0005-02-multiunit.pdf','rb')
-#fd = open('data/ohcrash-scanned-case-converted-image.pdf','rb')
-#fd = open('data/seattlemuni-cr-charges-brackets','rb')
-#fd = open('data/PDF32000_2008.pdf','rb')
-fd = open('data/cumberland-arrests.pdf','rb')
+#fd = open('samples/tyler-or-DocumentFragment.pdf','rb')
+#fd = open('samples/fw8ben.pdf','rb')
+#fd = open('samples/leesoil-cases-2.pdf','rb')
+#fd = open('samples/ohcrash-02-0005-02-multiunit.pdf','rb')
+#fd = open('samples/ohcrash-scanned-case-converted-image.pdf','rb')
+fd = open('samples/seattlemuni-cr-charges-brackets.pdf','rb')
+#fd = open('samples/PDF32000_2008.pdf','rb')
+#fd = open('samples/cumberland-arrests.pdf','rb')
 doc = PDFDocument(fd)
 
 
@@ -140,6 +140,6 @@ doc = PDFDocument(fd)
         return obj
 
     def pages(self):
-        return self.root.Pages.gen_pages()
+        return self.root.Pages.pages()
 
 
