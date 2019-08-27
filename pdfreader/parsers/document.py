@@ -1,12 +1,8 @@
 import re
 
-from pdfreader.buffer import Buffer
-from pdfreader.constants import WHITESPACE_CODES, WHITESPACES, EOL, DELIMITERS, CR, LF, SP, STRING_ESCAPED, DEFAULT_ENCODING
-from pdfreader.exceptions import ParserException
-from pdfreader.objects import Trailer, StartXRef
-from pdfreader.types import *
-from pdfreader.filestructure import PDFHeader, PDFTrailer
-from pdfreader.xref import XRef, XRefEntry
+from ..constants import WHITESPACE_CODES, EOL, SP, DEFAULT_ENCODING
+from ..exceptions import ParserException
+from ..types import *
 
 from .base import BasicTypesParser
 

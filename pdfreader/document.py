@@ -3,8 +3,7 @@ import logging
 from .exceptions import ParserException
 from .registry import Registry
 from .parsers import RegistryPDFParser
-from .types import null, IndirectObject, Stream, Array, Dictionary, IndirectReference, ATOMIC_TYPES
-from .objects import obj_factory
+from .types import null, IndirectObject, Stream, Array, Dictionary, IndirectReference, ATOMIC_TYPES, obj_factory
 
 
 is_atomic = lambda obj: isinstance(obj, (ATOMIC_TYPES))

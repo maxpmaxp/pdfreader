@@ -22,6 +22,10 @@ class Name(str):
 class HexString(String):
     """ Hexadecimal string: <AF20FA> """
 
+    @property
+    def as_int(self):
+        return int(self, 16)
+
 
 class Stream(object):
     """ binary stream: dictionary and binary data

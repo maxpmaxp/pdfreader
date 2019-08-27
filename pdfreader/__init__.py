@@ -1,4 +1,4 @@
 from .document import PDFDocument
-from .filestructure import PDFHeader, PDFTrailer
+from .types import PDFHeader, PDFTrailer
 from .registry import Registry
-from .xref import XRefEntry, CompressedObjEntry, XRef
+from pdfreader.types.xref import XRefEntry, CompressedObjEntry, XRef
