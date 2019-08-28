@@ -1,72 +1,90 @@
+import logging
+
+from ..constants import DEFAULT_ENCODING, ESCAPED_CHARS
 from .native import HexString
 
 
 class Range(object):
 
-    def __init__(self, begin, end):
-        if isinstance(begin, HexString):
-            begin = begin.as_int
-        if isinstance(end, HexString):
-            end = end.as_int
-        self.begin = begin
-        self.end = end
+    def __init__(self, begin: str, end: str):
+        assert len(begin) == len(end)
+        begin = HexString(begin)
+        end = HexString(end)
+        self.int_begin = begin.as_int
+        self.int_end = end.as_int
+        if self.int_begin > self.int_end:
+            raise ValueError(begin)
+        self.begin = begin.upper()
+        self.end = end.upper()
+        self.size = len(self.begin)
 
-    def __contains__(self, item):
+    def match_size(self, item: str):
+        return len(item) == len(self.begin)
+
+    def __contains__(self, item: HexString):
         """
-        >>> 2 in Range(0, 4)
+        >>> HexString("0a") in Range("0A", "0F")
         True
-        >>> HexString("0a") in Range(0, 4)
+        >>> HexString("0B") in Range("0A", "0F")
+        True
+        >>> HexString("00A") in Range("0A", "0F")
         False
-        >>> HexString("02") in Range(0, 4)
+        >>> HexString("10") in Range("0A", "0F")
+        False
+        >>> HexString("0a") in Range("000a", "000f")
+        False
+        >>> HexString("000C") in Range("000a", "000f")
         True
+        >>> Range("000f", "000a")
+        Traceback (most recent call last):
+        ...
+        ValueError: 000f
         """
-        if isinstance(item, HexString):
-            item = item.as_int
-        return self.begin <= item <= self.end
+        return len(item) == self.size and self.int_begin <= HexString(item).as_int <= self.int_end
 
     def __repr__(self):
         return "<Range:{self.begin}-{self.end}>".format(self=self)
 
     def __len__(self):
         """
-        >>> len(Range(0, 0))
+        >>> len(Range("00", "00"))
         1
-        >>> len(Range(0, 100))
-        101
+        >>> len(Range("0000", "00ff"))
+        256
         """
-        return self.end - self.begin + 1
+        return self.int_end - self.int_begin + 1
 
 
 class MapRange(Range):
 
-    def __init__(self, begin, end, map_to_start):
+    def __init__(self, begin: str, end: str, map_to_start: [int,str]):
         super(MapRange, self).__init__(begin, end)
-        if isinstance(map_to_start, HexString):
-            map_to_start = map_to_start.as_int
+        if isinstance(map_to_start, str):
+            map_to_start = HexString(map_to_start).as_int
         self.map_to_start = map_to_start
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str):
         """
-        >>> r = MapRange(0, 4, 5)
-        >>> r[0], r[1], r[4]
+        >>> r = MapRange("00", "04", 5)
+        >>> r["00"], r["01"], r["04"]
         (5, 6, 9)
-        >>> r[5]
+        >>> r["05"]
         Traceback (most recent call last):
         ...
-        KeyError: 5
+        KeyError: '05'
         """
         if item not in self:
             raise KeyError(item)
-        return self.map_to_start + (item - self.begin)
+        return self.map_to_start + (HexString(item).as_int - self.int_begin)
 
     def get(self, item, default=None):
         """
-        >>> r = MapRange(0, 4, 5)
-        >>> r.get(0), r.get(1, None), r.get(4)
+        >>> r = MapRange("00", "04", "05")
+        >>> r.get("00"), r.get("01", None), r.get("04")
         (5, 6, 9)
-        >>> r.get(5) is None
+        >>> r.get("05") is None
         True
-        >>> r.get(5, -1)
+        >>> r.get("05", -1)
         -1
         """
         try:
@@ -89,56 +107,64 @@ class CodespaceRanges(object):
     def __bool__(self):
         return bool(self.ranges)
 
-    def __contains__(self, item):
+    def __contains__(self, item: str):
         """
         >>> cr = CodespaceRanges()
-        >>> cr.add(2, 30)
-        >>> cr.add(HexString("FA"), HexString("FF"))
-        >>> 10 in cr
+        >>> cr.add("02", "1E")
+        >>> cr.add("FA", "FF")
+        >>> "0A" in cr
         True
-        >>> 2 in cr
+        >>> "02" in cr
         True
-        >>> HexString('1e') in cr
+        >>> '1E' in cr
         True
-        >>> HexString('fb') in cr
+        >>> 'fb' in cr
         True
-        >>> HexString("2f") in cr
+        >>> "2f" in cr
         False
-        >>> HexString("f9") in cr
+        >>> "f9" in cr
         False
-        >>> 256 in cr
-        False
-        >>> cr = CodespaceRanges(2, 2)
-        >>> 2 in cr
+        >>> cr = CodespaceRanges("02", "02")
+        >>> "02" in cr
         True
-        >>> 3 in cr
+        >>> "03" in cr
         False
         """
-        if isinstance(item, HexString):
-            item = item.as_int
         return any(item in r for r in self.ranges)
 
     def add(self, begin, end):
         self.ranges.append(Range(begin, end))
 
     @property
+    def max(self):
+        """
+        >>> cr = CodespaceRanges()
+        >>> cr.add("02", "1e")
+        >>> cr.add("FA", "FF")
+        >>> cr.max
+        255
+        """
+        return max(r.int_end for r in self.ranges)
+
+    @property
     def as_list(self):
         """
         >>> cr = CodespaceRanges()
-        >>> cr.add(2, 5)
+        >>> cr.add('02', '05')
         >>> cr.add(HexString("FA"), HexString("FF"))
         >>> cr.as_list
-        [2, 3, 4, 5, 250, 251, 252, 253, 254, 255]
+        ['02', '03', '04', '05', 'FA', 'FB', 'FC', 'FD', 'FE', 'FF']
         """
         res = set({})
         for r in self.ranges:
-            res.update(list(range(r.begin, r.end + 1)))
+            int_range = sorted(list(range(r.int_begin, r.int_end + 1)))
+            res.update([HexString(hex(n)[2:].upper().zfill(r.size)) for n in int_range])
         return sorted(res)
 
     def __len__(self):
         """
         >>> cr = CodespaceRanges()
-        >>> cr.add(2, 5)
+        >>> cr.add("02", "05")
         >>> cr.add(HexString("FA"), HexString("FF"))
         >>> len(cr)
         10
@@ -154,12 +180,12 @@ class CodespaceRanges(object):
     def merge(self, other):
         """
         >>> cr1 = CodespaceRanges()
-        >>> cr1.add(2, 5)
+        >>> cr1.add("02", "05")
         >>> cr2 = CodespaceRanges()
-        >>> cr2.add(102, 105)
+        >>> cr2.add("000A", "000B")
         >>> cr1.merge(cr2)
         >>> cr1.as_list
-        [2, 3, 4, 5, 102, 103, 104, 105]
+        ['000A', '000B', '02', '03', '04', '05']
         """
         self.ranges.extend(other.ranges)
 
@@ -176,18 +202,18 @@ class MappedCodespaceRanges(CodespaceRanges):
 
     def __getitem__(self, item):
         """
-        >>> r = MappedCodespaceRanges(0, 4, 5)
-        >>> r.add(6, 10, 106)
-        >>> r[0], r[4], r[6], r[7], r[8]
+        >>> r = MappedCodespaceRanges("00", "04", 5)
+        >>> r.add("06", "0A", 106)
+        >>> r["00"], r["04"], r["06"], r["07"], r["08"]
         (5, 9, 106, 107, 108)
-        >>> r[5]
+        >>> r["05"]
         Traceback (most recent call last):
         ...
-        KeyError: 5
-        >>> r[20]
+        KeyError: '05'
+        >>> r["20"]
         Traceback (most recent call last):
         ...
-        KeyError: 20
+        KeyError: '20'
         """
         for r in self.ranges:
             if item in r:
@@ -196,13 +222,13 @@ class MappedCodespaceRanges(CodespaceRanges):
 
     def get(self, item, default=None):
         """
-        >>> r = MappedCodespaceRanges(0, 4, 5)
-        >>> r.add(6, 10, 106)
-        >>> r.get(5) is None
+        >>> r = MappedCodespaceRanges('00', '04', 5)
+        >>> r.add('06', '0a', 106)
+        >>> r.get('05') is None
         True
-        >>> r.get(5, -1)
+        >>> r.get('05', -1)
         -1
-        >>> r.get(0), r.get(4), r.get(6, -1), r.get(7, None), r.get(8)
+        >>> r.get('00'), r.get('04'), r.get('06', -1), r.get('07', None), r.get('08')
         (5, 9, 106, 107, 108)
         """
         try:
@@ -214,9 +240,9 @@ class MappedCodespaceRanges(CodespaceRanges):
     @property
     def as_dict(self):
         """
-        >>> r = MappedCodespaceRanges(0, 4, 5)
-        >>> r.add(6, 10, 106)
-        >>> r.as_dict == {0: 5, 1: 6, 2: 7, 3: 8, 4: 9, 6: 106, 7:107, 8:108, 9:109, 10:110}
+        >>> r = MappedCodespaceRanges('00', '04', 5)
+        >>> r.add('06', '0a', 106)
+        >>> r.as_dict == {'00': 5, '01': 6, '02': 7, '03': 8, '04': 9, '06': 106, '07':107, '08':108, '09':109, '0A':110}
         True
         """
         return {item: self[item] for item in self.as_list}
@@ -242,6 +268,26 @@ class CMapResource(object):
                "cid_ranges={self.cid_ranges!r}," \
                "notdef_ranges={self.notdef_ranges!r}," \
                "bf_ranges={self.bf_ranges!r}>".format(self=self)
+
+    def decode_hexstring(self, s: HexString):
+        res, code = "", ""
+        for i in range(0, len(s), 2):
+            code += s[i:i + 2]
+            try:
+                ch = chr(self.bf_ranges[code])
+            except KeyError:
+                if len(code) < 4:
+                    continue
+                else:
+                    # leave as is
+                    ch = chr(int(code, 16))
+            res += ESCAPED_CHARS.get(ch, ch)
+            code = ""
+        return res
+
+    def decode_string(self, s):
+        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
+        return self.decode_hexstring(s_hex)
 
 
 if __name__ == "__main__":

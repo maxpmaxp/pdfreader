@@ -26,6 +26,12 @@ class HexString(String):
     def as_int(self):
         return int(self, 16)
 
+    def to_string(self):
+        return "".join([chr(int(self[i:i + 2], 16)) for i in range(0, len(self), 2)])
+
+    def to_bytes(self):
+        return b''.join([bytes([int(self[i:i+2], 16)]) for i in range(0, len(self), 2)])
+
 
 class Stream(object):
     """ binary stream: dictionary and binary data

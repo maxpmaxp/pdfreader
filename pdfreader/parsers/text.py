@@ -10,14 +10,13 @@ class TextParser(BasicTypesParser):
     def __init__(self, fonts, *args, **kwargs):
         self.fonts = fonts
         super(TextParser, self).__init__(*args, **kwargs)
-        self.current_font = None
+        self.current_font_name = None
         self.current_strings = []
 
     @property
-    def bf_mapping(self):
-        f = self.fonts.get(self.current_font[1:])
-        if f:
-            return f.ToUnicode.resource.bf_ranges
+    def current_font(self):
+        if self.current_font_name:
+            return self.fonts[self.current_font_name[1:]]
 
     def on_string_parsed(self, s):
         self.current_strings.append(s)
@@ -78,7 +77,7 @@ class TextParser(BasicTypesParser):
             token = self.object()
             block += token
             if token == "Tf":
-                self.current_font = args[0]
+                self.current_font_name = args[0]
             if self.is_command(token):
                 args = []
             else:
@@ -88,37 +87,19 @@ class TextParser(BasicTypesParser):
         self.current_strings = []
         return res
 
-    def decode_char(self, code):
-        if code in self.bf_mapping:
-            ch = chr(self.bf_mapping.get(code))
-            return ch
-        raise KeyError(code)
-
     def hexstring(self):
         s = super(TextParser, self).hexstring()
-        # Decode according to the current font settings
-        if self.bf_mapping:
-            res, raw_res, to_convert = "", "", ""
-            for i in range(0, len(s), 2):
-                to_convert += s[i:i + 2]
-                code = HexString(to_convert).as_int
-                try:
-                    ch = self.decode_char(code)
-                except KeyError:
-                    if len(to_convert) <= 2:
-                        continue
-                    else:
-                        # leave as is
-                        ch = "\\x{}".format(to_convert)
-                raw_res += ch
-                res += ESCAPED_CHARS.get(ch, ch)
-                to_convert = ""
+        if self.current_font:
+            s = self.current_font.decode_hexstring(s)
+        self.on_string_parsed(s)
+        return "({})".format(s)
 
-            res = "({})".format(res)
-        else:
-            res = raw_res = s
-        self.on_string_parsed(raw_res)
-        return res
+    def string(self):
+        s = super(TextParser, self).string()
+        if self.current_font:
+            s = self.current_font.decode_string(s)
+        self.on_string_parsed(s)
+        return "({})".format(s)
 
     def skip_until_token(self, name):
         while True:

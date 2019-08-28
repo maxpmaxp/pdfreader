@@ -21,22 +21,18 @@ import logging
 logging.getLogger().setLevel("DEBUG")
 
 from pdfreader import PDFDocument
-#fd = open('samples/tyler-or-DocumentFragment.pdf','rb')
-#fd = open('samples/fw8ben.pdf','rb')
+fd = open('samples/tyler-or-DocumentFragment.pdf','rb')
 #fd = open('samples/leesoil-cases-2.pdf','rb')
 #fd = open('samples/ohcrash-02-0005-02-multiunit.pdf','rb')
 #fd = open('samples/ohcrash-scanned-case-converted-image.pdf','rb')
-fd = open('samples/seattlemuni-cr-charges-brackets.pdf','rb')
-#fd = open('samples/PDF32000_2008.pdf','rb')
+#fd = open('samples/seattlemuni-cr-charges-brackets.pdf','rb')
 #fd = open('samples/cumberland-arrests.pdf','rb')
 doc = PDFDocument(fd)
-page = doc.root.Pages.Kids[0]
-fonts = doc.root.Pages.Kids[0].Resources.Font
-from pdfreader.parsers.text import TextParser
-p = TextParser(fonts, open("111.txt","rb"))
-p.text()
-
-        """
+pages = [p for p in doc.pages()]
+page = pages[0]
+text_objects = [to for to in page.text_objects()]
+to = text_objects[0]
+"""
 
         self.registry = Registry()
         self.parser = RegistryPDFParser(fobj, self.registry)

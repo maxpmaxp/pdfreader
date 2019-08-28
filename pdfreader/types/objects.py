@@ -1,6 +1,7 @@
 from copy import copy
 
-from .native import Stream, Dictionary
+from ..constants import DEFAULT_ENCODING
+from .native import Stream, Dictionary, HexString
 
 
 class StartXRef(object):
@@ -132,9 +133,9 @@ class PageTreeNode(DictBasedObject):
             node = self
         for child in node.Kids:
             if isinstance(child, Page):
-                yield Page
+                yield child
             else:
-                for page in self.gen_pages(child):
+                for page in self.pages(child):
                     yield page
 
 
@@ -148,6 +149,14 @@ class Page(DictBasedObject):
         else:
             for c in self.Contents:
                 yield c
+
+    def text_objects(self):
+        from ..parsers.text import TextParser
+        fonts = self.Resources.get("Font", dict())
+        for ct in self.contents():
+            p = TextParser(fonts, ct.filtered)
+            for txt_obj in p.text():
+                yield txt_obj
 
 
 class XObject(StreamBasedObject):
@@ -206,6 +215,32 @@ class Font(DictBasedObject):
 
     def _type__ToUnicode(self, obj):
         return CMap(obj.doc, obj)
+
+    def decode_hexstring(self, s: HexString):
+        cmap = self.get('ToUnicode')
+        encoding = self.get('Encoding')
+        if cmap:
+            res = cmap.resource.decode_hexstring(s)
+        elif encoding:
+            val = s.to_bytes()
+            if encoding == "MacRomanEncoding":
+                py_encoding = 'macroman'
+            elif encoding == "MacExpertEncoding":
+                # ToDO: not sure about that
+                py_encoding = 'maclatin2'
+            elif encoding == "WinAnsiEncoding":
+                # ToDO: not sure about that
+                py_encoding = 'cp1251'
+            else:
+                py_encoding = 'latin1'
+            res = val.decode(py_encoding)
+        else:
+            res = s.to_string()
+        return res
+
+    def decode_string(self, s):
+        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
+        return self.decode_hexstring(s_hex)
 
 
 class Encoding(DictBasedObject):
