@@ -16,23 +16,96 @@ class PDFDocument(object):
     def __init__(self, fobj):
         """ fobj - file-like object
 
-import logging
-#logging.basicConfig(filename='pdf.log', filemode='w')
-logging.getLogger().setLevel("DEBUG")
+            >>> import pkg_resources
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/cumberland-arrests.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            31
+            >>> text_objects = [to for to in pages[0].text_objects()]
+            >>> len(text_objects)
+            30
+            >>> text_objects[0].source
+            'BT /Font-1 8 Tf 1 0 0 1 54 56.099998 Tm[(rpjlasr) 55(.x7) -32000  -23695.125 (07/29/19)] TJ\\n  ET'
+            >>> text_objects[0].strings
+            ['rpjlasr', '.x7', '07/29/19']
 
-from pdfreader import PDFDocument
-fd = open('samples/tyler-or-DocumentFragment.pdf','rb')
-#fd = open('samples/leesoil-cases-2.pdf','rb')
-#fd = open('samples/ohcrash-02-0005-02-multiunit.pdf','rb')
-#fd = open('samples/ohcrash-scanned-case-converted-image.pdf','rb')
-#fd = open('samples/seattlemuni-cr-charges-brackets.pdf','rb')
-#fd = open('samples/cumberland-arrests.pdf','rb')
-doc = PDFDocument(fd)
-pages = [p for p in doc.pages()]
-page = pages[0]
-text_objects = [to for to in page.text_objects()]
-to = text_objects[0]
-"""
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/leesoil-cases-2.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            4
+            >>> text_objects = [to for to in pages[0].text_objects()]
+            >>> len(text_objects)
+            1
+            >>> text_objects[0].strings[:7]
+            ['LEE COUNTY JAIL', 'NEWS RELEASE', 'AS OF: 3/9/2019', 'Date of', ' ', 'Arrest', ': 3/9/2019  12:30:51AM']
+
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/ohcrash-02-0005-02-multiunit.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            5
+            >>> text_objects = [to for to in pages[0].text_objects()]
+            >>> len(text_objects)
+            346
+            >>> text_objects[0].strings
+            ['LOCAL INFORMATION']
+
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/ohcrash-scanned-case-converted-image.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            5
+            >>> text_objects = [to for to in pages[0].text_objects()]
+            >>> len(text_objects)
+            0
+
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/seattlemuni-cr-charges-brackets.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            4
+            >>> text_objects = [to for to in pages[0].text_objects()]
+            >>> len(text_objects)
+            11
+            >>> text_objects[0].strings
+            ['MUNICIPAL COURT OF SEATTLE DOCKET']
+
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            2
+            >>> text_objects = [to for to in pages[0].text_objects()]
+            >>> len(text_objects)
+            208
+            >>> text_objects[0].source
+            'BT\\n/GS0 gs\\n/TT0 9.96001 Tf\\n72.024 747.6 Td\\n( )Tj\\nET'
+
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/bellerica-pd-logs.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            1
+            >>> text_objects = [to for to in pages[0].text_objects()]
+            >>> len(text_objects)
+            2
+            >>> text_objects[1].strings[:10]
+            ['W', 'ARRAN', 'T', ' ', 'ARRES', 'T', '  -', 'Name:', '  CIANO, ', 'STEVEN MICHAE']
+
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/waltham-pd-logs.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            9
+            >>> text_objects = [to for to in pages[0].text_objects()]
+            >>> len(text_objects)
+            4
+            >>> text_objects[0].strings
+            ['QuickSearch Results', 'aaa.htm', '[8/26/2019 2:07:16 PM]']
+
+        """
 
         self.registry = Registry()
         self.parser = RegistryPDFParser(fobj, self.registry)
@@ -142,4 +215,8 @@ to = text_objects[0]
     def pages(self):
         return self.root.Pages.pages()
 
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 

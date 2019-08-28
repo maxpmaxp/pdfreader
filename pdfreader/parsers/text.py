@@ -1,5 +1,6 @@
-from ..constants import ESCAPED_CHARS, DEFAULT_ENCODING
-from ..types.native import HexString
+import logging
+
+from ..constants import DEFAULT_ENCODING
 from ..types.text import TextObject
 from .base import BasicTypesParser
 
@@ -22,9 +23,9 @@ class TextParser(BasicTypesParser):
         self.current_strings.append(s)
 
     def object(self):
-        val = self.maybe_spaces()
+        val = ""
         if self.current == b'<':
-            val += self.hexstring()
+            val += self.dictionary_or_hexstring()
         elif self.current == b'[':
             val += self.array()
         elif self.current == b'(':
@@ -37,6 +38,38 @@ class TextParser(BasicTypesParser):
             val += self.token()
         else:
             self.on_parser_error("Unexpected token")
+        return val
+
+    def dictionary(self):
+        pfx = self.read(2)
+        if pfx != b'<<':
+            self.on_parser_error("Dictionary expected")
+        res = "<<"
+        res += self.maybe_spaces()
+        while self.current != b'>':
+            res += self.name()
+            res += self.maybe_spaces()
+            res += self.object()
+            res += self.maybe_spaces()
+        self.next()
+        if self.next() != b'>':
+            self.on_parser_error("End of dictionary >> expected ")
+        res += ">>"
+        return res
+
+    def dictionary_or_hexstring(self):
+        if self.current != b"<":
+            self.on_parser_error("Dict or hexstring expected")
+        self.next()
+        val = None
+        if self.current == b"<":
+            self.prev()
+            val = self.dictionary()
+        elif self.is_hex_digit:
+            self.prev()
+            val = self.hexstring()
+        else:
+            self.on_parser_error("Dict, stream or hexstring expected")
         return val
 
     def array(self):
@@ -72,8 +105,10 @@ class TextParser(BasicTypesParser):
         self.current_strings = []
         token = self.object()
         block += token
-        while token != "ET":
+        while token != "ET" and not self.is_eof:
             block += self.maybe_spaces()
+            if self.is_eof:
+                break
             token = self.object()
             block += token
             if token == "Tf":
@@ -82,7 +117,8 @@ class TextParser(BasicTypesParser):
                 args = []
             else:
                 args.append(token)
-
+        if token != "ET":
+            logging.warning("BT without closing ET found")
         res = TextObject(block, self.current_strings)
         self.current_strings = []
         return res
