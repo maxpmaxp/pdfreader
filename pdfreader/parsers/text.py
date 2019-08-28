@@ -102,18 +102,11 @@ class TextParser(BasicTypesParser):
         return "({})".format(s)
 
     def skip_until_token(self, name):
-        while True:
-            if self.current is None:
-                break
-            self.maybe_spaces()
-            if self.current is None:
-                break
-            obj = self.object()
-            if obj == name:
-                for _ in range(len(name)):
-                    self.prev()
-                return True
-        return False
+        self.maybe_spaces()
+        window = self.read(len(name))
+        while window != name and self.current is not None:
+            window = window[1:] + self.next()
+        return window == name
 
     def maybe_spaces(self):
         res = ''
