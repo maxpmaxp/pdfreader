@@ -390,6 +390,7 @@ class RegistryPDFParser(PDFParser):
         obj = super(RegistryPDFParser, self).indirect_object()
         # handle all known indirect objects
         self.on_parsed_indirect_object(obj)
+        return obj
 
 
 if __name__ == "__main__":
