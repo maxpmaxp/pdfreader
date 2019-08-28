@@ -62,7 +62,7 @@ class TextParser(BasicTypesParser):
         Returns a list of TextObjects parsed from stream
         """
         objs = []
-        while self.skip_until_token("BT"):
+        while self.skip_until_token(b'BT'):
             objs.append(self.bt_et())
         return objs
 
@@ -103,10 +103,20 @@ class TextParser(BasicTypesParser):
 
     def skip_until_token(self, name):
         self.maybe_spaces()
-        window = self.read(len(name))
+        if self.is_eof:
+            return False
+        window = self.next()
+        if self.is_eof:
+            return False
+        window += self.next()
+
         while window != name and self.current is not None:
             window = window[1:] + self.next()
-        return window == name
+        res = window == name
+        if res:
+            for _ in range(len(name)):
+                self.prev()
+        return res
 
     def maybe_spaces(self):
         res = ''
