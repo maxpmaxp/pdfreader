@@ -1,5 +1,6 @@
 from ..constants import ESCAPED_CHARS, DEFAULT_ENCODING
 from ..types.native import HexString
+from ..types.text import TextObject
 from .base import BasicTypesParser
 
 
@@ -10,12 +11,16 @@ class TextParser(BasicTypesParser):
         self.fonts = fonts
         super(TextParser, self).__init__(*args, **kwargs)
         self.current_font = None
+        self.current_strings = []
 
     @property
     def bf_mapping(self):
         f = self.fonts.get(self.current_font[1:])
         if f:
             return f.ToUnicode.resource.bf_ranges
+
+    def on_string_parsed(self, s):
+        self.current_strings.append(s)
 
     def object(self):
         val = self.maybe_spaces()
@@ -54,14 +59,18 @@ class TextParser(BasicTypesParser):
         return "/" + s
 
     def text(self):
-        block = ""
+        """
+        Returns a list of TextObjects parsed from stream
+        """
+        objs = []
         while self.skip_until_token("BT"):
-            block += self.bt_et()
-        return block
+            objs.append(self.bt_et())
+        return objs
 
     def bt_et(self):
         block = ""
         args = []
+        self.current_strings = []
         token = self.object()
         block += token
         while token != "ET":
@@ -74,30 +83,41 @@ class TextParser(BasicTypesParser):
                 args = []
             else:
                 args.append(token)
-        return block
+
+        res = TextObject(block, self.current_strings)
+        self.current_strings = []
+        return res
+
+    def decode_char(self, code):
+        if code in self.bf_mapping:
+            ch = chr(self.bf_mapping.get(code))
+            return ch
+        raise KeyError(code)
 
     def hexstring(self):
         s = super(TextParser, self).hexstring()
         # Decode according to the current font settings
         if self.bf_mapping:
-            res = ""
-            to_convert = ""
+            res, raw_res, to_convert = "", "", ""
             for i in range(0, len(s), 2):
                 to_convert += s[i:i + 2]
                 code = HexString(to_convert).as_int
-                if code in self.bf_mapping:
-                    ch = chr(self.bf_mapping.get(code))
-                    ch = ESCAPED_CHARS.get(ch, ch)
-                    res += ch
-                    to_convert = ""
-                if len(to_convert) <= 2:
-                    continue
-                else:
-                    # leave as is
-                    res += "\\x{}".format(to_convert)
+                try:
+                    ch = self.decode_char(code)
+                except KeyError:
+                    if len(to_convert) <= 2:
+                        continue
+                    else:
+                        # leave as is
+                        ch = "\\x{}".format(to_convert)
+                raw_res += ch
+                res += ESCAPED_CHARS.get(ch, ch)
+                to_convert = ""
+
             res = "({})".format(res)
         else:
-            res = s
+            res = raw_res = s
+        self.on_string_parsed(raw_res)
         return res
 
     def skip_until_token(self, name):
