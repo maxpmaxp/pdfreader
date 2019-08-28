@@ -215,6 +215,14 @@ class PDFDocument(object):
     def pages(self):
         return self.root.Pages.pages()
 
+    def text_objects(self):
+        for page in self.pages():
+            for to in page.text_objects():
+                yield to
+
+    def text_sources(self, separator="\n"):
+        return separator.join([to.source for to in self.text_objects()])
+
 
 if __name__ == "__main__":
     import doctest
