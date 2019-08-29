@@ -143,20 +143,22 @@ class Page(DictBasedObject):
     """ Type = Page
     """
 
-    def contents(self):
+    def content(self):
+        """ ToDo: Can BT instruction come in one content stream and have enclosing ET in a following one??
+                  The current implementation says
+        """
         if isinstance(self.Contents, StreamBasedObject):
-            yield self.Contents
+            res = self.Contents.filtered
         else:
-            for c in self.Contents:
-                yield c
+            res = b''.join([ct.filtered for ct in self.Contents])
+        return res
 
     def text_objects(self):
         from ..parsers.text import TextParser
         fonts = self.Resources.get("Font", dict())
-        for ct in self.contents():
-            p = TextParser(fonts, ct.filtered)
-            for txt_obj in p.text():
-                yield txt_obj
+        p = TextParser(fonts, self.content())
+        for txt_obj in p.text():
+            yield txt_obj
 
 
 class XObject(StreamBasedObject):

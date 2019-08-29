@@ -549,6 +549,7 @@ class BasicTypesParser(Buffer):
                         val += "\\" + code.decode(DEFAULT_ENCODING)
                 elif ch in EOL:
                     # multiline string - just skip
+                    self.prev()
                     self.eol()
                 else:
                     # unescape or leave as is

@@ -106,22 +106,26 @@ class TextParser(BasicTypesParser):
         block = ""
         args = []
         self.current_strings = []
-        token = self.object()
-        block += token
-        while token != "ET" and not self.is_eof:
-            try:
+        try:
+            token = self.object()
+            block += token
+            while token != "ET" and not self.is_eof:
                 block += self.maybe_spaces()
                 token = self.object()
                 block += token
+                if token == "BT":
+                    self.prev()
+                    self.prev()
+                    raise ParserException("BT without enclosing ET")
                 if token == "Tf":
                     self.current_font_name = args[0]
                 if self.is_command(token):
                     args = []
                 else:
                     args.append(token)
-            except ParserException:
-                logging.warning("Inconsistent BT ET block detected:\n{}".format(block))
-                break
+        except ParserException:
+            logging.warning("Inconsistent BT ET block detected:\n{}".format(block))
+
         res = TextObject(block, self.current_strings)
         self.current_strings = []
         return res
