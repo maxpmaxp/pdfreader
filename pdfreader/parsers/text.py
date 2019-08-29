@@ -1,6 +1,7 @@
 import logging
 
 from ..constants import DEFAULT_ENCODING
+from ..exceptions import ParserException
 from ..types.text import TextObject
 from .base import BasicTypesParser
 
@@ -23,6 +24,8 @@ class TextParser(BasicTypesParser):
         self.current_strings.append(s)
 
     def object(self):
+        if self.current is None:
+            raise ParserException("Character expected")
         val = ""
         if self.current == b'<':
             val += self.dictionary_or_hexstring()
@@ -106,19 +109,19 @@ class TextParser(BasicTypesParser):
         token = self.object()
         block += token
         while token != "ET" and not self.is_eof:
-            block += self.maybe_spaces()
-            if self.is_eof:
+            try:
+                block += self.maybe_spaces()
+                token = self.object()
+                block += token
+                if token == "Tf":
+                    self.current_font_name = args[0]
+                if self.is_command(token):
+                    args = []
+                else:
+                    args.append(token)
+            except ParserException:
+                logging.warning("Inconsistent BT ET block detected:\n{}".format(block))
                 break
-            token = self.object()
-            block += token
-            if token == "Tf":
-                self.current_font_name = args[0]
-            if self.is_command(token):
-                args = []
-            else:
-                args.append(token)
-        if token != "ET":
-            logging.warning("BT without closing ET found")
         res = TextObject(block, self.current_strings)
         self.current_strings = []
         return res
