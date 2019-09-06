@@ -83,6 +83,17 @@ class PDFDocument(object):
             >>> text_objects[0].source
             'BT\\n/GS0 gs\\n/TT0 9.96001 Tf\\n72.024 747.6 Td\\n( )Tj\\nET'
 
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-3.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            3
+            >>> text_objects = [to for to in pages[2].text_objects()]
+            >>> len(text_objects)
+            3
+            >>> next(i for i, to in enumerate(pages[2].text_objects()) if 'future. ' in to.source)
+            0
+
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/bellerica-pd-logs.pdf')
             >>> doc = PDFDocument(fd)
             >>> pages = [p for p in doc.pages()]

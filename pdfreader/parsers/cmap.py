@@ -1,6 +1,6 @@
 from ..exceptions import ParserException
 from ..types.native import Name, Token, Integer, HexString
-from ..types.cmap import CodespaceRanges, MappedCodespaceRanges, CMapResource
+from ..types.cmap import CodespaceRanges, MappedCodespaceRanges, CMapResource, Range, MapRange, BFChar
 from .base import BasicTypesParser
 
 
@@ -57,13 +57,13 @@ class CMapParser(BasicTypesParser):
         >>> cmap.name
         '83pv-RKSJ-H'
         >>> cmap.codespace_ranges
-        <CodespaceRanges:ranges=[<Range:0-128>, <Range:33088-40956>, <Range:160-22 ...>
+        <CodespaceRanges:ranges=[<Range:00-80>, <Range:8140-9FFC>, <Range:A0-DF>,  ...>
         >>> cmap.cid_ranges
-        <MappedCodespaceRanges:ranges=[<MapRange:32-126,1>, <MapRange:128-128,97>, <MapR ...>
+        <MappedCodespaceRanges:ranges=[<MapRange:20-7E,1>, <MapRange:80-80,97>, <MapRang ...>
         >>> len(cmap.cid_ranges.ranges)
         222
         >>> cmap.notdef_ranges
-        <MappedCodespaceRanges:ranges=[<MapRange:0-31,1>]>
+        <MappedCodespaceRanges:ranges=[<MapRange:00-1F,1>]>
         >>> cmap.bf_ranges
         <MappedCodespaceRanges:ranges=[]>
 
@@ -149,7 +149,7 @@ class CMapParser(BasicTypesParser):
             self.maybe_spaces_or_comments()
             cr_to = self.hexstring()
             self.maybe_spaces_or_comments()
-            res.add(cr_from, cr_to)
+            res.add(Range(cr_from, cr_to))
         self.expected_token("endcodespacerange")
         return res
 
@@ -166,7 +166,7 @@ class CMapParser(BasicTypesParser):
             if not isinstance(cid_from, (HexString, Integer)):
                 self.on_parser_error("Int of Hexstring expected")
             self.maybe_spaces_or_comments()
-            res.add(cr_from, cr_to, cid_from)
+            res.add(MapRange(cr_from, cr_to, cid_from))
         self.expected_token("end{}range".format(rangename))
         return res
 
@@ -179,7 +179,11 @@ class CMapParser(BasicTypesParser):
             self.maybe_spaces_or_comments()
             dst_code = self.hexstring()
             self.maybe_spaces_or_comments()
-            res.add(src_code, src_code, dst_code)
+            if rangename == 'bf':
+                obj = BFChar(src_code, dst_code)
+            else:
+                obj = MapRange(src_code, src_code, dst_code)
+            res.add(obj)
         self.expected_token("end{}char".format(rangename))
         return res
 
