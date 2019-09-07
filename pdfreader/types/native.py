@@ -125,7 +125,16 @@ class Stream(object):
             raise ValueError("Unknown predictor type {}".format(predictor))
         return res
 
-    #ToDo: implement more filters
+    # ToDo: implement more filters:
+    # ASCIIHexDecode
+    # ASCII85Decode
+    # LZWDecode
+    # RunLengthDecode
+    # CCITTFaxDecode
+    # JBIG2Decode
+    # DCTDecode
+    # JPXDecode
+    # Crypt
 
     def filter_FlateDecode(self, data):
         data = zlib.decompress(data)

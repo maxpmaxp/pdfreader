@@ -1,3 +1,5 @@
+import logging
+
 from copy import copy
 
 from ..constants import DEFAULT_ENCODING
@@ -219,6 +221,7 @@ class Font(DictBasedObject):
         return CMap(obj.doc, obj)
 
     def decode_hexstring(self, s: HexString):
+        # ToDo: Differences support. See p263 PDF32000_2008.pdf
         cmap = self.get('ToUnicode')
         encoding = self.get('Encoding')
         if cmap:
@@ -226,14 +229,17 @@ class Font(DictBasedObject):
         elif encoding:
             val = s.to_bytes()
             if encoding == "MacRomanEncoding":
+                # ToDO: Not 100% correct there are some differences between MacRomanEncoding and macroman
                 py_encoding = 'macroman'
             elif encoding == "MacExpertEncoding":
-                # ToDO: not sure about that
+                # ToDO: Not 100% correct
                 py_encoding = 'maclatin2'
             elif encoding == "WinAnsiEncoding":
-                # ToDO: not sure about that
-                py_encoding = 'cp1251'
+                py_encoding = 'cp1252'
+            elif encoding == "StandardEncoding":
+                py_encoding = 'latin1'
             else:
+                logging.warning("Unsupported encoding {}. Using default latin1".format(encoding))
                 py_encoding = 'latin1'
             res = val.decode(py_encoding)
         else:
