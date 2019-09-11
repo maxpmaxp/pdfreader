@@ -18,12 +18,21 @@ class PDFDocument(object):
 
             >>> import pkg_resources
 
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-deep-recursion.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            9
+            >>> bool(doc.text_sources())
+            True
+
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-4.pdf')
             >>> doc = PDFDocument(fd)
             >>> pages = [p for p in doc.pages()]
             >>> len(pages)
             4
-            >>> text = doc.text_sources()
+            >>> bool(doc.text_sources())
+            True
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/cumberland-arrests.pdf')
             >>> doc = PDFDocument(fd)
@@ -179,6 +188,10 @@ class PDFDocument(object):
         2. XRefs - try to find and load
         3. Brute-force reading objects one by one from the file start
         """
+        # locate in registry
+        if self.registry.is_registered(num, gen):
+            return self.registry.get(num, gen)
+
         # Locate by xref
         for xref in self.trailer.xrefs:
             # try to find in-use object
