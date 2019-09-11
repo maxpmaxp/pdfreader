@@ -1,5 +1,5 @@
 from ..buffer import Buffer
-from ..constants import WHITESPACES, EOL, DELIMITERS, CR, LF, STRING_ESCAPED, DEFAULT_ENCODING
+from ..constants import WHITESPACES, EOL, DELIMITERS, CR, LF, STRING_ESCAPED
 from ..types import *
 from ..exceptions import ParserException
 
@@ -7,12 +7,14 @@ from ..exceptions import ParserException
 class BasicTypesParser(Buffer):
     """ can parse basic PDF types  """
 
+    exception_class = ParserException
+
     def __init__(self, fileobj, offset=0):
         super(BasicTypesParser, self).__init__(fileobj, offset)
 
     def on_parser_error(self, message):
         # ToDo: display parsing context here
-        raise ParserException(message)
+        raise self.exception_class(message)
 
     def spaces(self):
         if self.is_whitespace:

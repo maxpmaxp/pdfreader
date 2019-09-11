@@ -17,6 +17,14 @@ class PDFDocument(object):
         """ fobj - file-like object
 
             >>> import pkg_resources
+
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-4.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            4
+            >>> text = doc.text_sources()
+
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/cumberland-arrests.pdf')
             >>> doc = PDFDocument(fd)
             >>> pages = [p for p in doc.pages()]

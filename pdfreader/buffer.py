@@ -20,11 +20,8 @@ class Buffer(object):
     b'2'
     >>> b.next()
     b'3'
-    >>> b.next()
-    Traceback (most recent call last):
-    ...
-    pdfreader.exceptions.EOFException
-
+    >>> b.next() is None
+    True
 
     >>> b = Buffer(s, 1, 2)
     >>> b.next()
@@ -33,10 +30,8 @@ class Buffer(object):
     b'3'
     >>> b.next()
     b'3'
-    >>> b.next()
-    Traceback (most recent call last):
-    ...
-    pdfreader.exceptions.EOFException
+    >>> b.next() is None
+    True
 
 
     Test backward reading
@@ -50,10 +45,8 @@ class Buffer(object):
     b'2'
     >>> b.prev()
     b'1'
-    >>> b.prev()
-    Traceback (most recent call last):
-    ...
-    pdfreader.exceptions.EOFException
+    >>> b.prev() is None
+    True
 
 
     Test forward/backward reading
@@ -75,10 +68,8 @@ class Buffer(object):
     >>> b = Buffer(s, 0, 2)
     >>> b.read(3)
     b'123'
-    >>> b.current
-    Traceback (most recent call last):
-    ...
-    pdfreader.exceptions.EOFException
+    >>> b.current is None
+    True
 
     >>> b = Buffer(s, 0, 2)
     >>> b.read(2)

@@ -46,7 +46,7 @@ class PDFTrailer(object):
         return self.params.get("Id")
 
     def __repr__(self):
-        return "<PDF Trailer:xrefs={self.xrefs},root={self.root},offset={self.offset}>".format(self=self)
+        return "<PDF Trailer:xrefs={self.xrefs},root={self.root},info={self.info}>".format(self=self)
 
 
 

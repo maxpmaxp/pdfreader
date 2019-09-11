@@ -1,11 +1,17 @@
 from ..exceptions import ParserException
-from ..types.native import Name, Token, Integer, HexString
+from ..types.native import Name, Token, Integer, HexString, Array
 from ..types.cmap import CodespaceRanges, MappedCodespaceRanges, CMapResource, Range, MapRange, BFChar
 from .base import BasicTypesParser
 
 
+class CMapParserException(ParserException):
+    pass
+
+
 class CMapParser(BasicTypesParser):
     """ Very poor implementation as we don't support PostScript language in full """
+
+    exception_class = CMapParserException
 
     def object_or_token(self):
         state = self.get_state()
@@ -73,6 +79,19 @@ class CMapParser(BasicTypesParser):
         'Adobe-Identity-UCS'
         >>> len(cmap.bf_ranges.ranges)
         69
+
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-bfrange-with-list.txt')
+        >>> cmap = CMapParser(fd).cmap()
+        >>> cmap.name
+        'Adobe-Identity-UCS'
+        >>> len(cmap.bf_ranges.ranges)
+        70
+        >>> cmap.bf_ranges['0001']
+        ' '
+        >>> cmap.bf_ranges['0002']
+        'U'
+        >>> cmap.bf_ranges['0045']
+        '6'
 
         """
         #/CIDInit /ProcSet findresource begin
@@ -163,10 +182,16 @@ class CMapParser(BasicTypesParser):
             cr_to = self.hexstring()
             self.maybe_spaces_or_comments()
             cid_from = self.object()
-            if not isinstance(cid_from, (HexString, Integer)):
-                self.on_parser_error("Int of Hexstring expected")
+            if not isinstance(cid_from, (HexString, Integer, Array)):
+                self.on_parser_error("Int, Hexstring or Array expected")
+            if isinstance(cid_from, (Integer, HexString)):
+                res.add(MapRange(cr_from, cr_to, cid_from))
+            else:
+                # mapping represented as an array
+                for i, v in enumerate(Range(cr_from, cr_to)):
+                    res.add(BFChar(v, cid_from[i]))
             self.maybe_spaces_or_comments()
-            res.add(MapRange(cr_from, cr_to, cid_from))
+
         self.expected_token("end{}range".format(rangename))
         return res
 

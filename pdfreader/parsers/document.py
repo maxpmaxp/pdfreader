@@ -149,12 +149,20 @@ class PDFParser(BasicTypesParser):
         self.reset(xref_offset)
         if self.current == b'x':
             # parse direct xref
-            xref = self.direct_xref()
+            all_xrefs = [self.direct_xref()]
             # parse trailer
-            # ToDO: parse several xref sections like we do for streams
             self.maybe_spaces_or_comments()
-            t = self.trailer()
-            trailer = PDFTrailer([xref], **t.params)
+            t = last_trailer = self.trailer()
+            prev_xref_offset = t.params.get("Prev")
+            while prev_xref_offset:
+                self.reset(prev_xref_offset)
+                all_xrefs.append(self.direct_xref())
+                # parse previous trailer
+                self.maybe_spaces_or_comments()
+                t = self.trailer()
+                prev_xref_offset = t.params.get("Prev")
+
+            trailer = PDFTrailer(all_xrefs, **last_trailer.params)
         else:
             # Assume xref as a stream which may contain liks to the previous xref streams
             last_offset = xref_offset

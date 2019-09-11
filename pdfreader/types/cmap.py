@@ -1,7 +1,5 @@
-import logging
-
 from .constants import PS_CHARNAMES
-from ..constants import DEFAULT_ENCODING, ESCAPED_CHARS
+from ..constants import DEFAULT_ENCODING
 from .native import HexString
 
 
@@ -54,6 +52,14 @@ class Range(object):
         256
         """
         return self.int_end - self.int_begin + 1
+
+    def __iter__(self):
+        """
+        >>> [v for v in Range("09", "0f")]
+        ['09', '0A', '0B', '0C', '0D', '0E', '0F']
+        """
+        for i in range(self.int_begin, self.int_end+1):
+            yield hex(i)[2:].upper().zfill(self.size)
 
 
 class MapRange(Range):
