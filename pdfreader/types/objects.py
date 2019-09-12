@@ -72,6 +72,8 @@ class ArrayBasedObject(Array):
 
     def __init__(self, doc, lst):
         self.doc = doc
+        # ToDo: this must be lazier thing.
+        # Need to build objects only on access attempte like a.index, a[i], a[1:2] etc.
         lst = [self.doc.build(obj, lazy=True) for obj in lst]
         super(ArrayBasedObject, self).__init__(lst)
 
