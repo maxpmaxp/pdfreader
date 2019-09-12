@@ -18,6 +18,14 @@ class PDFDocument(object):
 
             >>> import pkg_resources
 
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-with-array-based-object.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            63
+            >>> bool(doc.text_sources())
+            True
+
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-deep-recursion.pdf')
             >>> doc = PDFDocument(fd)
             >>> pages = [p for p in doc.pages()]

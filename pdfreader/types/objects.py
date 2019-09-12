@@ -3,7 +3,7 @@ import logging
 from copy import copy
 
 from ..constants import DEFAULT_ENCODING
-from .native import Stream, Dictionary, HexString
+from .native import Stream, Dictionary, HexString, Array
 
 
 class StartXRef(object):
@@ -67,6 +67,15 @@ class StreamBasedObject(Stream):
         return self._cache[item]
 
 
+class ArrayBasedObject(Array):
+    """ Array-based object. Can solve indirect references """
+
+    def __init__(self, doc, lst):
+        self.doc = doc
+        lst = [self.doc.build(obj, lazy=True) for obj in lst]
+        super(ArrayBasedObject, self).__init__(lst)
+
+
 class DictBasedObject(Dictionary):
     """ Dictionary-based object. Can solve indirect references """
 
@@ -109,6 +118,8 @@ def obj_factory(doc, obj):
             klass = STREAM_BASED_OBJECTS.get(obj.Type, StreamBasedObject)
     elif isinstance(obj, Dictionary):
         klass = DICT_OBJECTS.get(obj.get('Type'), DictBasedObject)
+    elif isinstance(obj, list):
+        klass = ArrayBasedObject
     else:
         raise TypeError("Unsupported object type: {}".format(type(obj)))
     return klass(doc, obj)
