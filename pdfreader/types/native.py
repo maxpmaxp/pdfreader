@@ -1,4 +1,4 @@
-import zlib
+import logging, zlib
 
 from copy import copy
 from decimal import Decimal
@@ -137,8 +137,12 @@ class Stream(object):
     # Crypt
 
     def filter_FlateDecode(self, data):
-        data = zlib.decompress(data)
-        data = self._remove_predictors(data)
+        try:
+            data = zlib.decompress(data)
+            data = self._remove_predictors(data)
+        except zlib.error:
+            logging.exception("Skipping broken stream")
+            data = b''
         return data
 
     def __eq__(self, other):
