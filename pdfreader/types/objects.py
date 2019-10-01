@@ -175,6 +175,9 @@ class Page(DictBasedObject):
         for txt_obj in p.text():
             yield txt_obj
 
+    def text(self, glue=""):
+        return glue.join([to.to_string(glue) for to in self.text_objects()])
+
 
 class XObject(StreamBasedObject):
     """ Type = XObject
@@ -196,6 +199,7 @@ class Metadata(StreamBasedObject):
         Subtype = XML
     """
 
+
 class Image(XObject):
     """ Type = XObject
         Subtype = Image
@@ -213,6 +217,9 @@ class Form(XObject):
         p = TextParser(fonts, self.filtered)
         for txt_obj in p.text():
             yield txt_obj
+
+    def text(self, glue=""):
+        return glue.join([to.to_string(glue) for to in self.text_objects()])
 
 
 class Group(XObject):
