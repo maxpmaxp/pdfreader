@@ -257,7 +257,7 @@ class Font(DictBasedObject):
         # ToDo: Differences support. See p263 PDF32000_2008.pdf
         cmap = self.get('ToUnicode')
         encoding = self.get('Encoding')
-        py_encoding = None
+
         if encoding == "MacRomanEncoding":
             # ToDO: Not 100% correct there are some differences between MacRomanEncoding and macroman
             py_encoding = 'macroman'

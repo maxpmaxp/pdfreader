@@ -18,6 +18,14 @@ class PDFDocument(object):
 
             >>> import pkg_resources
 
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20220531.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            7
+            >>> "OMB Approval: 1205-0509 Expiration Date: 05/31/2022" in pages[0].text()
+            True
+
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20190131.pdf')
             >>> doc = PDFDocument(fd)
             >>> pages = [p for p in doc.pages()]

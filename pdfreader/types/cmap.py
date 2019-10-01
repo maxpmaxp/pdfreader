@@ -393,6 +393,11 @@ class CMapResource(object):
                     ch = HexString(code).to_string()
             res += ch
             code = ""
+
+        if code:
+            hs = HexString(code)
+            res += hs.to_bytes().decode(encoding) if encoding else hs.to_string()
+
         return res
 
     def decode_string(self, s, encoding=None):
