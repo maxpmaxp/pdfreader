@@ -178,6 +178,9 @@ class Page(DictBasedObject):
     def text(self, glue=""):
         return glue.join([to.to_string(glue) for to in self.text_objects()])
 
+    def text_sources(self, glue=""):
+        return glue.join([to.source for to in self.text_objects()])
+
 
 class XObject(StreamBasedObject):
     """ Type = XObject
