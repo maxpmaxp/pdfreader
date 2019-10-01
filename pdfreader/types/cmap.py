@@ -164,6 +164,11 @@ class BFChar(object):
         >>> r = BFChar("00", "/yen")
         >>> r["00"]
         '¥'
+
+        >>> r = BFChar("35", "0035")
+        >>> r["35"]
+        '5'
+
         >>> r["05"]
         Traceback (most recent call last):
         ...
@@ -180,7 +185,12 @@ class BFChar(object):
         else:
             # decode
             l = len(self.begin)
-            val = "".join([chr(HexString(self.mapped[i:i+l]).as_int) for i in range(0, len(self.mapped), l)])
+            if len(self.mapped) == 4 and self.mapped.startswith("00"):
+                # ignore leading 00
+                val = chr(HexString(self.mapped[2:]).as_int)
+            else:
+                # may encode several characters
+                val = "".join([chr(HexString(self.mapped[i:i+l]).as_int) for i in range(0, len(self.mapped), l)])
         return val
 
     def get(self, item, default=None):
@@ -366,8 +376,9 @@ class CMapResource(object):
                "notdef_ranges={self.notdef_ranges!r}," \
                "bf_ranges={self.bf_ranges!r}>".format(self=self)
 
-    def decode_hexstring(self, s: HexString):
+    def decode_hexstring(self, s: HexString, encoding=None):
         res, code = "", ""
+
         for i in range(0, len(s), 2):
             code += s[i:i + 2]
             try:
@@ -375,16 +386,18 @@ class CMapResource(object):
             except KeyError:
                 if len(code) < 4:
                     continue
+                elif encoding:
+                    ch = HexString(code).to_bytes().decode(encoding)
                 else:
                     # leave as is
-                    ch = chr(int(code, 16))
+                    ch = HexString(code).to_string()
             res += ch
             code = ""
         return res
 
-    def decode_string(self, s):
+    def decode_string(self, s, encoding=None):
         s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
-        return self.decode_hexstring(s_hex)
+        return self.decode_hexstring(s_hex, encoding=encoding)
 
 
 if __name__ == "__main__":
