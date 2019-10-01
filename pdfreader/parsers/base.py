@@ -302,7 +302,8 @@ class BasicTypesParser(Buffer):
             self.maybe_spaces_or_comments()
             if self.current == b's':
                 val = self._stream(val)
-        elif self.is_hex_digit:
+        elif self.is_hex_digit or self.is_whitespace:
+            # < 09FF> is possible
             self.prev()
             val = self.hexstring()
         else:

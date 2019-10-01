@@ -37,6 +37,7 @@ class CMapParser(BasicTypesParser):
 
     def skip_until_token(self, name):
         while True:
+
             if self.current is None:
                 break
             self.maybe_spaces_or_comments()
@@ -58,6 +59,15 @@ class CMapParser(BasicTypesParser):
     def cmap(self):
         """
         >>> import pkg_resources
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-3.txt')
+        >>> cmap = CMapParser(fd).cmap()
+        >>> cmap.name
+        'Adobe-Identity-UCS'
+        >>> len(cmap.bf_ranges.ranges)
+        64
+        >>> cmap.codespace_ranges
+        <CodespaceRanges:ranges=[<Range:0000-FFFF>]>
+
         >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample.txt')
         >>> cmap = CMapParser(fd).cmap()
         >>> cmap.name

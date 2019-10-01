@@ -115,7 +115,7 @@ class DictBasedObject(Dictionary):
 def obj_factory(doc, obj):
     if isinstance(obj, Stream):
         if obj.Type == 'XObject':
-            klass = XOBJECTS.get(obj.SubType, XObject)
+            klass = XOBJECTS.get(obj.Subtype, XObject)
         else:
             klass = STREAM_BASED_OBJECTS.get(obj.Type, StreamBasedObject)
     elif isinstance(obj, Dictionary):
@@ -206,6 +206,13 @@ class Form(XObject):
     """ Type = XObject
         Subtype = Form
     """
+
+    def text_objects(self):
+        from ..parsers.text import TextParser
+        fonts = self.Resources.get("Font", dict())
+        p = TextParser(fonts, self.filtered)
+        for txt_obj in p.text():
+            yield txt_obj
 
 
 class Group(XObject):

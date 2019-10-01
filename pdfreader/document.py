@@ -18,6 +18,18 @@ class PDFDocument(object):
 
             >>> import pkg_resources
 
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2a-case.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            8
+            >>> form_field_value = pages[2].Resources.XObject['Fm19']
+            >>> type(form_field_value)
+            <class 'pdfreader.types.objects.Form'>
+
+            >>> [t.to_string() for t in form_field_value.text_objects()]
+            ['MAS Labor H2A, LLC']
+
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-DocuSign.pdf')
             >>> doc = PDFDocument(fd)
             >>> pages = [p for p in doc.pages()]
@@ -276,3 +288,13 @@ if __name__ == "__main__":
     import doctest
     doctest.testmod()
 
+"""
+import pkg_resources
+from pdfreader import PDFDocument
+fd = pkg_resources.resource_stream('pdfreader', 'samples/h2a-case.pdf')
+doc = PDFDocument(fd)
+pages = [p for p in doc.pages()]
+
+obj  = pages[2].Resources.XObject['Fm0']
+
+"""
