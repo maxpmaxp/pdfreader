@@ -287,14 +287,3 @@ class PDFDocument(object):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-
-"""
-import pkg_resources
-from pdfreader import PDFDocument
-fd = pkg_resources.resource_stream('pdfreader', 'samples/h2a-case.pdf')
-doc = PDFDocument(fd)
-pages = [p for p in doc.pages()]
-
-obj  = pages[2].Resources.XObject['Fm0']
-
-"""
