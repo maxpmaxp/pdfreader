@@ -178,7 +178,7 @@ class Page(DictBasedObject):
     def text(self, glue=""):
         return glue.join([to.to_string(glue) for to in self.text_objects()])
 
-    def text_sources(self, glue=""):
+    def text_sources(self, glue="\n"):
         return glue.join([to.source for to in self.text_objects()])
 
 
@@ -224,7 +224,7 @@ class Form(XObject):
     def text(self, glue=""):
         return glue.join([to.to_string(glue) for to in self.text_objects()])
 
-    def text_sources(self, glue=""):
+    def text_sources(self, glue="\n"):
         return glue.join([to.source for to in self.text_objects()])
 
 
