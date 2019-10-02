@@ -268,6 +268,9 @@ class Font(DictBasedObject):
             py_encoding = 'cp1252'
         elif encoding == "StandardEncoding":
             py_encoding = 'latin1'
+        elif encoding in ("Identity-H", "Identity-V"):
+            # It maps 2 byte character to the same 2 byte character
+            py_encoding = 'latin1'
         else:
             logging.warning("Unsupported encoding {}. Using default latin1".format(encoding))
             py_encoding = 'latin1'
