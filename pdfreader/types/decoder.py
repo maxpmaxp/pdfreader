@@ -10,7 +10,7 @@ class BaseDecoder(object):
         self.encoding = font.get('Encoding')
 
     def decode_string(self, s):
-        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
+        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s))
         return self.decode_hexstring(s_hex)
 
     def decode_hexstring(self, s: HexString):
@@ -25,7 +25,7 @@ class CMAPDecoder(BaseDecoder):
         for i in range(0, len(s), 2):
             code += s[i:i + 2]
             try:
-                ch = self.cmap.bf_ranges[code]
+                ch = self.cmap.resource.bf_ranges[code]
             except KeyError:
                 if len(code) < 4:
                     continue
@@ -41,10 +41,17 @@ class CMAPDecoder(BaseDecoder):
 
         return res
 
+    def decode_string(self, s):
+        s_hex = HexString(s.hex().upper())
+        return self.decode_hexstring(s_hex)
+
 
 class EncodingDecoder(BaseDecoder):
 
     def decode_hexstring(self, s: HexString):
+        return self.decode_string(s.to_bytes())
+
+    def decode_string(self, s):
         # ToDo: Differences support. See p263 PDF32000_2008.pdf
         encoding = self.encoding
 
@@ -63,21 +70,14 @@ class EncodingDecoder(BaseDecoder):
             py_encoding = 'latin1'
         else:
             logging.warning("Unsupported encoding {}. Using default {}".format(encoding, DEFAULT_ENCODING))
-            py_encoding = DEFAULT_ENCODING
+            py_encoding = DEFAULT_ENCODING \
 
         # Add differences support
 
-        val = s.to_bytes()
-        try:
-            res = val.decode(py_encoding)
-        except UnicodeDecodeError:
-            logging.warning("Incorrect bytes: {}".format(repr(val)))
-            res = val.decode(py_encoding, "replace")
-        return res
+        return s.decode(py_encoding, "replace")
 
-    def decode_string(self, s):
-        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
-        return self.decode_hexstring(s_hex)
+
+default_decoder = EncodingDecoder(dict(Encoding="latin1"))
 
 
 def Decoder(font):

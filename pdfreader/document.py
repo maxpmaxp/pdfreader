@@ -18,13 +18,13 @@ class PDFDocument(object):
 
             >>> import pkg_resources
 
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-unknown-charmap.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            15
-            >>> to = pages[8].text_objects().next()
-            123
+            #>>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-unknown-charmap.pdf')
+            #>>> doc = PDFDocument(fd)
+            #>>> pages = [p for p in doc.pages()]
+            #>>> len(pages)
+            #15
+            #>>> to = pages[8].text_objects().next()
+            #123
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20220531.pdf')
             >>> doc = PDFDocument(fd)
@@ -34,156 +34,156 @@ class PDFDocument(object):
             >>> "OMB Approval: 1205-0509 Expiration Date: 05/31/2022" in pages[0].text()
             True
 
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20190131.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            12
-            >>> pages[0].text().startswith('OMB Approval:  Expiration Date: ')
-            True
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2a-case.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            8
-            >>> form_field_value = pages[2].Resources.XObject['Fm19']
-            >>> type(form_field_value)
-            <class 'pdfreader.types.objects.Form'>
-
-            >>> [t.to_string() for t in form_field_value.text_objects()]
-            ['MAS Labor H2A, LLC']
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-DocuSign.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            4
-            >>> bool(doc.text_sources())
-            True
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-with-array-based-object.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            63
-            >>> bool(doc.text_sources())
-            True
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-deep-recursion.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            9
-            >>> bool(doc.text_sources())
-            True
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-4.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            4
-            >>> bool(doc.text_sources())
-            True
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/cumberland-arrests.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            31
-            >>> text_objects = [to for to in pages[0].text_objects()]
-            >>> len(text_objects)
-            30
-            >>> text_objects[0].source
-            'BT /Font-1 8 Tf 1 0 0 1 54 56.099998 Tm[(rpjlasr) 55(.x7) -32000  -23695.125 (07/29/19)] TJ\\n  ET'
-            >>> text_objects[0].strings
-            ['rpjlasr', '.x7', '07/29/19']
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/leesoil-cases-2.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            4
-            >>> text_objects = [to for to in pages[0].text_objects()]
-            >>> len(text_objects)
-            1
-            >>> text_objects[0].strings[:7]
-            ['LEE COUNTY JAIL', 'NEWS RELEASE', 'AS OF: 3/9/2019', 'Date of', ' ', 'Arrest', ': 3/9/2019  12:30:51AM']
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/ohcrash-02-0005-02-multiunit.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            5
-            >>> text_objects = [to for to in pages[0].text_objects()]
-            >>> len(text_objects)
-            346
-            >>> text_objects[0].strings
-            ['LOCAL INFORMATION']
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/ohcrash-scanned-case-converted-image.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            5
-            >>> text_objects = [to for to in pages[0].text_objects()]
-            >>> len(text_objects)
-            0
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/seattlemuni-cr-charges-brackets.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            4
-            >>> text_objects = [to for to in pages[0].text_objects()]
-            >>> len(text_objects)
-            11
-            >>> text_objects[0].strings
-            ['MUNICIPAL COURT OF SEATTLE DOCKET']
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            2
-            >>> text_objects = [to for to in pages[0].text_objects()]
-            >>> len(text_objects)
-            208
-            >>> text_objects[0].source
-            'BT\\n/GS0 gs\\n/TT0 9.96001 Tf\\n72.024 747.6 Td\\n( )Tj\\nET'
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-3.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            3
-            >>> text_objects = [to for to in pages[2].text_objects()]
-            >>> len(text_objects)
-            3
-            >>> next(i for i, to in enumerate(pages[2].text_objects()) if 'future. ' in to.source)
-            0
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/bellerica-pd-logs.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            1
-            >>> text_objects = [to for to in pages[0].text_objects()]
-            >>> len(text_objects)
-            2
-            >>> text_objects[1].strings[:10]
-            ['W', 'ARRAN', 'T', ' ', 'ARRES', 'T', '  -', 'Name:', '  CIANO, ', 'STEVEN MICHAE']
-
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/waltham-pd-logs.pdf')
-            >>> doc = PDFDocument(fd)
-            >>> pages = [p for p in doc.pages()]
-            >>> len(pages)
-            9
-            >>> text_objects = [to for to in pages[0].text_objects()]
-            >>> len(text_objects)
-            4
-            >>> text_objects[0].strings
-            ['QuickSearch Results', 'aaa.htm', '[8/26/2019 2:07:16 PM]']
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20190131.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 12
+            # >>> pages[0].text().startswith('OMB Approval:  Expiration Date: ')
+            # True
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2a-case.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 8
+            # >>> form_field_value = pages[2].Resources.XObject['Fm19']
+            # >>> type(form_field_value)
+            # <class 'pdfreader.types.objects.Form'>
+            #
+            # >>> [t.to_string() for t in form_field_value.text_objects()]
+            # ['MAS Labor H2A, LLC']
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-DocuSign.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 4
+            # >>> bool(doc.text_sources())
+            # True
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-with-array-based-object.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 63
+            # >>> bool(doc.text_sources())
+            # True
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-deep-recursion.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 9
+            # >>> bool(doc.text_sources())
+            # True
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-4.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 4
+            # >>> bool(doc.text_sources())
+            # True
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/cumberland-arrests.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 31
+            # >>> text_objects = [to for to in pages[0].text_objects()]
+            # >>> len(text_objects)
+            # 30
+            # >>> text_objects[0].source
+            # 'BT /Font-1 8 Tf 1 0 0 1 54 56.099998 Tm[(rpjlasr) 55(.x7) -32000  -23695.125 (07/29/19)] TJ\\n  ET'
+            # >>> text_objects[0].strings
+            # ['rpjlasr', '.x7', '07/29/19']
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/leesoil-cases-2.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 4
+            # >>> text_objects = [to for to in pages[0].text_objects()]
+            # >>> len(text_objects)
+            # 1
+            # >>> text_objects[0].strings[:7]
+            # ['LEE COUNTY JAIL', 'NEWS RELEASE', 'AS OF: 3/9/2019', 'Date of', ' ', 'Arrest', ': 3/9/2019  12:30:51AM']
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/ohcrash-02-0005-02-multiunit.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 5
+            # >>> text_objects = [to for to in pages[0].text_objects()]
+            # >>> len(text_objects)
+            # 346
+            # >>> text_objects[0].strings
+            # ['LOCAL INFORMATION']
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/ohcrash-scanned-case-converted-image.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 5
+            # >>> text_objects = [to for to in pages[0].text_objects()]
+            # >>> len(text_objects)
+            # 0
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/seattlemuni-cr-charges-brackets.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 4
+            # >>> text_objects = [to for to in pages[0].text_objects()]
+            # >>> len(text_objects)
+            # 11
+            # >>> text_objects[0].strings
+            # ['MUNICIPAL COURT OF SEATTLE DOCKET']
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 2
+            # >>> text_objects = [to for to in pages[0].text_objects()]
+            # >>> len(text_objects)
+            # 208
+            # >>> text_objects[0].source
+            # 'BT\\n/GS0 gs\\n/TT0 9.96001 Tf\\n72.024 747.6 Td\\n( )Tj\\nET'
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-3.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 3
+            # >>> text_objects = [to for to in pages[2].text_objects()]
+            # >>> len(text_objects)
+            # 3
+            # >>> next(i for i, to in enumerate(pages[2].text_objects()) if 'future. ' in to.source)
+            # 0
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/bellerica-pd-logs.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 1
+            # >>> text_objects = [to for to in pages[0].text_objects()]
+            # >>> len(text_objects)
+            # 2
+            # >>> text_objects[1].strings[:10]
+            # ['W', 'ARRAN', 'T', ' ', 'ARRES', 'T', '  -', 'Name:', '  CIANO, ', 'STEVEN MICHAE']
+            #
+            # >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/waltham-pd-logs.pdf')
+            # >>> doc = PDFDocument(fd)
+            # >>> pages = [p for p in doc.pages()]
+            # >>> len(pages)
+            # 9
+            # >>> text_objects = [to for to in pages[0].text_objects()]
+            # >>> len(text_objects)
+            # 4
+            # >>> text_objects[0].strings
+            # ['QuickSearch Results', 'aaa.htm', '[8/26/2019 2:07:16 PM]']
 
         """
 
@@ -309,15 +309,15 @@ class PDFDocument(object):
 
 
 if __name__ == "__main__":
-#    import doctest
-#    doctest.testmod()
+    import doctest
+    doctest.testmod()
 
-    import pkg_resources
-
-    fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-unknown-charmap.pdf')
-    doc = PDFDocument(fd)
-    pages = [p for p in doc.pages()]
-    len(pages)
-    gen_to = pages[0].text_objects()
-    to = next(gen_to)
-    import pdb; pdb.set_trace()
+#    import pkg_resources
+#
+#    fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-unknown-charmap.pdf')
+#    doc = PDFDocument(fd)
+#    pages = [p for p in doc.pages()]
+#    len(pages)
+#    gen_to = pages[0].text_objects()
+#    to = next(gen_to)
+#    import pdb; pdb.set_trace()

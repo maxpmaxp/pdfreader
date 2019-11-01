@@ -3,6 +3,7 @@ import logging
 from ..constants import DEFAULT_ENCODING
 from ..exceptions import ParserException
 from ..types.content import TextObject
+from ..types.decoder import default_decoder
 from ..types.native import HexString
 from .base import BasicTypesParser
 
@@ -74,17 +75,12 @@ class EncodingDecoder(BaseDecoder):
             logging.warning("Unsupported encoding {}. Using default {}".format(encoding, DEFAULT_ENCODING))
             py_encoding = DEFAULT_ENCODING
 
-        if cmap:
-            res = cmap.resource.decode_hexstring(s, encoding=py_encoding)
-        elif encoding:
-            val = s.to_bytes()
-            try:
-                res = val.decode(py_encoding)
-            except UnicodeDecodeError:
-                logging.warning("Incorrect bytes: {}".format(repr(val)))
-                res = val.decode(py_encoding, "replace")
-        else:
-            res = s.to_string()
+        val = s.to_bytes()
+        try:
+            res = val.decode(py_encoding)
+        except UnicodeDecodeError:
+            logging.warning("Incorrect bytes: {}".format(repr(val)))
+            res = val.decode(py_encoding, "replace")
         return res
 
     def decode_string(self, s):
@@ -100,16 +96,19 @@ def Decoder(font):
 class TextParser(BasicTypesParser):
     """ BT/ET section parser """
 
-    def __init__(self, fonts, *args, **kwargs):
-        self.fonts = fonts
+    def __init__(self, context, *args, **kwargs):
+        self.context = context
         super(TextParser, self).__init__(*args, **kwargs)
         self.current_font_name = None
         self.current_strings = []
 
     @property
-    def current_font(self):
+    def decoder(self):
         if self.current_font_name:
-            return self.fonts[self.current_font_name[1:]]
+            decoder = self.context.decoders[self.current_font_name[1:]]
+        else:
+            decoder = default_decoder
+        return decoder
 
     def on_string_parsed(self, s):
         self.current_strings.append(s)
@@ -184,16 +183,6 @@ class TextParser(BasicTypesParser):
         s = super(TextParser, self).name()
         return "/" + s
 
-    def text(self):
-        """
-        Returns a list of TextObjects parsed from stream
-        """
-        objs = []
-        for o in self.parse_objects():
-            if isinstance(o, TextObject):
-                objs.append(o)
-        return objs
-
     def text_object(self):
         block = ""
         args = []
@@ -224,15 +213,15 @@ class TextParser(BasicTypesParser):
 
     def hexstring(self):
         s = super(TextParser, self).hexstring()
-        if self.current_font:
-            s = self.current_font.decode_hexstring(s)
+        if self.decoder:
+            s = self.decoder.decode_hexstring(s)
         self.on_string_parsed(s)
         return "({})".format(s)
 
     def string(self):
         s = super(TextParser, self).string()
-        if self.current_font:
-            s = self.current_font.decode_string(s)
+        if self.decoder:
+            s = self.decoder.decode_string(s)
         self.on_string_parsed(s)
         return "({})".format(s)
 

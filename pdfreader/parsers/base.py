@@ -1,5 +1,5 @@
 from ..buffer import Buffer
-from ..constants import WHITESPACES, EOL, DELIMITERS, CR, LF, STRING_ESCAPED
+from ..constants import WHITESPACES, EOL, DELIMITERS, CR, LF, STRING_ESCAPED, DEFAULT_ENCODING
 from ..types import *
 from ..exceptions import ParserException
 

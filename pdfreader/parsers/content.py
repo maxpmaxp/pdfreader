@@ -1,4 +1,5 @@
 from .base import BasicTypesParser
+from ..types.native import null
 from .inlineimage import InlineImageParser
 from .text import TextParser
 
@@ -12,16 +13,31 @@ class ContentParser(BasicTypesParser):
 
     def objects(self):
         """ Returns list of content objects as they follow in the document """
-        res = []
         while self.current:
             self.maybe_spaces_or_comments()
             obj = self.object()
-            res.append(obj)
+            from ..types import TextObject
+            if isinstance(obj, TextObject):
+                import pdb; pdb.set_trace()
+            yield obj
             self.maybe_spaces_or_comments()
-        return res
+
+    def null_false_true_token(self):
+        val = self.token()
+        if val == 'null':
+            val = null
+        elif val == 'true':
+            val = True
+        elif val == 'false':
+            val = False
+        return val
 
     def _get_parser(self):
-        method = super(ContentParser, self)._get_parser()
+        if self.current in b'nft':
+            # work around tokens which starts the same as null, false, true
+            method = self.null_false_true_token
+        else:
+            method = super(ContentParser, self)._get_parser()
         if method is None:
             # assume token
             method = self.token
@@ -29,7 +45,6 @@ class ContentParser(BasicTypesParser):
             val = method()
             for i in range(len(val)):
                 self.prev()
-
             if val == 'BT':
                 method = self.bt_et
             elif val == 'BI':
@@ -39,7 +54,7 @@ class ContentParser(BasicTypesParser):
 
     def bt_et(self):
         """ returns TextObject """
-        p = TextParser(self.context.fonts, self.fileobj, offset=self.last_block_offset + self.index)
+        p = TextParser(self.context, self.fileobj, offset=self.last_block_offset + self.index)
         return p.text_object()
 
     def bi_ei(self):

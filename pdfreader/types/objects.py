@@ -1,9 +1,7 @@
-import logging
-
-from ..constants import DEFAULT_ENCODING
 from ..utils import cached_property
 from .content import TextObject
-from .native import Stream, Dictionary, HexString, Array
+from .decoder import Decoder
+from .native import Stream, Dictionary, Array
 
 
 class StartXRef(object):
@@ -104,6 +102,10 @@ class DictBasedObject(Dictionary):
         self._cache[item] = obj
         return self._cache[item]
 
+    def __delitem__(self, item): # real signature unknown
+        """ Delete self[key]. """
+        del self._cache[item]
+
     def get(self, item, default=None):
         try:
             val = self[item]
@@ -159,6 +161,10 @@ class PageContentMixin(object):
     @cached_property
     def fonts(self):
         return self.Resources.get("Font", dict())
+
+    @cached_property
+    def decoders(self):
+        return {name: Decoder(self.fonts[name]) for name in self.fonts.keys()}
 
     def text_objects(self):
         from ..parsers.content import ContentParser

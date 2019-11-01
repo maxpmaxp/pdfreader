@@ -2,6 +2,7 @@ import logging, zlib
 
 from decimal import Decimal
 
+from ..constants import DEFAULT_ENCODING
 from ..utils import cached_property
 
 
@@ -29,10 +30,10 @@ class HexString(str):
         return int(self, 16)
 
     def to_string(self):
-        return "".join([chr(int(self[i:i + 2], 16)) for i in range(0, len(self), 2)])
+        return self.to_bytes().decode(DEFAULT_ENCODING)
 
     def to_bytes(self):
-        return b''.join([bytes([int(self[i:i+2], 16)]) for i in range(0, len(self), 2)])
+        return bytes.fromhex(self)
 
 
 class Stream(object):
