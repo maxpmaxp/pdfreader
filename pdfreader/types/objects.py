@@ -1,8 +1,8 @@
 import logging
 
-from copy import copy
-
 from ..constants import DEFAULT_ENCODING
+from ..utils import cached_property
+from .content import TextObject
 from .native import Stream, Dictionary, HexString, Array
 
 
@@ -44,7 +44,7 @@ class StreamBasedObject(Stream):
     """ Stream-based object. Can solve indirect references """
 
     def __init__(self, doc, stream):
-        super(StreamBasedObject, self).__init__(copy(stream.dictionary), copy(stream.stream))
+        super(StreamBasedObject, self).__init__(stream.dictionary, stream.stream)
         self.doc = doc
         self._cache = dict()
 
@@ -154,32 +154,39 @@ class PageTreeNode(DictBasedObject):
                     yield page
 
 
-class Page(DictBasedObject):
-    """ Type = Page
-    """
+class PageContentMixin(object):
 
-    def content(self):
-        """ ToDo: Can BT instruction come in one content stream and have enclosing ET in a following one??
-                  The current implementation says
-        """
-        if isinstance(self.Contents, StreamBasedObject):
-            res = self.Contents.filtered
-        else:
-            res = b''.join([ct.filtered for ct in self.Contents])
-        return res
+    @cached_property
+    def fonts(self):
+        return self.Resources.get("Font", dict())
 
     def text_objects(self):
-        from ..parsers.text import TextParser
-        fonts = self.Resources.get("Font", dict())
-        p = TextParser(fonts, self.content())
-        for txt_obj in p.text():
-            yield txt_obj
+        from ..parsers.content import ContentParser
+        p = ContentParser(self, self.stream_content)
+        for obj in p.objects():
+            if isinstance(obj, TextObject):
+                yield obj
 
     def text(self, glue=""):
         return glue.join([to.to_string(glue) for to in self.text_objects()])
 
     def text_sources(self, glue="\n"):
         return glue.join([to.source for to in self.text_objects()])
+
+
+class Page(PageContentMixin, DictBasedObject):
+    """ Type = Page
+    """
+
+    @cached_property
+    def stream_content(self):
+        """ ToDo: Can BT instruction come in one content stream and have enclosing ET in a following one??
+        """
+        if isinstance(self.Contents, StreamBasedObject):
+            res = self.Contents.filtered
+        else:
+            res = b''.join([ct.filtered for ct in self.Contents])
+        return res
 
 
 class XObject(StreamBasedObject):
@@ -209,23 +216,12 @@ class Image(XObject):
     """
 
 
-class Form(XObject):
+class Form(PageContentMixin, XObject):
     """ Type = XObject
         Subtype = Form
     """
 
-    def text_objects(self):
-        from ..parsers.text import TextParser
-        fonts = self.Resources.get("Font", dict())
-        p = TextParser(fonts, self.filtered)
-        for txt_obj in p.text():
-            yield txt_obj
-
-    def text(self, glue=""):
-        return glue.join([to.to_string(glue) for to in self.text_objects()])
-
-    def text_sources(self, glue="\n"):
-        return glue.join([to.source for to in self.text_objects()])
+    stream_content = XObject.filtered
 
 
 class Group(XObject):
@@ -252,41 +248,6 @@ class Font(DictBasedObject):
 
     def _type__ToUnicode(self, obj):
         return CMap(obj.doc, obj)
-
-    def decode_hexstring(self, s: HexString):
-        # ToDo: Differences support. See p263 PDF32000_2008.pdf
-        cmap = self.get('ToUnicode')
-        encoding = self.get('Encoding')
-
-        if encoding == "MacRomanEncoding":
-            # ToDO: Not 100% correct there are some differences between MacRomanEncoding and macroman
-            py_encoding = 'macroman'
-        elif encoding == "MacExpertEncoding":
-            # ToDO: Not 100% correct
-            py_encoding = 'maclatin2'
-        elif encoding == "WinAnsiEncoding":
-            py_encoding = 'cp1252'
-        elif encoding == "StandardEncoding":
-            py_encoding = 'latin1'
-        elif encoding in ("Identity-H", "Identity-V"):
-            # It maps 2 byte character to the same 2 byte character
-            py_encoding = 'latin1'
-        else:
-            logging.warning("Unsupported encoding {}. Using default latin1".format(encoding))
-            py_encoding = 'latin1'
-
-        if cmap:
-            res = cmap.resource.decode_hexstring(s, encoding=py_encoding)
-        elif encoding:
-            val = s.to_bytes()
-            res = val.decode(py_encoding)
-        else:
-            res = s.to_string()
-        return res
-
-    def decode_string(self, s):
-        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
-        return self.decode_hexstring(s_hex)
 
 
 class Encoding(DictBasedObject):

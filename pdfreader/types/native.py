@@ -3,6 +3,9 @@ import logging, zlib
 from copy import copy
 from decimal import Decimal
 
+from ..utils import cached_property
+
+
 null = None
 Boolean = bool
 Integer = int
@@ -71,11 +74,10 @@ class Stream(object):
             data = (self.stream[:25] + b' ...')
         return "<Stream:len={},data={}>".format(self.dictionary["Length"], repr(data))
 
-    @property
     def type(self):
         return self.get('Type')
 
-    @property
+    @cached_property
     def filtered(self):
         filters = self.get('Filter')
         if not filters:
@@ -150,7 +152,7 @@ class Stream(object):
 
     @classmethod
     def from_stream(cls, other):
-        return cls(copy(other.dictionary), copy(other.stream))
+        return cls(other.dictionary, other.stream)
 
     def __getattr__(self, item):
         return self.dictionary.get(item)

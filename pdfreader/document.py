@@ -18,6 +18,14 @@ class PDFDocument(object):
 
             >>> import pkg_resources
 
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-unknown-charmap.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            15
+            >>> to = pages[8].text_objects().next()
+            123
+
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20220531.pdf')
             >>> doc = PDFDocument(fd)
             >>> pages = [p for p in doc.pages()]
@@ -301,5 +309,15 @@ class PDFDocument(object):
 
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+#    import doctest
+#    doctest.testmod()
+
+    import pkg_resources
+
+    fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-unknown-charmap.pdf')
+    doc = PDFDocument(fd)
+    pages = [p for p in doc.pages()]
+    len(pages)
+    gen_to = pages[0].text_objects()
+    to = next(gen_to)
+    import pdb; pdb.set_trace()

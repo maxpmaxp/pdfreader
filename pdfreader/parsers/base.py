@@ -563,27 +563,34 @@ class BasicTypesParser(Buffer):
                 val += ch.decode(DEFAULT_ENCODING)
         return String(val)
 
+    def _get_parser(self):
+        method = None
+        if self.current == b'<':
+            method = self.dictionary_or_stream_or_hexstring
+        elif self.current == b'[':
+            method = self.array
+        elif self.current == b'(':
+            method = self.string
+        elif self.current == b'n':
+            method = self.null
+        elif self.current == b'f':
+            method = self.false
+        elif self.current == b't':
+            method = self.true
+        elif self.current in b'+-.':
+            method = self.numeric
+        elif self.current in b'1234567890':
+            method = self.numeric_or_indirect_reference
+        elif self.current == b"/":
+            method = self.name
+        return method
+
     def object(self):
         val = None
         self.maybe_spaces_or_comments()
-        if self.current == b'<':
-            val = self.dictionary_or_stream_or_hexstring()
-        elif self.current == b'[':
-            val = self.array()
-        elif self.current == b'(':
-            val = self.string()
-        elif self.current == b'n':
-            val = self.null()
-        elif self.current == b'f':
-            val = self.false()
-        elif self.current == b't':
-            val = self.true()
-        elif self.current in b'+-.':
-            val = self.numeric()
-        elif self.current in b'1234567890':
-            val = self.numeric_or_indirect_reference()
-        elif self.current == b"/":
-            val = self.name()
+        method = self._get_parser()
+        if method:
+            val = method()
         else:
             self.on_parser_error("Unexpected token")
         return val
