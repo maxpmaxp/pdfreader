@@ -332,7 +332,7 @@ class BasicTypesParser(Buffer):
         ...                           >>
         ...         >>'''
         >>> BasicTypesParser(s, 0).dictionary()
-        {'Type': 'Example', 'Subtype': 'DictExample', 'Version': Decimal('0.01'), 'IntegerItem': 12, 'StringItem': 'a string', 'ArrayItem': [1, 2], 'ObjRef': <IndirectReference:n=12,g=0>, 'SubDictionary': {'Item1': True, 'Item2': False, 'Item3': None, 'Item4': 'OK'}}
+        {'Type': 'Example', 'Subtype': 'DictExample', 'Version': Decimal('0.01'), 'IntegerItem': 12, 'StringItem': b'a string', 'ArrayItem': [1, 2], 'ObjRef': <IndirectReference:n=12,g=0>, 'SubDictionary': {'Item1': True, 'Item2': False, 'Item3': None, 'Item4': b'OK'}}
 
         """
         pfx = self.read(2)
@@ -465,7 +465,7 @@ class BasicTypesParser(Buffer):
 
         >>> s = b'[-1.5 <AABBCC> (Regular string) <</Name /Value>> 0 10 5 R]'
         >>> BasicTypesParser(s, 0).array()
-        [Decimal('-1.5'), 'AABBCC', 'Regular string', {'Name': 'Value'}, 0, <IndirectReference:n=10,g=5>]
+        [Decimal('-1.5'), 'AABBCC', b'Regular string', {'Name': 'Value'}, 0, <IndirectReference:n=10,g=5>]
 
         """
         if self.current != b'[':
@@ -546,7 +546,7 @@ class BasicTypesParser(Buffer):
                     icode = int(code, 8)
                     # 8 bits values are allowed only
                     if icode <= 255:
-                        val += chr(icode)
+                        val += bytes([icode])
                     else:
                         # leave as is
                         val += b"\\" + code
@@ -556,7 +556,7 @@ class BasicTypesParser(Buffer):
                     self.eol()
                 else:
                     # unescape or leave as is
-                    val += STRING_ESCAPED.get(ch) or (b"\\" + ch).decode(DEFAULT_ENCODING)
+                    val += STRING_ESCAPED.get(ch) or (b"\\" + ch)
             elif ch == b')':
                 break
             else:

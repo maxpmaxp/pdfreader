@@ -21,7 +21,7 @@ class Name(str):
     """ Name type: /SomeName """
 
 
-class HexString(String):
+class HexString(str):
     """ Hexadecimal string: <AF20FA> """
 
     @property
@@ -209,7 +209,7 @@ PDF_TYPES = (type(null), IndirectReference, IndirectObject, Comment, Stream, Dic
 ATOMIC_TYPES = (Integer, Real, Boolean, String, HexString, Name, type(null))
 
 
-class Token(String):
+class Token(str):
     """ That's not a PDF type itself. We used it to reflect other than PDF types tokens.
         For example CMap: def, findresource, begin
     """

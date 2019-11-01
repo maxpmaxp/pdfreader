@@ -40,7 +40,7 @@ class PDFParser(BasicTypesParser):
         ...     (Brilling)
         ... endobj'''
         >>> PDFParser(s, 0).indirect_object()
-        <IndirectObject:n=12,g=0,v='Brilling'>
+        <IndirectObject:n=12,g=0,v=b'Brilling'>
 
         """
         num = self.non_negative_int()
