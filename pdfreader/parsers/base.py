@@ -485,55 +485,55 @@ class BasicTypesParser(Buffer):
 
         >>> s = b'(This is a string)'
         >>> BasicTypesParser(s, 0).string()
-        'This is a string'
+        b'This is a string'
 
         >>> s = b'''(Strings may contain newlines
         ... and such.)'''
         >>> BasicTypesParser(s, 0).string()
-        'Strings may contain newlines\\nand such.'
+        b'Strings may contain newlines\\nand such.'
 
         >>> s = b'''(Strings may contain balanced parenthesis () and special characters (*!&}^% and so on).)'''
         >>> BasicTypesParser(s, 0).string()
-        'Strings may contain balanced parenthesis () and special characters (*!&}^% and so on).'
+        b'Strings may contain balanced parenthesis () and special characters (*!&}^% and so on).'
 
         Empty strings are allowed
         >>> s = b'()'
         >>> BasicTypesParser(s, 0).string()
-        ''
+        b''
 
         Multiline strings come with reverse solidus wollowed by CR, LF or the both.
         >>> s = b'''(This is \\
         ... a multiline \\
         ... string)'''
         >>> BasicTypesParser(s, 0).string()
-        'This is a multiline string'
+        b'This is a multiline string'
 
         >>> s = b'(This string has escaped chars in it \\\\n\\\\r\\\\t\\\\b\\\\f\\\\(\\\\)\\\\\\\\)'
         >>> BasicTypesParser(s, 0).string()
-        'This string has escaped chars in it \\n\\r\\t\\x08\\x0c()\\\\'
+        b'This string has escaped chars in it \\n\\r\\t\\x08\\x0c()\\\\'
 
         >>> s = b'(This string contains 2 \\\\245octal characters\\\\307)'
         >>> BasicTypesParser(s, 0).string()
-        'This string contains 2 ¥octal charactersÇ'
+        b'This string contains 2 ¥octal charactersÇ'
 
         >>> s = b'(The octal ddd may contain 1,2 or 3 octal digits: \\\\2,\\\\20,\\\\245)'
         >>> BasicTypesParser(s, 0).string()
-        'The octal ddd may contain 1,2 or 3 octal digits: \\x02,\\x10,¥'
+        b'The octal ddd may contain 1,2 or 3 octal digits: \\x02,\\x10,¥'
 
         >>> s = b'(\\\\0053 denotes 2 characters Ctl+E followed by the digit 3)'
         >>> BasicTypesParser(s, 0).string()
-        '\\x053 denotes 2 characters Ctl+E followed by the digit 3'
+        b'\\x053 denotes 2 characters Ctl+E followed by the digit 3'
         """
 
         if self.current != b'(':
             self.on_parser_error("String expected")
-        val = ''
+        val = b''
         self.next()
         while True:
             ch = self.next()
             if ch == b'(':
                 self.prev()
-                val += "(" + self.string() + ")"
+                val += b"(" + self.string() + b")"
             elif ch == b'\\':
                 ch = self.next()
                 if ch in b"01234567":
@@ -549,7 +549,7 @@ class BasicTypesParser(Buffer):
                         val += chr(icode)
                     else:
                         # leave as is
-                        val += "\\" + code.decode(DEFAULT_ENCODING)
+                        val += b"\\" + code
                 elif ch in EOL:
                     # multiline string - just skip
                     self.prev()
@@ -560,7 +560,7 @@ class BasicTypesParser(Buffer):
             elif ch == b')':
                 break
             else:
-                val += ch.decode(DEFAULT_ENCODING)
+                val += ch
         return String(val)
 
     def _get_parser(self):

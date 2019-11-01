@@ -1,6 +1,5 @@
 import logging, zlib
 
-from copy import copy
 from decimal import Decimal
 
 from ..utils import cached_property
@@ -14,8 +13,8 @@ Array = list
 Dictionary = dict
 
 
-class String(str):
-    """ Literal string. Just to tell apart of the other types """
+class String(bytes):
+    """ A string object shall consist of a series of zero or more bytes """
 
 
 class Name(str):
