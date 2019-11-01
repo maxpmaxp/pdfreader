@@ -67,10 +67,10 @@ class EncodingDecoder(BaseDecoder):
             py_encoding = 'macroman'
         elif encoding == "StandardEncoding":
             # ToDO: Not 100% correct
-            py_encoding = 'latin1'
+            py_encoding = 'latin-1'
         elif encoding in ("Identity-H", "Identity-V"):
             # It maps 2 byte character to the same 2 byte character
-            py_encoding = 'latin1'
+            py_encoding = 'latin-1'
         else:
             logging.warning("Unsupported encoding {}. Using default {}".format(encoding, DEFAULT_ENCODING))
             py_encoding = DEFAULT_ENCODING

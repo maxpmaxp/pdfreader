@@ -15,11 +15,7 @@ class ContentParser(BasicTypesParser):
         """ Returns list of content objects as they follow in the document """
         while self.current:
             self.maybe_spaces_or_comments()
-            obj = self.object()
-            from ..types import TextObject
-            if isinstance(obj, TextObject):
-                import pdb; pdb.set_trace()
-            yield obj
+            yield self.object()
             self.maybe_spaces_or_comments()
 
     def null_false_true_token(self):
@@ -54,10 +50,10 @@ class ContentParser(BasicTypesParser):
 
     def bt_et(self):
         """ returns TextObject """
-        p = TextParser(self.context, self.fileobj, offset=self.last_block_offset + self.index)
+        p = TextParser(self.context, self.buffer)
         return p.text_object()
 
     def bi_ei(self):
         """ returns InlineImage """
-        p = InlineImageParser(self.fileobj, offset=self.last_block_offset + self.index)
+        p = InlineImageParser(self.buffer)
         return p.inline_image()

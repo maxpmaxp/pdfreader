@@ -1,6 +1,6 @@
 import re
 
-from ..constants import WHITESPACE_CODES, EOL, SP, DEFAULT_ENCODING
+from ..constants import WHITESPACE_CODES, EOL, SP
 from ..exceptions import ParserException
 from ..types import *
 
@@ -134,7 +134,7 @@ class PDFParser(BasicTypesParser):
         for _ in range(size):
             self.prev()
 
-        return PDFHeader(m.groups()[0].decode(DEFAULT_ENCODING), offset=self.index + m.start())
+        return PDFHeader(m.groups()[0].decode(DEFAULT_ENCODING), offset=self.buffer.index + m.start())
 
     def pdf_trailer(self):
         """

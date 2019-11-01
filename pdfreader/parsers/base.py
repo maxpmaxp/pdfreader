@@ -4,13 +4,42 @@ from ..types import *
 from ..exceptions import ParserException
 
 
-class BasicTypesParser(Buffer):
+class BasicTypesParser(object):
     """ can parse basic PDF types  """
 
     exception_class = ParserException
 
-    def __init__(self, fileobj, offset=0):
-        super(BasicTypesParser, self).__init__(fileobj, offset)
+    def __init__(self, fileobj_or_buffer, offset=0):
+        if isinstance(fileobj_or_buffer, Buffer):
+            self.buffer = fileobj_or_buffer
+        else:
+            self.buffer = Buffer(fileobj_or_buffer, offset)
+
+    @property
+    def current(self):
+        return self.buffer.current
+
+    @property
+    def is_eof(self):
+        return self.buffer.is_eof
+
+    def next(self):
+        return self.buffer.next()
+
+    def prev(self):
+        return self.buffer.prev()
+
+    def read(self, n):
+        return self.buffer.read(n)
+
+    def get_state(self):
+        return self.buffer.get_state()
+
+    def set_state(self, state):
+        return self.buffer.set_state(state)
+
+    def reset(self, n):
+        return self.buffer.reset(n)
 
     def on_parser_error(self, message):
         # ToDo: display parsing context here
