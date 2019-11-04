@@ -1,3 +1,5 @@
+import logging
+
 from ..exceptions import ParserException
 from ..types.native import Name, Token, Integer, HexString, Array
 from ..types.cmap import CodespaceRanges, MappedCodespaceRanges, CMapResource, Range, MapRange, BFChar
@@ -59,6 +61,16 @@ class CMapParser(BasicTypesParser):
     def cmap(self):
         """
         >>> import pkg_resources
+
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-missing-name.txt')
+        >>> cmap = CMapParser(fd).cmap()
+        >>> cmap.name is None
+        True
+        >>> len(cmap.bf_ranges.ranges)
+        7
+        >>> cmap.bf_ranges['01']
+        ' '
+
         >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-3.txt')
         >>> cmap = CMapParser(fd).cmap()
         >>> cmap.name
@@ -128,7 +140,13 @@ class CMapParser(BasicTypesParser):
         self.maybe_spaces_or_comments()
         state = self.get_state() # save parser state
 
-        cmapname = self.cmap_name()
+        try:
+            cmapname = self.cmap_name()
+        except ParserException:
+            # see cmap-sample-4.txt (page 9 samples/tyler-or-inline-image.pdf) - missing /CMapName
+            logging.warning("Missing /CMapName")
+            cmapname = None
+            self.set_state(state)
 
         # Extarct Coderanges
         self.set_state(state)
