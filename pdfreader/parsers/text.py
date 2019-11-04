@@ -1,96 +1,10 @@
 import logging
 
+from ..codecs.decoder import default_decoder
 from ..constants import DEFAULT_ENCODING
 from ..exceptions import ParserException
 from ..types.content import TextObject
-from ..types.decoder import default_decoder
-from ..types.native import HexString
 from .base import BasicTypesParser
-
-
-class BaseDecoder(object):
-    def __init__(self, font):
-        self.cmap = font.get("ToUnicode")
-        self.encoding = font.get('Encoding')
-
-    def decode_string(self, s):
-        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
-        return self.decode_hexstring(s_hex)
-
-    def decode_hexstring(self, s: HexString):
-        raise NotImplementedError()
-
-
-class CMAPDecoder(BaseDecoder):
-
-    def decode_hexstring(self, s: HexString):
-        res, code = "", ""
-
-        for i in range(0, len(s), 2):
-            code += s[i:i + 2]
-            try:
-                ch = self.cmap.bf_ranges[code]
-            except KeyError:
-                if len(code) < 4:
-                    continue
-                elif self.encoding:
-                    # According to the spec we may ignore encoding if CMAP defined but prefer to not.
-                    ch = HexString(code).to_bytes().decode(self.encoding)
-                else:
-                    # leave as is
-                    ch = HexString(code).to_string()
-            res += ch
-            code = ""
-
-        if code:
-            hs = HexString(code)
-            res += hs.to_bytes().decode(self.encoding) if self.encoding else hs.to_string()
-
-        return res
-
-
-class EncodingDecoder(BaseDecoder):
-
-    def decode_hexstring(self, s: HexString, encoding=None):
-        # ToDo: Differences support. See p263 PDF32000_2008.pdf
-        encoding = self.encoding
-
-        # replace expert encodings with regular & warn
-        if encoding == "MacExpertEncoding":
-            logging.warning("Replacing MacExpertEncoding with MacRomanEncoding")
-            encoding = "MacRomanEncoding"
-
-        if encoding == "WinAnsiEncoding":
-            py_encoding = 'cp1252'
-        elif encoding == "MacRomanEncoding":
-            # ToDO: Not 100% correct there are some differences between MacRomanEncoding and macroman
-            py_encoding = 'macroman'
-        elif encoding == "StandardEncoding":
-            # ToDO: Not 100% correct
-            py_encoding = 'latin-1'
-        elif encoding in ("Identity-H", "Identity-V"):
-            # It maps 2 byte character to the same 2 byte character
-            py_encoding = 'latin-1'
-        else:
-            logging.warning("Unsupported encoding {}. Using default {}".format(encoding, DEFAULT_ENCODING))
-            py_encoding = DEFAULT_ENCODING
-
-        val = s.to_bytes()
-        try:
-            res = val.decode(py_encoding)
-        except UnicodeDecodeError:
-            logging.warning("Incorrect bytes: {}".format(repr(val)))
-            res = val.decode(py_encoding, "replace")
-        return res
-
-    def decode_string(self, s):
-        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
-        return self.decode_hexstring(s_hex)
-
-
-def Decoder(font):
-    klass = CMAPDecoder if font.get("ToUnicode") else EncodingDecoder
-    return klass(font)
 
 
 class TextParser(BasicTypesParser):

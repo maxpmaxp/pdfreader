@@ -1,6 +1,6 @@
+from ..codecs.decoder import Decoder
 from ..utils import cached_property
 from .content import TextObject, InlineImage
-from .decoder import Decoder
 from .native import Stream, Dictionary, Array
 
 

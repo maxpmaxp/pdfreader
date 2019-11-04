@@ -122,7 +122,7 @@ class PDFDocument(object):
             >>> len(text_objects)
             346
             >>> text_objects[0].strings
-            ['LOCAL INFORMATION']
+            ['LOCAL\xa0INFORMATION']
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/ohcrash-scanned-case-converted-image.pdf')
             >>> doc = PDFDocument(fd)
@@ -153,7 +153,7 @@ class PDFDocument(object):
             >>> len(text_objects)
             208
             >>> text_objects[0].source
-            'BT\\n/GS0 gs\\n/TT0 9.96001 Tf\\n72.024 747.6 Td\\n( )Tj\\nET'
+            'BT\\n/GS0 gs\\n/TT0 9.96001 Tf\\n72.024 747.6 Td\\n(\\xa0)Tj\\nET'
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-DocumentFragment-3.pdf')
             >>> doc = PDFDocument(fd)
@@ -186,7 +186,7 @@ class PDFDocument(object):
             >>> len(text_objects)
             4
             >>> text_objects[0].strings
-            ['QuickSearch Results', 'aaa.htm', '[8/26/2019 2:07:16 PM]']
+            ['QuickSearch\\xa0Results', 'aaa.htm', '[8/26/2019\\xa02:07:16\\xa0PM]']
 
         """
 
@@ -319,3 +319,4 @@ class PDFDocument(object):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+

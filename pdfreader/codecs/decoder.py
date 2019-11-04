@@ -1,7 +1,11 @@
+import codecs
 import logging
 
 from ..constants import DEFAULT_ENCODING
-from .native import HexString
+from ..types.native import HexString
+from . import register_pdf_encodings
+
+register_pdf_encodings()
 
 
 class BaseDecoder(object):
@@ -53,28 +57,13 @@ class EncodingDecoder(BaseDecoder):
 
     def decode_string(self, s):
         # ToDo: Differences support. See p263 PDF32000_2008.pdf
-        encoding = self.encoding
+        try:
+            codec = codecs.lookup(self.encoding)
+        except LookupError:
+            logging.warning("Unsupported encoding {}. Using default {}".format(self.encoding, DEFAULT_ENCODING))
+            codec = codecs.lookup(DEFAULT_ENCODING)
 
-        # replace expert encodings with regular & warn
-        if encoding == "MacExpertEncoding":
-            logging.warning("Replacing MacExpertEncoding with MacRomanEncoding")
-            encoding = "MacRomanEncoding"
-
-        if encoding == "WinAnsiEncoding":
-            py_encoding = 'cp1252'
-        elif encoding == "MacRomanEncoding":
-            # ToDO: Not 100% correct there are some differences between MacRomanEncoding and macroman
-            py_encoding = 'macroman'
-        elif encoding == "StandardEncoding":
-            # ToDO: Not 100% correct
-            py_encoding = 'latin1'
-        else:
-            logging.warning("Unsupported encoding {}. Using default {}".format(encoding, DEFAULT_ENCODING))
-            py_encoding = DEFAULT_ENCODING \
-
-        # Add differences support
-
-        return s.decode(py_encoding, "replace")
+        return codec.decode(s)[0]
 
 
 default_decoder = EncodingDecoder(dict(Encoding="latin1"))
