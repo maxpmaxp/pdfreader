@@ -18,13 +18,16 @@ class PDFDocument(object):
 
             >>> import pkg_resources
 
-            #>>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-unknown-charmap.pdf')
-            #>>> doc = PDFDocument(fd)
-            #>>> pages = [p for p in doc.pages()]
-            #>>> len(pages)
-            #15
-            #>>> to = pages[8].text_objects().next()
-            #123
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-inline-image.pdf')
+            >>> doc = PDFDocument(fd)
+            >>> pages = [p for p in doc.pages()]
+            >>> len(pages)
+            15
+            >>> img = next(pages[8].inline_images())
+            >>> img.entries
+            {'D': [1, 0], 'IM': True, 'W': 1800, 'H': 3113, 'BPC': 1, 'F': 'CCITTFaxDecode', 'DecodeParms': {'K': -1, 'Columns': 1800, 'Rows': 3113, 'BlackIs1': True}}
+            >>> len(img.data)
+            290251
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20220531.pdf')
             >>> doc = PDFDocument(fd)
@@ -303,6 +306,11 @@ class PDFDocument(object):
         for page in self.pages():
             for to in page.text_objects():
                 yield to
+
+    def inline_images(self):
+        for page in self.pages():
+            for img in page.inline_images():
+                yield img
 
     def text_sources(self, separator="\n"):
         return separator.join([to.source for to in self.text_objects()])

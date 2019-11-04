@@ -1,5 +1,5 @@
 from ..utils import cached_property
-from .content import TextObject
+from .content import TextObject, InlineImage
 from .decoder import Decoder
 from .native import Stream, Dictionary, Array
 
@@ -171,6 +171,13 @@ class PageContentMixin(object):
         p = ContentParser(self, self.stream_content)
         for obj in p.objects():
             if isinstance(obj, TextObject):
+                yield obj
+
+    def inline_images(self):
+        from ..parsers.content import ContentParser
+        p = ContentParser(self, self.stream_content)
+        for obj in p.objects():
+            if isinstance(obj, InlineImage):
                 yield obj
 
     def text(self, glue=""):
