@@ -1,50 +1,70 @@
-import codecs
-
-from typing import Tuple
-
-WinAsciiEncoding = "WinAsciiEncoding"
-
-encode_table = {'A': b'A', 'Æ': b'\xc6', 'Á': b'\xc1', 'Â': b'\xc2', 'Ä': b'\xc4', 'À': b'\xc0', 'Å': b'\xc5',
-                'Ã': b'\xc3', 'B': b'B', 'C': b'C', 'Ç': b'\xc7', 'D': b'D', 'E': b'E', 'É': b'\xc9', 'Ê': b'\xca',
-                'Ë': b'\xcb', 'È': b'\xc8', 'Ð': b'\xd0', '€': b'\x80', 'F': b'F', 'G': b'G', 'H': b'H', 'I': b'I',
-                'Í': b'\xcd', 'Î': b'\xce', 'Ï': b'\xcf', 'Ì': b'\xcc', 'J': b'J', 'K': b'K', 'L': b'L', 'M': b'M',
-                'N': b'N', 'Ñ': b'\xd1', 'O': b'O', 'Œ': b'\x8c', 'Ó': b'\xd3', 'Ô': b'\xd4', 'Ö': b'\xd6',
-                'Ò': b'\xd2', 'Ø': b'\xd8', 'Õ': b'\xd5', 'P': b'P', 'Q': b'Q', 'R': b'R', 'S': b'S', 'Š': b'\x8a',
-                'T': b'T', 'Þ': b'\xde', 'U': b'U', 'Ú': b'\xda', 'Û': b'\xdb', 'Ü': b'\xdc', 'Ù': b'\xd9', 'V': b'V',
-                'W': b'W', 'X': b'X', 'Y': b'Y', 'Ý': b'\xdd', 'Ÿ': b'\x9f', 'Z': b'Z', 'Ž': b'\x8e', 'a': b'a',
-                'á': b'\xe1', 'â': b'\xe2', '´': b'\xb4', 'ä': b'\xe4', 'æ': b'\xe6', 'à': b'\xe0', '&': b'&',
-                'å': b'\xe5', '^': b'^', '~': b'~', '*': b'*', '@': b'@', 'ã': b'\xe3', 'b': b'b', '\\': b'\\',
-                '|': b'|', '{': b'{', '}': b'}', '[': b'[', ']': b']', '¦': b'\xa6', '•': b'\x95', 'c': b'c',
-                'ç': b'\xe7', '¸': b'\xb8', '¢': b'\xa2', 'ˆ': b'\x88', ':': b':', ',': b',', '©': b'\xa9',
-                '¤': b'\xa4', 'd': b'd', '†': b'\x86', '‡': b'\x87', '°': b'\xb0', '¨': b'\xa8', '÷': b'\xf7',
-                '$': b'$', 'e': b'e', 'é': b'\xe9', 'ê': b'\xea', 'ë': b'\xeb', 'è': b'\xe8', '8': b'8', '…': b'\x85',
-                '—': b'\x97', '–': b'\x96', '=': b'=', 'ð': b'\xf0', '!': b'!', '¡': b'\xa1', 'f': b'f', '5': b'5',
-                'ƒ': b'\x83', '4': b'4', 'g': b'g', 'ß': b'\xdf', '`': b'`', '>': b'>', '«': b'\xab', '»': b'\xbb',
-                '‹': b'\x8b', '›': b'\x9b', 'h': b'h', '-': b'-', 'i': b'i', 'í': b'\xed', 'î': b'\xee', 'ï': b'\xef',
-                'ì': b'\xec', 'j': b'j', 'k': b'k', 'l': b'l', '<': b'<', '¬': b'\xac', 'm': b'm', '¯': b'\xaf',
-                'μ': b'\xb5', '×': b'\xd7', 'n': b'n', '9': b'9', 'ñ': b'\xf1', '#': b'#', 'o': b'o', 'ó': b'\xf3',
-                'ô': b'\xf4', 'ö': b'\xf6', 'œ': b'\x9c', 'ò': b'\xf2', '1': b'1', '½': b'\xbd', '¼': b'\xbc',
-                '¹': b'\xb9', 'ª': b'\xaa', 'º': b'\xba', 'ø': b'\xf8', 'õ': b'\xf5', 'p': b'p', '¶': b'\xb6',
-                '(': b'(', ')': b')', '%': b'%', '.': b'.', '·': b'\xb7', '‰': b'\x89', '+': b'+', '±': b'\xb1',
-                'q': b'q', '?': b'?', '¿': b'\xbf', '"': b'"', '„': b'\x84', '“': b'\x93', '”': b'\x94',
-                '‘': b'\x91', '’': b'\x92', '‚': b'\x82', "'": b"'", 'r': b'r', '®': b'\xae', 's': b's', 'š': b'\x9a',
-                '§': b'\xa7', ';': b';', '7': b'7', '6': b'6', '/': b'/', '\xa0': b' ', '£': b'\xa3', 't': b't',
-                'þ': b'\xfe', '3': b'3', '¾': b'\xbe', '³': b'\xb3', '˜': b'\x98', '™': b'\x99', '2': b'2',
-                '²': b'\xb2', 'u': b'u', 'ú': b'\xfa', 'û': b'\xfb', 'ü': b'\xfc', 'ù': b'\xf9', '_': b'_', 'v': b'v',
-                'w': b'w', 'x': b'x', 'y': b'y', 'ý': b'\xfd', 'ÿ': b'\xff', '¥': b'\xa5', 'z': b'z', 'ž': b'\x9e',
-                '0': b'0'}
+from .codec import Codec
 
 
-decode_table = {v[0]: k for k, v in encode_table.items()}
+class WinAsciiCodec(Codec):
+    name = "WinAsciiEncoding"
 
+    encode_table = {'A': b'A', 'Æ': b'\xc6', 'Á': b'\xc1', 'Â': b'\xc2', 'Ä': b'\xc4', 'À': b'\xc0', 'Å': b'\xc5',
+                    'Ã': b'\xc3', 'B': b'B', 'C': b'C', 'Ç': b'\xc7', 'D': b'D', 'E': b'E', 'É': b'\xc9', 'Ê': b'\xca',
+                    'Ë': b'\xcb', 'È': b'\xc8', 'Ð': b'\xd0', '€': b'\x80', 'F': b'F', 'G': b'G', 'H': b'H', 'I': b'I',
+                    'Í': b'\xcd', 'Î': b'\xce', 'Ï': b'\xcf', 'Ì': b'\xcc', 'J': b'J', 'K': b'K', 'L': b'L', 'M': b'M',
+                    'N': b'N', 'Ñ': b'\xd1', 'O': b'O', 'Œ': b'\x8c', 'Ó': b'\xd3', 'Ô': b'\xd4', 'Ö': b'\xd6',
+                    'Ò': b'\xd2', 'Ø': b'\xd8', 'Õ': b'\xd5', 'P': b'P', 'Q': b'Q', 'R': b'R', 'S': b'S', 'Š': b'\x8a',
+                    'T': b'T', 'Þ': b'\xde', 'U': b'U', 'Ú': b'\xda', 'Û': b'\xdb', 'Ü': b'\xdc', 'Ù': b'\xd9', 'V': b'V',
+                    'W': b'W', 'X': b'X', 'Y': b'Y', 'Ý': b'\xdd', 'Ÿ': b'\x9f', 'Z': b'Z', 'Ž': b'\x8e', 'a': b'a',
+                    'á': b'\xe1', 'â': b'\xe2', '´': b'\xb4', 'ä': b'\xe4', 'æ': b'\xe6', 'à': b'\xe0', '&': b'&',
+                    'å': b'\xe5', '^': b'^', '~': b'~', '*': b'*', '@': b'@', 'ã': b'\xe3', 'b': b'b', '\\': b'\\',
+                    '|': b'|', '{': b'{', '}': b'}', '[': b'[', ']': b']', '¦': b'\xa6', '•': b'\x95', 'c': b'c',
+                    'ç': b'\xe7', '¸': b'\xb8', '¢': b'\xa2', 'ˆ': b'\x88', ':': b':', ',': b',', '©': b'\xa9',
+                    '¤': b'\xa4', 'd': b'd', '†': b'\x86', '‡': b'\x87', '°': b'\xb0', '¨': b'\xa8', '÷': b'\xf7',
+                    '$': b'$', 'e': b'e', 'é': b'\xe9', 'ê': b'\xea', 'ë': b'\xeb', 'è': b'\xe8', '8': b'8', '…': b'\x85',
+                    '—': b'\x97', '–': b'\x96', '=': b'=', 'ð': b'\xf0', '!': b'!', '¡': b'\xa1', 'f': b'f', '5': b'5',
+                    'ƒ': b'\x83', '4': b'4', 'g': b'g', 'ß': b'\xdf', '`': b'`', '>': b'>', '«': b'\xab', '»': b'\xbb',
+                    '‹': b'\x8b', '›': b'\x9b', 'h': b'h', '-': b'-', 'i': b'i', 'í': b'\xed', 'î': b'\xee', 'ï': b'\xef',
+                    'ì': b'\xec', 'j': b'j', 'k': b'k', 'l': b'l', '<': b'<', '¬': b'\xac', 'm': b'm', '¯': b'\xaf',
+                    'μ': b'\xb5', '×': b'\xd7', 'n': b'n', '9': b'9', 'ñ': b'\xf1', '#': b'#', 'o': b'o', 'ó': b'\xf3',
+                    'ô': b'\xf4', 'ö': b'\xf6', 'œ': b'\x9c', 'ò': b'\xf2', '1': b'1', '½': b'\xbd', '¼': b'\xbc',
+                    '¹': b'\xb9', 'ª': b'\xaa', 'º': b'\xba', 'ø': b'\xf8', 'õ': b'\xf5', 'p': b'p', '¶': b'\xb6',
+                    '(': b'(', ')': b')', '%': b'%', '.': b'.', '·': b'\xb7', '‰': b'\x89', '+': b'+', '±': b'\xb1',
+                    'q': b'q', '?': b'?', '¿': b'\xbf', '"': b'"', '„': b'\x84', '“': b'\x93', '”': b'\x94',
+                    '‘': b'\x91', '’': b'\x92', '‚': b'\x82', "'": b"'", 'r': b'r', '®': b'\xae', 's': b's', 'š': b'\x9a',
+                    '§': b'\xa7', ';': b';', '7': b'7', '6': b'6', '/': b'/', '\xa0': b' ', '£': b'\xa3', 't': b't',
+                    'þ': b'\xfe', '3': b'3', '¾': b'\xbe', '³': b'\xb3', '˜': b'\x98', '™': b'\x99', '2': b'2',
+                    '²': b'\xb2', 'u': b'u', 'ú': b'\xfa', 'û': b'\xfb', 'ü': b'\xfc', 'ù': b'\xf9', '_': b'_', 'v': b'v',
+                    'w': b'w', 'x': b'x', 'y': b'y', 'ý': b'\xfd', 'ÿ': b'\xff', '¥': b'\xa5', 'z': b'z', 'ž': b'\x9e',
+                    '0': b'0'}
 
-def encode(text: str) -> Tuple[bytes, int]:
-    return b''.join(encode_table.get(x, x.encode("latin1", 'replace')) for x in text), len(text)
-
-
-def decode(binary: bytes) -> Tuple[str, int]:
-    return ''.join(decode_table.get(x, chr(x)) for x in binary), len(binary)
-
-
-def search(encoding_name):
-    return codecs.CodecInfo(encode, decode, name=WinAsciiEncoding)
+    decode_table = {65: 'A', 198: 'AE', 193: 'Aacute', 194: 'Acircumflex', 196: 'Adieresis', 192: 'Agrave',
+                    197: 'Aring', 195: 'Atilde', 66: 'B', 67: 'C', 199: 'Ccedilla', 68: 'D', 69: 'E', 201: 'Eacute',
+                    202: 'Ecircumflex', 203: 'Edieresis', 200: 'Egrave', 208: 'Eth', 128: 'Euro', 70: 'F', 71: 'G',
+                    72: 'H', 73: 'I', 205: 'Iacute', 206: 'Icircumflex', 207: 'Idieresis', 204: 'Igrave', 74: 'J',
+                    75: 'K', 76: 'L', 77: 'M', 78: 'N', 209: 'Ntilde', 79: 'O', 140: 'OE', 211: 'Oacute',
+                    212: 'Ocircumflex', 214: 'Odieresis', 210: 'Ograve', 216: 'Oslash', 213: 'Otilde', 80: 'P', 81: 'Q',
+                    82: 'R', 83: 'S', 138: 'Scaron', 84: 'T', 222: 'Thorn', 85: 'U', 218: 'Uacute', 219: 'Ucircumflex',
+                    220: 'Udieresis', 217: 'Ugrave', 86: 'V', 87: 'W', 88: 'X', 89: 'Y', 221: 'Yacute',
+                    159: 'Ydieresis', 90: 'Z', 142: 'Zcaron', 97: 'a', 225: 'aacute', 226: 'acircumflex',
+                    180: 'acute', 228: 'adieresis', 230: 'ae', 224: 'agrave', 38: 'ampersand', 229: 'aring',
+                    94: 'asciicircum', 126: 'asciitilde', 42: 'asterisk', 64: 'at', 227: 'atilde', 98: 'b',
+                    92: 'backslash', 124: 'bar', 123: 'braceleft', 125: 'braceright', 91: 'bracketleft',
+                    93: 'bracketright', 166: 'brokenbar', 149: 'bullet', 99: 'c', 231: 'ccedilla', 184: 'cedilla',
+                    162: 'cent', 136: 'circumflex', 58: 'colon', 44: 'comma', 169: 'copyright', 164: 'currency1',
+                    100: 'd', 134: 'dagger', 135: 'daggerdbl', 176: 'degree', 168: 'dieresis', 247: 'divide',
+                    36: 'dollar', 101: 'e', 233: 'eacute', 234: 'ecircumflex', 235: 'edieresis', 232: 'egrave',
+                    56: 'eight', 133: 'ellipsis', 151: 'emdash', 150: 'endash', 61: 'equal', 240: 'eth', 33: 'exclam',
+                    161: 'exclamdown', 102: 'f', 53: 'five', 131: 'florin', 52: 'four', 103: 'g', 223: 'germandbls',
+                    96: 'grave', 62: 'greater', 171: 'guillemotleft', 187: 'guillemotright',
+                    139: 'guilsinglleft', 155: 'guilsinglright', 104: 'h', 45: 'hyphen', 105: 'i', 237: 'iacute',
+                    238: 'icircumflex', 239: 'idieresis', 236: 'igrave', 106: 'j', 107: 'k', 108: 'l', 60: 'less',
+                    172: 'logicalnot', 109: 'm', 175: 'macron', 181: 'mu', 215: 'multiply', 110: 'n', 57: 'nine',
+                    241: 'ntilde', 35: 'numbersign', 111: 'o', 243: 'oacute', 244: 'ocircumflex', 246: 'odieresis',
+                    156: 'oe', 242: 'ograve', 49: 'one', 189: 'onehalf', 188: 'onequarter', 185: 'onesuperior',
+                    170: 'ordfeminine', 186: 'ordmasculine', 248: 'oslash', 245: 'otilde', 112: 'p', 182: 'paragraph',
+                    40: 'parenleft', 41: 'parenright', 37: 'percent', 46: 'period', 183: 'periodcentered',
+                    137: 'perthousand', 43: 'plus', 177: 'plusminus', 113: 'q', 63: 'question', 191: 'questiondown',
+                    34: 'quotedbl', 132: 'quotedblbase', 147: 'quotedblleft', 148: 'quotedblright', 145: 'quoteleft',
+                    146: 'quoteright', 130: 'quotesinglbase', 39: 'quotesingle', 114: 'r', 174: 'registered', 115: 's',
+                    154: 'scaron', 167: 'section', 59: 'semicolon', 55: 'seven', 54: 'six', 47: 'slash', 32: 'space',
+                    163: 'sterling', 116: 't', 254: 'thorn', 51: 'three', 190: 'threequarters', 179: 'threesuperior',
+                    152: 'tilde', 153: 'trademark', 50: 'two', 178: 'twosuperior', 117: 'u', 250: 'uacute',
+                    251: 'ucircumflex', 252: 'udieresis', 249: 'ugrave', 95: 'underscore', 118: 'v', 119: 'w', 120: 'x',
+                    121: 'y', 253: 'yacute', 255: 'ydieresis', 165: 'yen', 122: 'z', 158: 'zcaron', 48: 'zero'}
