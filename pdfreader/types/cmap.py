@@ -376,33 +376,7 @@ class CMapResource(object):
                "notdef_ranges={self.notdef_ranges!r}," \
                "bf_ranges={self.bf_ranges!r}>".format(self=self)
 
-    def decode_hexstring(self, s: HexString, encoding=None):
-        res, code = "", ""
 
-        for i in range(0, len(s), 2):
-            code += s[i:i + 2]
-            try:
-                ch = self.bf_ranges[code]
-            except KeyError:
-                if len(code) < 4:
-                    continue
-                elif encoding:
-                    ch = HexString(code).to_bytes().decode(encoding)
-                else:
-                    # leave as is
-                    ch = HexString(code).to_string()
-            res += ch
-            code = ""
-
-        if code:
-            hs = HexString(code)
-            res += hs.to_bytes().decode(encoding) if encoding else hs.to_string()
-
-        return res
-
-    def decode_string(self, s, encoding=None):
-        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s.encode(DEFAULT_ENCODING)))
-        return self.decode_hexstring(s_hex, encoding=encoding)
 
 
 if __name__ == "__main__":

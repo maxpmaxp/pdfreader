@@ -1,16 +1,45 @@
 from ..buffer import Buffer
-from ..constants import WHITESPACES, EOL, DELIMITERS, CR, LF, STRING_ESCAPED
+from ..constants import WHITESPACES, EOL, DELIMITERS, CR, LF, STRING_ESCAPED, DEFAULT_ENCODING
 from ..types import *
 from ..exceptions import ParserException
 
 
-class BasicTypesParser(Buffer):
+class BasicTypesParser(object):
     """ can parse basic PDF types  """
 
     exception_class = ParserException
 
-    def __init__(self, fileobj, offset=0):
-        super(BasicTypesParser, self).__init__(fileobj, offset)
+    def __init__(self, fileobj_or_buffer, offset=0):
+        if isinstance(fileobj_or_buffer, Buffer):
+            self.buffer = fileobj_or_buffer
+        else:
+            self.buffer = Buffer(fileobj_or_buffer, offset)
+
+    @property
+    def current(self):
+        return self.buffer.current
+
+    @property
+    def is_eof(self):
+        return self.buffer.is_eof
+
+    def next(self):
+        return self.buffer.next()
+
+    def prev(self):
+        return self.buffer.prev()
+
+    def read(self, n):
+        return self.buffer.read(n)
+
+    def get_state(self):
+        return self.buffer.get_state()
+
+    def set_state(self, state):
+        return self.buffer.set_state(state)
+
+    def reset(self, n):
+        return self.buffer.reset(n)
 
     def on_parser_error(self, message):
         # ToDo: display parsing context here
@@ -332,7 +361,7 @@ class BasicTypesParser(Buffer):
         ...                           >>
         ...         >>'''
         >>> BasicTypesParser(s, 0).dictionary()
-        {'Type': 'Example', 'Subtype': 'DictExample', 'Version': Decimal('0.01'), 'IntegerItem': 12, 'StringItem': 'a string', 'ArrayItem': [1, 2], 'ObjRef': <IndirectReference:n=12,g=0>, 'SubDictionary': {'Item1': True, 'Item2': False, 'Item3': None, 'Item4': 'OK'}}
+        {'Type': 'Example', 'Subtype': 'DictExample', 'Version': Decimal('0.01'), 'IntegerItem': 12, 'StringItem': b'a string', 'ArrayItem': [1, 2], 'ObjRef': <IndirectReference:n=12,g=0>, 'SubDictionary': {'Item1': True, 'Item2': False, 'Item3': None, 'Item4': b'OK'}}
 
         """
         pfx = self.read(2)
@@ -465,7 +494,7 @@ class BasicTypesParser(Buffer):
 
         >>> s = b'[-1.5 <AABBCC> (Regular string) <</Name /Value>> 0 10 5 R]'
         >>> BasicTypesParser(s, 0).array()
-        [Decimal('-1.5'), 'AABBCC', 'Regular string', {'Name': 'Value'}, 0, <IndirectReference:n=10,g=5>]
+        [Decimal('-1.5'), 'AABBCC', b'Regular string', {'Name': 'Value'}, 0, <IndirectReference:n=10,g=5>]
 
         """
         if self.current != b'[':
@@ -485,55 +514,55 @@ class BasicTypesParser(Buffer):
 
         >>> s = b'(This is a string)'
         >>> BasicTypesParser(s, 0).string()
-        'This is a string'
+        b'This is a string'
 
         >>> s = b'''(Strings may contain newlines
         ... and such.)'''
         >>> BasicTypesParser(s, 0).string()
-        'Strings may contain newlines\\nand such.'
+        b'Strings may contain newlines\\nand such.'
 
         >>> s = b'''(Strings may contain balanced parenthesis () and special characters (*!&}^% and so on).)'''
         >>> BasicTypesParser(s, 0).string()
-        'Strings may contain balanced parenthesis () and special characters (*!&}^% and so on).'
+        b'Strings may contain balanced parenthesis () and special characters (*!&}^% and so on).'
 
         Empty strings are allowed
         >>> s = b'()'
         >>> BasicTypesParser(s, 0).string()
-        ''
+        b''
 
         Multiline strings come with reverse solidus wollowed by CR, LF or the both.
         >>> s = b'''(This is \\
         ... a multiline \\
         ... string)'''
         >>> BasicTypesParser(s, 0).string()
-        'This is a multiline string'
+        b'This is a multiline string'
 
         >>> s = b'(This string has escaped chars in it \\\\n\\\\r\\\\t\\\\b\\\\f\\\\(\\\\)\\\\\\\\)'
         >>> BasicTypesParser(s, 0).string()
-        'This string has escaped chars in it \\n\\r\\t\\x08\\x0c()\\\\'
+        b'This string has escaped chars in it \\n\\r\\t\\x08\\x0c()\\\\'
 
         >>> s = b'(This string contains 2 \\\\245octal characters\\\\307)'
         >>> BasicTypesParser(s, 0).string()
-        'This string contains 2 ¥octal charactersÇ'
+        b'This string contains 2 ¥octal charactersÇ'
 
         >>> s = b'(The octal ddd may contain 1,2 or 3 octal digits: \\\\2,\\\\20,\\\\245)'
         >>> BasicTypesParser(s, 0).string()
-        'The octal ddd may contain 1,2 or 3 octal digits: \\x02,\\x10,¥'
+        b'The octal ddd may contain 1,2 or 3 octal digits: \\x02,\\x10,¥'
 
         >>> s = b'(\\\\0053 denotes 2 characters Ctl+E followed by the digit 3)'
         >>> BasicTypesParser(s, 0).string()
-        '\\x053 denotes 2 characters Ctl+E followed by the digit 3'
+        b'\\x053 denotes 2 characters Ctl+E followed by the digit 3'
         """
 
         if self.current != b'(':
             self.on_parser_error("String expected")
-        val = ''
+        val = b''
         self.next()
         while True:
             ch = self.next()
             if ch == b'(':
                 self.prev()
-                val += "(" + self.string() + ")"
+                val += b"(" + self.string() + b")"
             elif ch == b'\\':
                 ch = self.next()
                 if ch in b"01234567":
@@ -546,44 +575,51 @@ class BasicTypesParser(Buffer):
                     icode = int(code, 8)
                     # 8 bits values are allowed only
                     if icode <= 255:
-                        val += chr(icode)
+                        val += bytes([icode])
                     else:
                         # leave as is
-                        val += "\\" + code.decode(DEFAULT_ENCODING)
+                        val += b"\\" + code
                 elif ch in EOL:
                     # multiline string - just skip
                     self.prev()
                     self.eol()
                 else:
                     # unescape or leave as is
-                    val += STRING_ESCAPED.get(ch) or (b"\\" + ch).decode(DEFAULT_ENCODING)
+                    val += STRING_ESCAPED.get(ch) or (b"\\" + ch)
             elif ch == b')':
                 break
             else:
-                val += ch.decode(DEFAULT_ENCODING)
+                val += ch
         return String(val)
+
+    def _get_parser(self):
+        method = None
+        if self.current == b'<':
+            method = self.dictionary_or_stream_or_hexstring
+        elif self.current == b'[':
+            method = self.array
+        elif self.current == b'(':
+            method = self.string
+        elif self.current == b'n':
+            method = self.null
+        elif self.current == b'f':
+            method = self.false
+        elif self.current == b't':
+            method = self.true
+        elif self.current in b'+-.':
+            method = self.numeric
+        elif self.current in b'1234567890':
+            method = self.numeric_or_indirect_reference
+        elif self.current == b"/":
+            method = self.name
+        return method
 
     def object(self):
         val = None
         self.maybe_spaces_or_comments()
-        if self.current == b'<':
-            val = self.dictionary_or_stream_or_hexstring()
-        elif self.current == b'[':
-            val = self.array()
-        elif self.current == b'(':
-            val = self.string()
-        elif self.current == b'n':
-            val = self.null()
-        elif self.current == b'f':
-            val = self.false()
-        elif self.current == b't':
-            val = self.true()
-        elif self.current in b'+-.':
-            val = self.numeric()
-        elif self.current in b'1234567890':
-            val = self.numeric_or_indirect_reference()
-        elif self.current == b"/":
-            val = self.name()
+        method = self._get_parser()
+        if method:
+            val = method()
         else:
             self.on_parser_error("Unexpected token")
         return val

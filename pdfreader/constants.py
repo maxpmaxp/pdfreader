@@ -38,14 +38,14 @@ TYPE_NULL = "null"
 # \\       | REVERSE SOLIDUS (5Ch) (Backslash)
 # \ddd     | Character code ddd (octal)
 
-STRING_ESCAPED = {b'n': "\n",
-                  b'r': "\r",
-                  b't': "\t",
-                  b'b': "\x08",
-                  b'f': "\x0c",
-                  b'(': "(",
-                  b')': ")",
-                  b'\\': "\\"}
+STRING_ESCAPED = {b'n': b"\n",
+                  b'r': b"\r",
+                  b't': b"\t",
+                  b'b': b"\x08",
+                  b'f': b"\x0c",
+                  b'(': b"(",
+                  b')': b")",
+                  b'\\':b"\\"}
 
 ESCAPED_CHARS = {"\n": "\\n",
                  "\r": "\\r",

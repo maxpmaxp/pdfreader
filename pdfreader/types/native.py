@@ -1,7 +1,10 @@
 import logging, zlib
 
-from copy import copy
 from decimal import Decimal
+
+from ..constants import DEFAULT_ENCODING
+from ..utils import cached_property
+
 
 null = None
 Boolean = bool
@@ -11,15 +14,15 @@ Array = list
 Dictionary = dict
 
 
-class String(str):
-    """ Literal string. Just to tell apart of the other types """
+class String(bytes):
+    """ A string object shall consist of a series of zero or more bytes """
 
 
 class Name(str):
     """ Name type: /SomeName """
 
 
-class HexString(String):
+class HexString(str):
     """ Hexadecimal string: <AF20FA> """
 
     @property
@@ -27,10 +30,10 @@ class HexString(String):
         return int(self, 16)
 
     def to_string(self):
-        return "".join([chr(int(self[i:i + 2], 16)) for i in range(0, len(self), 2)])
+        return self.to_bytes().decode(DEFAULT_ENCODING)
 
     def to_bytes(self):
-        return b''.join([bytes([int(self[i:i+2], 16)]) for i in range(0, len(self), 2)])
+        return bytes.fromhex(self)
 
 
 class Stream(object):
@@ -71,11 +74,10 @@ class Stream(object):
             data = (self.stream[:25] + b' ...')
         return "<Stream:len={},data={}>".format(self.dictionary["Length"], repr(data))
 
-    @property
     def type(self):
         return self.get('Type')
 
-    @property
+    @cached_property
     def filtered(self):
         filters = self.get('Filter')
         if not filters:
@@ -150,7 +152,7 @@ class Stream(object):
 
     @classmethod
     def from_stream(cls, other):
-        return cls(copy(other.dictionary), copy(other.stream))
+        return cls(other.dictionary, other.stream)
 
     def __getattr__(self, item):
         return self.dictionary.get(item)
@@ -208,7 +210,7 @@ PDF_TYPES = (type(null), IndirectReference, IndirectObject, Comment, Stream, Dic
 ATOMIC_TYPES = (Integer, Real, Boolean, String, HexString, Name, type(null))
 
 
-class Token(String):
+class Token(str):
     """ That's not a PDF type itself. We used it to reflect other than PDF types tokens.
         For example CMap: def, findresource, begin
     """

@@ -1,6 +1,6 @@
 import re
 
-from ..constants import WHITESPACE_CODES, EOL, SP, DEFAULT_ENCODING
+from ..constants import WHITESPACE_CODES, EOL, SP
 from ..exceptions import ParserException
 from ..types import *
 
@@ -40,7 +40,7 @@ class PDFParser(BasicTypesParser):
         ...     (Brilling)
         ... endobj'''
         >>> PDFParser(s, 0).indirect_object()
-        <IndirectObject:n=12,g=0,v='Brilling'>
+        <IndirectObject:n=12,g=0,v=b'Brilling'>
 
         """
         num = self.non_negative_int()
@@ -134,7 +134,7 @@ class PDFParser(BasicTypesParser):
         for _ in range(size):
             self.prev()
 
-        return PDFHeader(m.groups()[0].decode(DEFAULT_ENCODING), offset=self.index + m.start())
+        return PDFHeader(m.groups()[0].decode(DEFAULT_ENCODING), offset=self.buffer.index + m.start())
 
     def pdf_trailer(self):
         """
