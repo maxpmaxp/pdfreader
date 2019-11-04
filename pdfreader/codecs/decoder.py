@@ -1,6 +1,7 @@
 import codecs
 import logging
 
+from ..codecs.differences import DifferencesCodec
 from ..constants import DEFAULT_ENCODING
 from ..types.native import HexString
 from . import register_pdf_encodings
@@ -56,13 +57,22 @@ class EncodingDecoder(BaseDecoder):
         return self.decode_string(s.to_bytes())
 
     def decode_string(self, s):
-        # ToDo: Differences support. See p263 PDF32000_2008.pdf
-        try:
-            codec = codecs.lookup(self.encoding)
-        except LookupError:
-            logging.warning("Unsupported encoding {}. Using default {}".format(self.encoding, DEFAULT_ENCODING))
-            codec = codecs.lookup(DEFAULT_ENCODING)
+        from ..types.objects import Encoding
 
+        if isinstance(self.encoding, str):
+            # encoding name
+            try:
+                codec = codecs.lookup(self.encoding)
+            except LookupError:
+                logging.warning("Unsupported encoding {}. Using default {}".format(self.encoding, DEFAULT_ENCODING))
+                codec = codecs.lookup(DEFAULT_ENCODING)
+        elif isinstance(self.encoding, Encoding):
+            # Encoding object - See PDF spec PDF32000_2008.pdf p.255 sec 9.6.1
+            # Base encoding with differences
+            codec = DifferencesCodec(self.encoding)
+        else:
+            # This should never happen
+            raise TypeError("Unexpected type. Probably a bug: {} type of {}".format(self.encoding, type(self.encoding)))
         return codec.decode(s)[0]
 
 

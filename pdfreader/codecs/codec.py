@@ -17,7 +17,16 @@ class Codec(object):
 
     @classmethod
     def decode(cls, binary: bytes) -> Tuple[str, int]:
-        return ''.join([AGL[cls.decode_table[x]] if x in cls.decode_table else chr(x) for x in binary]), len(binary)
+        res = ''
+        for x in binary:
+            if x in cls.decode_table:
+                glyph_name = cls.decode_table[x]
+                glyph = AGL.get(glyph_name, glyph_name) # Leave unknown glyph names as is
+            else:
+                # treat unlisted codes as unicode characters
+                glyph = chr(x)
+            res += glyph
+        return res, len(binary)
 
     @classmethod
     def search(cls, encoding_name):
