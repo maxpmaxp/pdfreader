@@ -157,7 +157,6 @@ class Stream(object):
         res = b''
         buffer = []
         state = 'need_length'
-
         for c in data:
             if state == 'need_length':
                 if c == 128:
@@ -170,11 +169,11 @@ class Stream(object):
                 else:
                     state = 'need_many'
             elif state == 'need_one':
-                res += bytes([c] * (length + 1))
+                res += bytes([c] * (257 - length))
                 state = 'need_length'
             elif state == 'need_many':
                 buffer.append(c)
-                if len(buffer) == 257 - length:
+                if len(buffer) == length + 1:
                     res += bytes(buffer)
                     buffer = []
                     state = 'need_length'
@@ -184,8 +183,6 @@ class Stream(object):
             res = b''
 
         return res
-
-
 
     def filter_ASCIIHexDecode(self, data):
         """
