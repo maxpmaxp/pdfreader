@@ -3,6 +3,7 @@ import codecs
 from typing import Tuple
 
 from .agl import AGL
+from .zapfdingbatsgl import ZAPFDINGBATS_GL
 
 
 class Codec(object):
@@ -10,6 +11,79 @@ class Codec(object):
     encode_table = NotImplemented
     decode_table = NotImplemented
     name = NotImplemented
+    font_name = None
+    _cache = dict()
+
+    @classmethod
+    def glyph_name_to_string(cls, name):
+        """
+            See https://github.com/adobe-type-tools/agl-specification
+
+            >>> from pdfreader.codecs.codec import Codec
+            >>> Codec.glyph_name_to_string("Lcommaaccent") == "\\u013B"
+            True
+            >>> Codec.glyph_name_to_string("uni20AC0308") == "\\u20AC\\u0308"
+            True
+            >>> Codec.glyph_name_to_string("u1040C") == "\\U0001040C"
+            True
+            >>> Codec.glyph_name_to_string("uni20ac") == "\\u20AC"
+            True
+            >>> Codec.glyph_name_to_string("Lcommaaccent_uni20AC0308_u1040C.alternate") == "\\u013B\\u20AC\\u0308\\U0001040C"
+            True
+            >>> Codec.glyph_name_to_string("Lcommaaccent_uni20AC0308_u1040C.alternate") == "\\u013B\\u20AC\\u0308\\U0001040C"
+            True
+            >>> Codec.glyph_name_to_string("UnKnowN")
+            ''
+            >>> Codec.glyph_name_to_string("UnKnowN_uni20ac") == "\\u20AC"
+            True
+            >>> Codec.glyph_name_to_string("uni0UNK")
+            ''
+            >>> Codec.glyph_name_to_string("uUNKN")
+            ''
+            >>> Codec.glyph_name_to_string("uni01")
+            ''
+            >>> Codec.glyph_name_to_string("u01")
+            ''
+            >>> Codec.glyph_name_to_string("u1234567")
+            ''
+            >>> Codec.glyph_name_to_string("uni1234567")
+            ''
+            >>> Codec.glyph_name_to_string("uni1234567_uni20ac") == "\\u20AC"
+            True
+            >>> Codec.glyph_name_to_string("uni1234567_uni20ac") == "\\u20AC"
+            True
+            >>> Codec.glyph_name_to_string("UnKnowN_uni20ac.alternate") == "\\u20AC"
+            True
+            >>> Codec.glyph_name_to_string("a100")
+            ''
+        """
+        if name in cls._cache:
+            return cls._cache[name]
+
+        components = name.split(".")[0].split("_")
+        res = ""
+        for glyph in components:
+            val = ""
+            if cls.font_name == "ZapfDingbats" and glyph in ZAPFDINGBATS_GL:
+                val = ZAPFDINGBATS_GL[glyph]
+            elif glyph in AGL:
+                val = AGL[glyph]
+            elif glyph.startswith("uni") and (len(glyph) - 3) % 4 == 0:
+                try:
+                    val = "".join([chr(int(glyph[i:i+4], 16)) for i in range(3, len(glyph), 4)])
+                except ValueError:
+                    # char code out of range
+                    pass
+            elif glyph.startswith("u") and 5 <= len(glyph) <= 7:
+                try:
+                    val = chr(int(glyph[1:], 16))
+                except ValueError:
+                    # char code out of range
+                    pass
+            res += val
+
+        cls._cache[name] = res
+        return res
 
     @classmethod
     def encode(cls, text: str) -> Tuple[bytes, int]:
@@ -21,7 +95,9 @@ class Codec(object):
         for x in binary:
             if x in cls.decode_table:
                 glyph_name = cls.decode_table[x]
-                glyph = AGL.get(glyph_name, glyph_name) # Leave unknown glyph names as is
+
+                components = glyph_name.split(".")[0]
+                glyph = AGL.get(glyph_name, '')
             else:
                 # treat unlisted codes as unicode characters
                 glyph = chr(x)
@@ -31,3 +107,26 @@ class Codec(object):
     @classmethod
     def search(cls, encoding_name):
         return codecs.CodecInfo(cls.encode, cls.decode, name=cls.name)
+
+
+class ZapfDingbatsCodec(Codec):
+    """
+        See See https://github.com/adobe-type-tools/agl-specification
+
+        >>> ZapfDingbatsCodec.glyph_name_to_string("a100") == '\\u275E'
+        True
+        >>> ZapfDingbatsCodec.glyph_name_to_string("a100_Lcommaaccent") == '\\u275E\\u013B'
+        True
+        >>> ZapfDingbatsCodec.glyph_name_to_string("a100_u013B") == '\\u275E\\u013B'
+        True
+        >>> ZapfDingbatsCodec.glyph_name_to_string("a100_uni013B") == '\\u275E\\u013B'
+        True
+        >>> ZapfDingbatsCodec.glyph_name_to_string("a100_uni013B.alternate") == '\\u275E\\u013B'
+        True
+    """
+    font_name = "ZapfDingbats"
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

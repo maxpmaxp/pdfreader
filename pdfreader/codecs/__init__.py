@@ -8,3 +8,6 @@ def register_pdf_encodings():
     codecs.register(standard.StandardCodec.search)
     codecs.register(macroman.MacRomanCodec.search)
     codecs.register(pdfdoc.PdfDocCodec.search)
+
+
+
