@@ -2,7 +2,7 @@ import logging, zlib
 
 from decimal import Decimal
 
-from ..constants import DEFAULT_ENCODING
+from ..constants import DEFAULT_ENCODING, WHITESPACES
 from ..utils import cached_property
 
 
@@ -128,7 +128,6 @@ class Stream(object):
         return res
 
     # ToDo: implement more filters:
-    # ASCIIHexDecode
     # ASCII85Decode
     # LZWDecode
     # RunLengthDecode
@@ -137,6 +136,52 @@ class Stream(object):
     # DCTDecode
     # JPXDecode
     # Crypt
+
+    def filter_ASCIIHexDecode(self, data):
+        """
+        >>> data = b"646174612073616d706c65>"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCIIHexDecode(obj.stream)
+        b'data sample'
+
+        >>> data = b"64617461207 3616d\\n706c65>"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCIIHexDecode(obj.stream)
+        b'data sample'
+
+        >>> data = b"64617461207 3616d\\n706c652>"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCIIHexDecode(obj.stream)
+        b'data sample '
+
+        >>> data = b"BROKEN_STREAM>"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCIIHexDecode(obj.stream)
+        b''
+
+        """
+        buffer = b""
+        res = b""
+        try:
+            for i in range(0, len(data)):
+                c = data[i:i+1]
+                if c in WHITESPACES:
+                    continue
+                elif c == b">":
+                    break
+                buffer += c
+                if len(buffer) > 1:
+                    res += bytes.fromhex(buffer.decode(DEFAULT_ENCODING))
+                    buffer = b""
+
+            if buffer:
+                if len(buffer) == 1:
+                    buffer += b"0"
+                res += bytes.fromhex(buffer.decode(DEFAULT_ENCODING))
+        except ValueError:
+            # invalid characters on stream
+            logging.exception("Skipping broken stream")
+        return res
 
     def filter_FlateDecode(self, data):
         try:
@@ -215,3 +260,8 @@ class Token(str):
         For example CMap: def, findresource, begin
     """
     pass
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
