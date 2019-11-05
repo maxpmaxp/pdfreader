@@ -137,6 +137,56 @@ class Stream(object):
     # JPXDecode
     # Crypt
 
+    def filter_RunLengthDecode(self, data):
+        """
+        >>> data = bytes([5, 65, 66, 67, 68, 69, 70, 250, 55, 2, 65, 66, 67, 252, 53, 128])
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_RunLengthDecode(obj.stream)
+        b'ABCDEF7777777ABC55555'
+
+        >>> data = bytes([5, 65])
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_RunLengthDecode(obj.stream)
+        b''
+
+        >>> data = bytes([128])
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_RunLengthDecode(obj.stream)
+        b''
+        """
+        res = b''
+        buffer = []
+        state = 'need_length'
+
+        for c in data:
+            if state == 'need_length':
+                if c == 128:
+                    state = 'done'
+                    break
+                buffer = []
+                length = c
+                if c >= 129:
+                    state = 'need_one'
+                else:
+                    state = 'need_many'
+            elif state == 'need_one':
+                res += bytes([c] * (length + 1))
+                state = 'need_length'
+            elif state == 'need_many':
+                buffer.append(c)
+                if len(buffer) == 257 - length:
+                    res += bytes(buffer)
+                    buffer = []
+                    state = 'need_length'
+
+        if state != 'done':
+            logging.error("Skipping broken stream")
+            res = b''
+
+        return res
+
+
+
     def filter_ASCIIHexDecode(self, data):
         """
         >>> data = b"646174612073616d706c65>"
