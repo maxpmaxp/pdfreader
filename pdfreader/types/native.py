@@ -130,7 +130,6 @@ class Stream(object):
     # ToDo: implement more filters:
     # ASCII85Decode
     # LZWDecode
-    # RunLengthDecode
     # CCITTFaxDecode
     # JBIG2Decode
     # DCTDecode
@@ -205,7 +204,6 @@ class Stream(object):
         >>> obj = Stream(dict(Length=len(data)), data)
         >>> obj.filter_ASCIIHexDecode(obj.stream)
         b''
-
         """
         buffer = b""
         res = b""
@@ -231,6 +229,18 @@ class Stream(object):
         return res
 
     def filter_FlateDecode(self, data):
+        """
+        >>> from zlib import compress
+        >>> data = compress(b'sample data')
+        >>> obj = Stream(dict(Length=len(data), DecodeParams=dict(Predictor=1)), data)
+        >>> obj.filter_FlateDecode(obj.stream)
+        b'sample data'
+
+        >>> data = b"BROKEN_STREAM"
+        >>> obj = Stream(dict(Length=len(data), DecodeParams=dict(Predictor=1)), data)
+        >>> obj.filter_FlateDecode(obj.stream)
+        b''
+        """
         try:
             data = zlib.decompress(data)
             data = self._remove_predictors(data)
