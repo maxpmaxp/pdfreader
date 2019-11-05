@@ -1,5 +1,6 @@
 import logging, zlib
 
+from base64 import b85decode
 from decimal import Decimal
 
 from ..constants import DEFAULT_ENCODING, WHITESPACES
@@ -128,13 +129,38 @@ class Stream(object):
         return res
 
     # ToDo: implement more filters:
-    # ASCII85Decode
     # LZWDecode
     # CCITTFaxDecode
     # JBIG2Decode
     # DCTDecode
     # JPXDecode
     # Crypt
+
+    def filter_ASCII85Decode(self, data):
+        """
+        >>> from base64 import b85encode
+        >>> data = b85encode(b'sample data') + b'~>'
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCII85Decode(obj.stream)
+        b'sample data'
+
+        >>> data = b"BROKEN_STREAM"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCII85Decode(obj.stream)
+        b''
+        """
+        # filter whitespaces
+        ws = b''.join(WHITESPACES)
+        data = bytes([n for n in data if n not in ws])
+        try:
+            if data.endswith(b'~>'):
+                res = b85decode(data[:-2])
+            else:
+                raise ValueError("EOD ~> expected")
+        except (TypeError, ValueError):
+            logging.exception("Skipping broken stream")
+            res = b''
+        return res
 
     def filter_RunLengthDecode(self, data):
         """
