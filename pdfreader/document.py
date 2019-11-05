@@ -23,6 +23,9 @@ class PDFDocument(object):
             >>> pages = [p for p in doc.pages()]
             >>> len(pages)
             15
+            >>> tos = [to for to in doc.text_objects()]
+            >>> tos[0].to_string()
+            ' Plaintiff’s Complaint Page 1 of 3 ZWICKER & ASSOCIATES, P.C. A Law Firm Engaged in Debt Collection 12550 SE 93RD AVENUE, SUITE 430 CLACKAMAS, OR 97015 PH: (503)654-2050  FAX: (503)654-0345  '
             >>> img = next(pages[8].inline_images())
             >>> img.entries
             {'D': [1, 0], 'IM': True, 'W': 1800, 'H': 3113, 'BPC': 1, 'F': 'CCITTFaxDecode', 'DecodeParms': {'K': -1, 'Columns': 1800, 'Rows': 3113, 'BlackIs1': True}}
@@ -319,3 +322,4 @@ class PDFDocument(object):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+

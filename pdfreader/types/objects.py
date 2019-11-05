@@ -1,7 +1,7 @@
+from ..codecs.decoder import Decoder
 from ..utils import cached_property
 from .content import TextObject, InlineImage
-from .decoder import Decoder
-from .native import Stream, Dictionary, Array
+from .native import Stream, Dictionary, Array, Name
 
 
 class StartXRef(object):
@@ -115,6 +115,7 @@ class DictBasedObject(Dictionary):
 
 
 def obj_factory(doc, obj):
+    klass = None
     if isinstance(obj, Stream):
         if obj.Type == 'XObject':
             klass = XOBJECTS.get(obj.Subtype, XObject)
@@ -124,9 +125,8 @@ def obj_factory(doc, obj):
         klass = DICT_OBJECTS.get(obj.get('Type'), DictBasedObject)
     elif isinstance(obj, list):
         klass = ArrayBasedObject
-    else:
-        raise TypeError("Unsupported object type: {}".format(type(obj)))
-    return klass(doc, obj)
+
+    return klass(doc, obj) if klass else obj
         
 
 class ObjectStream(StreamBasedObject):
@@ -261,6 +261,13 @@ class Font(DictBasedObject):
 
     def _type__ToUnicode(self, obj):
         return CMap(obj.doc, obj)
+
+    def _type__Encoding(self, obj):
+        if isinstance(obj, (Name, Encoding)):
+            val = obj
+        else:
+            val = Encoding(obj.doc, obj)
+        return val
 
 
 class Encoding(DictBasedObject):

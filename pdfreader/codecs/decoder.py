@@ -1,13 +1,19 @@
+import codecs
 import logging
 
+from ..codecs.differences import DifferencesCodec
 from ..constants import DEFAULT_ENCODING
-from .native import HexString
+from ..types.native import HexString
+from . import register_pdf_encodings
+
+register_pdf_encodings()
 
 
 class BaseDecoder(object):
     def __init__(self, font):
         self.cmap = font.get("ToUnicode")
         self.encoding = font.get('Encoding')
+        self.base_font = font.get('BaseFont')
 
     def decode_string(self, s):
         s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s))
@@ -52,29 +58,23 @@ class EncodingDecoder(BaseDecoder):
         return self.decode_string(s.to_bytes())
 
     def decode_string(self, s):
-        # ToDo: Differences support. See p263 PDF32000_2008.pdf
-        encoding = self.encoding
+        from ..types.objects import Encoding
 
-        # replace expert encodings with regular & warn
-        if encoding == "MacExpertEncoding":
-            logging.warning("Replacing MacExpertEncoding with MacRomanEncoding")
-            encoding = "MacRomanEncoding"
-
-        if encoding == "WinAnsiEncoding":
-            py_encoding = 'cp1252'
-        elif encoding == "MacRomanEncoding":
-            # ToDO: Not 100% correct there are some differences between MacRomanEncoding and macroman
-            py_encoding = 'macroman'
-        elif encoding == "StandardEncoding":
-            # ToDO: Not 100% correct
-            py_encoding = 'latin1'
+        if isinstance(self.encoding, str):
+            # encoding name
+            try:
+                codec = codecs.lookup(self.encoding)
+            except LookupError:
+                logging.warning("Unsupported encoding {}. Using default {}".format(self.encoding, DEFAULT_ENCODING))
+                codec = codecs.lookup(DEFAULT_ENCODING)
+        elif isinstance(self.encoding, Encoding):
+            # Encoding object - See PDF spec PDF32000_2008.pdf p.255 sec 9.6.1
+            # Base encoding with differences
+            codec = DifferencesCodec(self.encoding, self.base_font)
         else:
-            logging.warning("Unsupported encoding {}. Using default {}".format(encoding, DEFAULT_ENCODING))
-            py_encoding = DEFAULT_ENCODING \
-
-        # Add differences support
-
-        return s.decode(py_encoding, "replace")
+            # This should never happen
+            raise TypeError("Unexpected type. Probably a bug: {} type of {}".format(self.encoding, type(self.encoding)))
+        return codec.decode(s)[0]
 
 
 default_decoder = EncodingDecoder(dict(Encoding="latin1"))
