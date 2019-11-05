@@ -5,10 +5,15 @@ known_base_codecs = (winansi.WinAnsiCodec, pdfdoc.PdfDocCodec, macroman.MacRoman
 base_encodings_map = {c.name: c for c in known_base_codecs}
 
 
-def DifferencesCodec(encoding_obj):
+def DifferencesCodec(encoding_obj, font=None):
+
+    # Note: We need font name here just because of ZapfDingbats font which has more glyph names
+
+    # Differences example:
     # {'BaseEncoding': 'WinAnsiEncoding',
     #  'Differences': [1, 'S', 'u', 'm', 'o', 'n', 's', 'space', 'P', 'a', 'g', 'e', 'f', 'l', 'i', 't', 'quoteright', 'C', 'p'],
     # 'Type': 'Encoding'}
+
     try:
         codec = base_encodings_map[encoding_obj.BaseEncoding]
     except KeyError:
@@ -28,5 +33,6 @@ def DifferencesCodec(encoding_obj):
         name = "{}-WithDifferences".format(codec.name)
         encode_table = codec.encode_table
         decode_table = dt
+        font_name = font
 
     return CustomCodec

@@ -13,6 +13,7 @@ class BaseDecoder(object):
     def __init__(self, font):
         self.cmap = font.get("ToUnicode")
         self.encoding = font.get('Encoding')
+        self.base_font = font.get('BaseFont')
 
     def decode_string(self, s):
         s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s))
@@ -69,7 +70,7 @@ class EncodingDecoder(BaseDecoder):
         elif isinstance(self.encoding, Encoding):
             # Encoding object - See PDF spec PDF32000_2008.pdf p.255 sec 9.6.1
             # Base encoding with differences
-            codec = DifferencesCodec(self.encoding)
+            codec = DifferencesCodec(self.encoding, self.base_font)
         else:
             # This should never happen
             raise TypeError("Unexpected type. Probably a bug: {} type of {}".format(self.encoding, type(self.encoding)))

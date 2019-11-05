@@ -115,6 +115,7 @@ class DictBasedObject(Dictionary):
 
 
 def obj_factory(doc, obj):
+    klass = None
     if isinstance(obj, Stream):
         if obj.Type == 'XObject':
             klass = XOBJECTS.get(obj.Subtype, XObject)
@@ -124,9 +125,8 @@ def obj_factory(doc, obj):
         klass = DICT_OBJECTS.get(obj.get('Type'), DictBasedObject)
     elif isinstance(obj, list):
         klass = ArrayBasedObject
-    else:
-        raise TypeError("Unsupported object type: {}".format(type(obj)))
-    return klass(doc, obj)
+
+    return klass(doc, obj) if klass else obj
         
 
 class ObjectStream(StreamBasedObject):

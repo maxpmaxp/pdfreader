@@ -7,9 +7,11 @@ import pdfreader.buffer, pdfreader.document, pdfreader.parsers, pdfreader.types
 def suite():
     suite = unittest.TestSuite()
     suite.addTests(doctest.DocTestSuite(pdfreader.buffer))
+    suite.addTests(doctest.DocTestSuite(pdfreader.codecs))
     suite.addTests(doctest.DocTestSuite(pdfreader.parsers.base))
-    suite.addTests(doctest.DocTestSuite(pdfreader.parsers.document))
     suite.addTests(doctest.DocTestSuite(pdfreader.parsers.cmap))
+    suite.addTests(doctest.DocTestSuite(pdfreader.parsers.document))
+    suite.addTests(doctest.DocTestSuite(pdfreader.parsers.inlineimage))
     suite.addTests(doctest.DocTestSuite(pdfreader.types.cmap))
     suite.addTests(doctest.DocTestSuite(pdfreader.document))
     return suite
