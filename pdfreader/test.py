@@ -13,6 +13,7 @@ def suite():
     suite.addTests(doctest.DocTestSuite(pdfreader.parsers.document))
     suite.addTests(doctest.DocTestSuite(pdfreader.parsers.inlineimage))
     suite.addTests(doctest.DocTestSuite(pdfreader.types.cmap))
+    suite.addTests(doctest.DocTestSuite(pdfreader.types.native))
     suite.addTests(doctest.DocTestSuite(pdfreader.document))
     return suite
 

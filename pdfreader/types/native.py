@@ -1,8 +1,9 @@
 import logging, zlib
 
+from base64 import b85decode
 from decimal import Decimal
 
-from ..constants import DEFAULT_ENCODING
+from ..constants import DEFAULT_ENCODING, WHITESPACES
 from ..utils import cached_property
 
 
@@ -128,17 +129,144 @@ class Stream(object):
         return res
 
     # ToDo: implement more filters:
-    # ASCIIHexDecode
-    # ASCII85Decode
     # LZWDecode
-    # RunLengthDecode
     # CCITTFaxDecode
     # JBIG2Decode
     # DCTDecode
     # JPXDecode
     # Crypt
 
+    def filter_ASCII85Decode(self, data):
+        """
+        >>> from base64 import b85encode
+        >>> data = b85encode(b'sample data') + b'~>'
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCII85Decode(obj.stream)
+        b'sample data'
+
+        >>> data = b"BROKEN_STREAM"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCII85Decode(obj.stream)
+        b''
+        """
+        # filter whitespaces
+        ws = b''.join(WHITESPACES)
+        data = bytes([n for n in data if n not in ws])
+        try:
+            if data.endswith(b'~>'):
+                res = b85decode(data[:-2])
+            else:
+                raise ValueError("EOD ~> expected")
+        except (TypeError, ValueError):
+            logging.exception("Skipping broken stream")
+            res = b''
+        return res
+
+    def filter_RunLengthDecode(self, data):
+        """
+        >>> data = bytes([5, 65, 66, 67, 68, 69, 70, 250, 55, 2, 65, 66, 67, 252, 53, 128])
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_RunLengthDecode(obj.stream)
+        b'ABCDEF7777777ABC55555'
+
+        >>> data = bytes([5, 65])
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_RunLengthDecode(obj.stream)
+        b''
+
+        >>> data = bytes([128])
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_RunLengthDecode(obj.stream)
+        b''
+        """
+        res = b''
+        buffer = []
+        state = 'need_length'
+        for c in data:
+            if state == 'need_length':
+                if c == 128:
+                    state = 'done'
+                    break
+                buffer = []
+                length = c
+                if c >= 129:
+                    state = 'need_one'
+                else:
+                    state = 'need_many'
+            elif state == 'need_one':
+                res += bytes([c] * (257 - length))
+                state = 'need_length'
+            elif state == 'need_many':
+                buffer.append(c)
+                if len(buffer) == length + 1:
+                    res += bytes(buffer)
+                    buffer = []
+                    state = 'need_length'
+
+        if state != 'done':
+            logging.error("Skipping broken stream")
+            res = b''
+
+        return res
+
+    def filter_ASCIIHexDecode(self, data):
+        """
+        >>> data = b"646174612073616d706c65>"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCIIHexDecode(obj.stream)
+        b'data sample'
+
+        >>> data = b"64617461207 3616d\\n706c65>"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCIIHexDecode(obj.stream)
+        b'data sample'
+
+        >>> data = b"64617461207 3616d\\n706c652>"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCIIHexDecode(obj.stream)
+        b'data sample '
+
+        >>> data = b"BROKEN_STREAM>"
+        >>> obj = Stream(dict(Length=len(data)), data)
+        >>> obj.filter_ASCIIHexDecode(obj.stream)
+        b''
+        """
+        buffer = b""
+        res = b""
+        try:
+            for i in range(0, len(data)):
+                c = data[i:i+1]
+                if c in WHITESPACES:
+                    continue
+                elif c == b">":
+                    break
+                buffer += c
+                if len(buffer) > 1:
+                    res += bytes.fromhex(buffer.decode(DEFAULT_ENCODING))
+                    buffer = b""
+
+            if buffer:
+                if len(buffer) == 1:
+                    buffer += b"0"
+                res += bytes.fromhex(buffer.decode(DEFAULT_ENCODING))
+        except ValueError:
+            # invalid characters on stream
+            logging.exception("Skipping broken stream")
+        return res
+
     def filter_FlateDecode(self, data):
+        """
+        >>> from zlib import compress
+        >>> data = compress(b'sample data')
+        >>> obj = Stream(dict(Length=len(data), DecodeParams=dict(Predictor=1)), data)
+        >>> obj.filter_FlateDecode(obj.stream)
+        b'sample data'
+
+        >>> data = b"BROKEN_STREAM"
+        >>> obj = Stream(dict(Length=len(data), DecodeParams=dict(Predictor=1)), data)
+        >>> obj.filter_FlateDecode(obj.stream)
+        b''
+        """
         try:
             data = zlib.decompress(data)
             data = self._remove_predictors(data)
@@ -215,3 +343,8 @@ class Token(str):
         For example CMap: def, findresource, begin
     """
     pass
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
