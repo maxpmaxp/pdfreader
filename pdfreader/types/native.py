@@ -42,7 +42,7 @@ class Stream(object):
         common keys:
         Length - integer (required)
         Filter - name or array
-        DecodeParams - dict or array
+        DecodeParms - dict or array
         F - file specification
 
     """
@@ -96,11 +96,11 @@ class Stream(object):
         filters_applied = []
         for fname in farr:
             try:
-                binary = apply_filter(fname, binary, self.dictionary.get("DecodeParams"))
+                binary = apply_filter(fname, binary, self.dictionary.get("DecodeParms"))
                 filters_applied.append(fname)
             except NotImplementedError:
-                logging.exception("Leaving partially decoded. Filters applied: {}".format(filters_applied))
-                break
+                logging.exception("Partially decoded. Filters applied: {}".format(filters_applied))
+                raise
 
         return binary
 

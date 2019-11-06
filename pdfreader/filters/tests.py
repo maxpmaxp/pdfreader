@@ -5,7 +5,8 @@ from . import decoders
 
 
 def suite():
-    suite = unittest.TestSuite()
+    loader = unittest.TestLoader()
+    suite = loader.discover('.', 'test_*')
     for m in decoders:
         suite.addTests(doctest.DocTestSuite(m))
     return suite

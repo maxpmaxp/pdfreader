@@ -31,6 +31,8 @@ class PDFDocument(object):
             {'D': [1, 0], 'IM': True, 'W': 1800, 'H': 3113, 'BPC': 1, 'F': 'CCITTFaxDecode', 'DecodeParms': {'K': -1, 'Columns': 1800, 'Rows': 3113, 'BlackIs1': True}}
             >>> len(img.data)
             290251
+            >>> len(img.filtered)
+            700425
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20220531.pdf')
             >>> doc = PDFDocument(fd)
