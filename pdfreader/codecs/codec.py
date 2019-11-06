@@ -1,9 +1,14 @@
 import codecs
 
+from collections import defaultdict
+
 from typing import Tuple
 
 from .agl import AGL
 from .zapfdingbatsgl import ZAPFDINGBATS_GL
+
+
+_cache = defaultdict(dict)
 
 
 class Codec(object):
@@ -12,7 +17,6 @@ class Codec(object):
     decode_table = NotImplemented
     name = NotImplemented
     font_name = None
-    _cache = dict()
 
     @classmethod
     def glyph_name_to_string(cls, name):
@@ -57,11 +61,12 @@ class Codec(object):
             >>> Codec.glyph_name_to_string("a100")
             ''
         """
-        if name in cls._cache:
-            return cls._cache[name]
+        if name in _cache[cls]:
+            return _cache[cls][name]
 
         components = name.split(".")[0].split("_")
         res = ""
+
         for glyph in components:
             val = ""
             if cls.font_name == "ZapfDingbats" and glyph in ZAPFDINGBATS_GL:
@@ -82,7 +87,7 @@ class Codec(object):
                     pass
             res += val
 
-        cls._cache[name] = res
+        _cache[cls][name] = res
         return res
 
     @classmethod
