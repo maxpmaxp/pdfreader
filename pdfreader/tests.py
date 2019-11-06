@@ -1,7 +1,7 @@
 import unittest
 import doctest
 
-import pdfreader.buffer, pdfreader.document, pdfreader.parsers, pdfreader.types, pdfreader.filters
+import pdfreader.buffer, pdfreader.document
 
 
 def suite():

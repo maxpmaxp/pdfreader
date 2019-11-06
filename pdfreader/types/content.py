@@ -1,3 +1,6 @@
+import logging
+from ..filters import apply_filter
+
 
 class TextObject(object):
     """ BT/ET data
@@ -28,3 +31,11 @@ class InlineImage(object):
     def __init__(self, entries, data):
         self.entries = entries
         self.data = data
+
+    @property
+    def filtered(self):
+        filter_name = self.entries.get('Filter') or self.entries.get('F')
+        binary = self.data
+        if filter_name:
+            binary = apply_filter(filter_name, binary, self.entries.get('DecodeParms'))
+        return binary
