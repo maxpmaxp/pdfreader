@@ -1,9 +1,9 @@
-import logging, zlib
+import logging
 
-from base64 import b85decode
 from decimal import Decimal
 
-from ..constants import DEFAULT_ENCODING, WHITESPACES
+from ..constants import DEFAULT_ENCODING
+from ..filters import apply_filter
 from ..utils import cached_property
 
 
@@ -92,188 +92,17 @@ class Stream(object):
         else:
             raise TypeError("Incorrect filter type: {}".format(filters))
 
-        data = self.stream
-        for f in farr:
-            method = getattr(self, "filter_{}".format(f))
-            if method is None:
-                raise ValueError("Unknown filter {}".format(f))
-            data = method(data)
-        return data
+        binary = self.stream
+        filters_applied = []
+        for fname in farr:
+            try:
+                binary = apply_filter(fname, binary, self.dictionary.get("DecodeParams"))
+                filters_applied.append(fname)
+            except NotImplementedError:
+                logging.exception("Leaving partially decoded. Filters applied: {}".format(filters_applied))
+                break
 
-    def _remove_predictors(self, data):
-        """ Remove LZW/Flate predictors
-        1 - No prediction
-        2 - TIFF predictor 2
-        10 - PNG None
-        11 - PNG Sub
-        12 - PNG Up
-        13 - PNG Average
-        14 - PNG Paeth
-        15 - PNG Optimum
-        """
-        params = self.get('DecodeParms') or dict()
-        predictor = params.get('Predictor', 1)
-        if predictor == 1:
-            res = data
-        elif predictor == 2:
-            raise ValueError("TIFF prediction not implemented")
-        elif 10 <= predictor <= 15:
-            row_size = params["Columns"] + 1
-            res = b''
-            for i in range(0, len(data), row_size):
-                if data[0] + 10 != predictor:
-                    raise ValueError("Unexpected predictor {}".format(data[0]))
-                res += data[i+1:i+row_size] # skip leading predictor byte
-        else:
-            raise ValueError("Unknown predictor type {}".format(predictor))
-        return res
-
-    # ToDo: implement more filters:
-    # LZWDecode
-    # CCITTFaxDecode
-    # JBIG2Decode
-    # DCTDecode
-    # JPXDecode
-    # Crypt
-
-    def filter_ASCII85Decode(self, data):
-        """
-        >>> from base64 import b85encode
-        >>> data = b85encode(b'sample data') + b'~>'
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_ASCII85Decode(obj.stream)
-        b'sample data'
-
-        >>> data = b"BROKEN_STREAM"
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_ASCII85Decode(obj.stream)
-        b''
-        """
-        # filter whitespaces
-        ws = b''.join(WHITESPACES)
-        data = bytes([n for n in data if n not in ws])
-        try:
-            if data.endswith(b'~>'):
-                res = b85decode(data[:-2])
-            else:
-                raise ValueError("EOD ~> expected")
-        except (TypeError, ValueError):
-            logging.exception("Skipping broken stream")
-            res = b''
-        return res
-
-    def filter_RunLengthDecode(self, data):
-        """
-        >>> data = bytes([5, 65, 66, 67, 68, 69, 70, 250, 55, 2, 65, 66, 67, 252, 53, 128])
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_RunLengthDecode(obj.stream)
-        b'ABCDEF7777777ABC55555'
-
-        >>> data = bytes([5, 65])
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_RunLengthDecode(obj.stream)
-        b''
-
-        >>> data = bytes([128])
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_RunLengthDecode(obj.stream)
-        b''
-        """
-        res = b''
-        buffer = []
-        state = 'need_length'
-        for c in data:
-            if state == 'need_length':
-                if c == 128:
-                    state = 'done'
-                    break
-                buffer = []
-                length = c
-                if c >= 129:
-                    state = 'need_one'
-                else:
-                    state = 'need_many'
-            elif state == 'need_one':
-                res += bytes([c] * (257 - length))
-                state = 'need_length'
-            elif state == 'need_many':
-                buffer.append(c)
-                if len(buffer) == length + 1:
-                    res += bytes(buffer)
-                    buffer = []
-                    state = 'need_length'
-
-        if state != 'done':
-            logging.error("Skipping broken stream")
-            res = b''
-
-        return res
-
-    def filter_ASCIIHexDecode(self, data):
-        """
-        >>> data = b"646174612073616d706c65>"
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_ASCIIHexDecode(obj.stream)
-        b'data sample'
-
-        >>> data = b"64617461207 3616d\\n706c65>"
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_ASCIIHexDecode(obj.stream)
-        b'data sample'
-
-        >>> data = b"64617461207 3616d\\n706c652>"
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_ASCIIHexDecode(obj.stream)
-        b'data sample '
-
-        >>> data = b"BROKEN_STREAM>"
-        >>> obj = Stream(dict(Length=len(data)), data)
-        >>> obj.filter_ASCIIHexDecode(obj.stream)
-        b''
-        """
-        buffer = b""
-        res = b""
-        try:
-            for i in range(0, len(data)):
-                c = data[i:i+1]
-                if c in WHITESPACES:
-                    continue
-                elif c == b">":
-                    break
-                buffer += c
-                if len(buffer) > 1:
-                    res += bytes.fromhex(buffer.decode(DEFAULT_ENCODING))
-                    buffer = b""
-
-            if buffer:
-                if len(buffer) == 1:
-                    buffer += b"0"
-                res += bytes.fromhex(buffer.decode(DEFAULT_ENCODING))
-        except ValueError:
-            # invalid characters on stream
-            logging.exception("Skipping broken stream")
-        return res
-
-    def filter_FlateDecode(self, data):
-        """
-        >>> from zlib import compress
-        >>> data = compress(b'sample data')
-        >>> obj = Stream(dict(Length=len(data), DecodeParams=dict(Predictor=1)), data)
-        >>> obj.filter_FlateDecode(obj.stream)
-        b'sample data'
-
-        >>> data = b"BROKEN_STREAM"
-        >>> obj = Stream(dict(Length=len(data), DecodeParams=dict(Predictor=1)), data)
-        >>> obj.filter_FlateDecode(obj.stream)
-        b''
-        """
-        try:
-            data = zlib.decompress(data)
-            data = self._remove_predictors(data)
-        except zlib.error:
-            logging.exception("Skipping broken stream")
-            data = b''
-        return data
+        return binary
 
     def __eq__(self, other):
         return self.dictionary == other.dictionary and self.stream == other.stream
