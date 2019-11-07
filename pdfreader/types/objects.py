@@ -85,9 +85,7 @@ class DictBasedObject(Dictionary):
         self._cache = dict()
 
     def __getattr__(self, item):
-        if item in self:
-            return self[item]
-        raise AttributeError(item)
+        return self.get(item)
 
     def __getitem__(self, item):
         if item in self._cache:
