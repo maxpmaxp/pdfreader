@@ -17,7 +17,7 @@ if LooseVersion(setuptools.__version__) <= LooseVersion("24.3"):
 
 
 setup(name="pdfreader",
-      version='0.1.1dev2',
+      version='0.1.1dev3',
       description="PDF reader",
       author="Maksym Polshcha",
       author_email="maxp@sterch.net",

@@ -100,9 +100,7 @@ class Codec(object):
         for x in binary:
             if x in cls.decode_table:
                 glyph_name = cls.decode_table[x]
-
-                components = glyph_name.split(".")[0]
-                glyph = AGL.get(glyph_name, '')
+                glyph = cls.glyph_name_to_string(glyph_name)
             else:
                 # treat unlisted codes as unicode characters
                 glyph = chr(x)
