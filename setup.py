@@ -27,7 +27,7 @@ setup(name="pdfreader",
       package_dir={'pdfreader': 'pdfreader'},
       package_data={'samples': ['samples/*']},
       zip_safe=False,
-      requires=[],
+      requires=['pillow'],
       entry_points={
         'console_scripts':
                 [],
