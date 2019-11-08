@@ -4,7 +4,7 @@ import logging
 filter_names = ('RunLengthDecode', 'RL')
 
 
-def decode(data, **_):
+def decode(data, *_):
     """
     >>> data = bytes([5, 65, 66, 67, 68, 69, 70, 250, 55, 2, 65, 66, 67, 252, 53, 128])
     >>> decode(data)

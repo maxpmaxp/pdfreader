@@ -1,6 +1,4 @@
-from PIL import Image
-
-from ..filters import apply_filter
+from ..types.imagesaver import ImageSaverMixin
 
 
 class TextObject(object):
@@ -26,65 +24,29 @@ class TextObject(object):
         return glue.join(self.strings)
 
 
-class InlineImage(object):
-    """ BI/EI data """
+class InlineImage(ImageSaverMixin):
+    """ BI/EI data
+
+        >>> import pkg_resources
+        >>> entries = {'D': [1, 0], 'IM': True, 'W': 128, 'H': 128, 'BPC': 1, 'F': 'RL'}
+        >>> with pkg_resources.resource_stream('pdfreader', 'types/samples/inline-image-0.data') as fd:
+        ...     data = fd.read()
+        >>> img = InlineImage(entries, data)
+        >>> len(img.filtered) == 2048
+        True
+        >>> len(img.decoded) == 16384
+        True
+        >>> with open("111.png", "wb") as f:
+        ...     img.save(f)
+
+    """
 
     def __init__(self, entries, data):
-        self.entries = entries
+        self.dictionary = entries
         self.data = data
 
-    @property
-    def Filter(self):
-        return self.entries.get('Filter') or self.entries.get('F')
-
-    @property
-    def Width(self):
-        return self.entries.get('Width') or self.entries.get('W')
-
-    @property
-    def Height(self):
-        return self.entries.get('Height') or self.entries.get('H')
-
-    @property
-    def ColorSpace(self):
-        return self.entries.get('ColorSpace') or self.entries.get('CS')
-
-    @property
-    def BitsPerComponent(self):
-        return self.entries.get('BitsPerComponent') or self.entries.get('BPC')
-
-    @property
-    def Decode(self):
-        return self.entries.get('Decode') or self.entries.get('D')
-
-    @property
-    def DecodeParms(self):
-        return self.entries.get('DecodeParms') or self.entries.get('DP')
-
-    @property
-    def Intent(self):
-        return self.entries.get('Intent')
-
-    @property
-    def Interpolate(self):
-        return self.entries.get('Interpolate') or self.entries.get('I')
-
-    @property
-    def filtered(self):
-        binary = self.data
-        if self.Filter:
-            binary = apply_filter(self.Filter, binary, self.entries.get('DecodeParms'))
-        return binary
-
-    def save(self, name):
-        size = self.Width, self.Height
-
-        if self.ColorSpace in ('DeviceRGB', 'RGB'):
-            mode = "RGB"
-        else:
-            mode = "P"
-
-        img = Image.frombytes(mode, size, self.filtered)
-        img.save(name)
 
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

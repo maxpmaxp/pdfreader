@@ -7,7 +7,7 @@ from ..constants import WHITESPACES
 filter_names = ('ASCII85Decode', 'A85')
 
 
-def decode(data, **_):
+def decode(data, *_):
     """
     >>> from base64 import b85encode
     >>> data = b85encode(b'sample data') + b'~>'

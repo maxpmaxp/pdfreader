@@ -1,6 +1,7 @@
 from ..codecs.decoder import Decoder
 from ..utils import cached_property
 from .content import TextObject, InlineImage
+from .imagesaver import ImageSaverMixin
 from .native import Stream, Dictionary, Array, Name
 
 
@@ -220,8 +221,7 @@ class Metadata(StreamBasedObject):
         Subtype = XML
     """
 
-
-class Image(XObject):
+class Image(ImageSaverMixin, XObject):
     """ Type = XObject
         Subtype = Image
     """
