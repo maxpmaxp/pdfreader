@@ -119,7 +119,7 @@ class TextParser(BasicTypesParser):
                 else:
                     args.append(token)
         except ParserException:
-            logging.warning("Inconsistent BT ET block detected:\n{}".format(block))
+            logging.warning("Inconsistent BT ET block detected. Possibly a bug:\n{}".format(block))
 
         res = TextObject(block, self.current_strings)
         self.current_strings = []

@@ -149,7 +149,7 @@ class XRef(object):
             else:
                 # PDF 1.5-1.7 defines any other reference types as references to null objects.
                 # so we just skip those
-                logging.warning("Undefined xref col type (index 0): {}".format(cols))
+                logging.debug("Undefined xref col type (index 0): {}".format(cols))
 
             if entry is not None:
                 self.add_entry(entry)

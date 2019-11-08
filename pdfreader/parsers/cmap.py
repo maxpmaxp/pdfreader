@@ -144,7 +144,7 @@ class CMapParser(BasicTypesParser):
             cmapname = self.cmap_name()
         except ParserException:
             # see cmap-sample-4.txt (page 9 samples/tyler-or-inline-image.pdf) - missing /CMapName
-            logging.warning("Missing /CMapName")
+            logging.debug("Missing /CMapName")
             cmapname = None
             self.set_state(state)
 
