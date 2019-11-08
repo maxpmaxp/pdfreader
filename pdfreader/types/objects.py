@@ -1,6 +1,7 @@
 from ..codecs.decoder import Decoder
 from ..utils import cached_property
 from .content import TextObject, InlineImage
+from .imagesaver import PILImageMixin
 from .native import Stream, Dictionary, Array, Name
 
 
@@ -184,6 +185,15 @@ class PageContentMixin(object):
     def text_sources(self, glue="\n"):
         return glue.join([to.source for to in self.text_objects()])
 
+    def images(self):
+        if self.Resources:
+            xobjs = self.Resources.get('XObject')
+            if xobjs:
+                for k in xobjs.keys():
+                    val = xobjs[k]
+                    if isinstance(val, Image):
+                        yield val
+
 
 class Page(PageContentMixin, DictBasedObject):
     """ Type = Page
@@ -220,8 +230,7 @@ class Metadata(StreamBasedObject):
         Subtype = XML
     """
 
-
-class Image(XObject):
+class Image(PILImageMixin, XObject):
     """ Type = XObject
         Subtype = Image
     """

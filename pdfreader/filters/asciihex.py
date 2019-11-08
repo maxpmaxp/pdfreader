@@ -6,7 +6,7 @@ from ..constants import WHITESPACES, DEFAULT_ENCODING
 filter_names = ('ASCIIHexDecode', 'AHx')
 
 
-def decode(data, **_):
+def decode(data, *_):
     """
     >>> data = b"646174612073616d706c65>"
     >>> decode(data)
