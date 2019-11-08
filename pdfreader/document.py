@@ -17,6 +17,7 @@ class PDFDocument(object):
         """ fobj - file-like object
 
             >>> import pkg_resources
+            >>> from PIL.Image import Image
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-inline-image.pdf')
             >>> doc = PDFDocument(fd)
@@ -27,12 +28,14 @@ class PDFDocument(object):
             >>> tos[0].to_string()
             ' Plaintiff’s Complaint Page 1 of 3 ZWICKER & ASSOCIATES, P.C. A Law Firm Engaged in Debt Collection 12550 SE 93RD AVENUE, SUITE 430 CLACKAMAS, OR 97015 PH: (503)654-2050  FAX: (503)654-0345  '
             >>> img = next(pages[8].inline_images())
-            >>> img.entries
+            >>> img.dictionary
             {'D': [1, 0], 'IM': True, 'W': 1800, 'H': 3113, 'BPC': 1, 'F': 'CCITTFaxDecode', 'DecodeParms': {'K': -1, 'Columns': 1800, 'Rows': 3113, 'BlackIs1': True}}
             >>> len(img.data)
             290251
             >>> len(img.filtered)
             700425
+            >>> isinstance(img.to_Pillow(), Image)
+            True
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/h2b-case-20220531.pdf')
             >>> doc = PDFDocument(fd)
@@ -171,7 +174,7 @@ class PDFDocument(object):
             >>> next(i for i, to in enumerate(pages[2].text_objects()) if 'future. ' in to.source)
             0
 
-            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/bellerica-pd-logs.pdf')
+            >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/billerica-pd-logs.pdf')
             >>> doc = PDFDocument(fd)
             >>> pages = [p for p in doc.pages()]
             >>> len(pages)
@@ -181,6 +184,11 @@ class PDFDocument(object):
             2
             >>> text_objects[1].strings[:10]
             ['W', 'ARRAN', 'T', ' ', 'ARRES', 'T', '  -', 'Name:', '  CIANO, ', 'STEVEN MICHAE']
+
+            >>> page = pages[0]
+            >>> img = page.Resources['XObject']['img0']
+            >>> isinstance(img.to_Pillow(), Image)
+            True
 
             >>> fd = pkg_resources.resource_stream('pdfreader', 'samples/waltham-pd-logs.pdf')
             >>> doc = PDFDocument(fd)
@@ -315,6 +323,11 @@ class PDFDocument(object):
     def inline_images(self):
         for page in self.pages():
             for img in page.inline_images():
+                yield img
+
+    def images(self):
+        for page in self.pages():
+            for img in page.images():
                 yield img
 
     def text_sources(self, separator="\n"):

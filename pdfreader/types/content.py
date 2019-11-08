@@ -1,4 +1,5 @@
-from ..types.imagesaver import ImageSaverMixin
+from ..filters import apply_filter
+from ..types.imagesaver import PILImageMixin
 
 
 class TextObject(object):
@@ -24,20 +25,12 @@ class TextObject(object):
         return glue.join(self.strings)
 
 
-class InlineImage(ImageSaverMixin):
+class InlineImage(PILImageMixin):
     """ BI/EI data
 
-        >>> import pkg_resources
-        >>> entries = {'D': [1, 0], 'IM': True, 'W': 128, 'H': 128, 'BPC': 1, 'F': 'RL'}
-        >>> with pkg_resources.resource_stream('pdfreader', 'types/samples/inline-image-0.data') as fd:
-        ...     data = fd.read()
-        >>> img = InlineImage(entries, data)
-        >>> len(img.filtered) == 2048
-        True
-        >>> len(img.decoded) == 16384
-        True
-        >>> with open("111.png", "wb") as f:
-        ...     img.save(f)
+        Inline image looks like a stream-based object but really it is not.
+        We just follow Stream interface to have an option to interact with InlineImage
+        the same way as with XObject/Image
 
     """
 
@@ -45,6 +38,52 @@ class InlineImage(ImageSaverMixin):
         self.dictionary = entries
         self.data = data
 
+    @property
+    def Filter(self):
+        return self.dictionary.get('Filter') or self.dictionary.get('F')
+
+    @property
+    def Width(self):
+        return self.dictionary.get('Width') or self.dictionary.get('W')
+
+    @property
+    def Height(self):
+        return self.dictionary.get('Height') or self.dictionary.get('H')
+
+    @property
+    def ColorSpace(self):
+        return self.dictionary.get('ColorSpace') or self.dictionary.get('CS')
+
+    @property
+    def BitsPerComponent(self):
+        return self.dictionary.get('BitsPerComponent') or self.dictionary.get('BPC')
+
+    @property
+    def Decode(self):
+        return self.dictionary.get('Decode') or self.dictionary.get('D')
+
+    @property
+    def DecodeParms(self):
+        return self.dictionary.get('DecodeParms') or self.dictionary.get('DP')
+
+    @property
+    def Intent(self):
+        return self.dictionary.get('Intent')
+
+    @property
+    def Interpolate(self):
+        return self.dictionary.get('Interpolate') or self.dictionary.get('I')
+
+    @property
+    def ImageMask(self):
+        return self.dictionary.get('ImageMask') or self.dictionary.get('IM')
+
+    @property
+    def filtered(self):
+        binary = self.data
+        if self.Filter:
+            binary = apply_filter(self.Filter, binary, self.dictionary.get('DecodeParms'))
+        return binary
 
 
 if __name__ == "__main__":

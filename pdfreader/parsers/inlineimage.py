@@ -9,9 +9,9 @@ class InlineImageParser(BasicTypesParser):
 
     >>> content = b'BI/D [1 0]/IM true /W 1800 /H 3113 /BPC 1 /F /CCITTFaxDecode /DecodeParms << /K -1 /Columns 1800 /Rows 3113 /BlackIs1 true >> ID <SOME-BINARY-CONTENT> EI'
     >>> img = InlineImageParser(content).inline_image()
-    >>> img.entries['W']
+    >>> img.dictionary['W']
     1800
-    >>> img.entries['D']
+    >>> img.dictionary['D']
     [1, 0]
     >>> img.data
     b'<SOME-BINARY-CONTENT>'
