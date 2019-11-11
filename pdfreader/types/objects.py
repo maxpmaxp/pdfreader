@@ -72,7 +72,7 @@ class ArrayBasedObject(Array):
     def __init__(self, doc, lst):
         self.doc = doc
         # ToDo: this must be lazier thing.
-        # Need to build objects only on access attempte like a.index, a[i], a[1:2] etc.
+        # Need to build objects only on access attempt only. For example: a.index, a[i], a[1:2] etc.
         lst = [self.doc.build(obj, lazy=True) for obj in lst]
         super(ArrayBasedObject, self).__init__(lst)
 
@@ -111,6 +111,31 @@ class DictBasedObject(Dictionary):
         except KeyError:
             val = default
         return val
+
+    # override defaults to build Dictionary values before returning
+
+    def keys(self):
+        return [k for k in super(DictBasedObject, self).keys()]
+
+    def values(self):
+        return [self[k] for k in super(DictBasedObject, self).keys()]
+
+    def items(self):
+        return [(k, self[k]) for k in super(DictBasedObject, self).keys()]
+
+    def pop(self, i, **kwargs):
+        if i in self:
+            res = self[i]
+            _ = super(DictBasedObject, self).pop(i)
+        else:
+            res = super(DictBasedObject, self).pop(i, **kwargs)
+        return res
+
+    def popitem(self):
+        if not self:
+            raise KeyError()
+        k = next(iter(super(DictBasedObject, self).keys()))
+        return k, self.pop(k)
 
 
 def obj_factory(doc, obj):
