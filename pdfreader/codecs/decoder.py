@@ -1,23 +1,56 @@
 import codecs
 import logging
+import pkg_resources
 
 from ..codecs.differences import DifferencesCodec
-from ..constants import DEFAULT_ENCODING
-from ..types.native import HexString
+from ..constants import DEFAULT_ENCODING, predefined_cmap_names
+from ..types.native import HexString, Name
 from . import register_pdf_encodings
 
 register_pdf_encodings()
 
 
+class PredefinedCmaps(object):
+    _cache = dict()
+
+    @staticmethod
+    def _load(name):
+        from ..parsers import CMapParser
+        fname = predefined_cmap_names[name]
+        with pkg_resources.resource_stream('pdfreader.codecs', 'cmaps/{}'.format(fname)) as fd:
+            return CMapParser(fd).cmap()
+
+    @staticmethod
+    def get(name):
+        if name not in PredefinedCmaps._cache:
+            PredefinedCmaps._cache[name] = PredefinedCmaps._load(name)
+        return PredefinedCmaps._cache[name]
+
+
+def _get_cmap_encoding(font):
+    cmap = encoding = None
+    explicit_cmap = font.get("ToUnicode")
+    explicit_encoding = font.get('Encoding')
+    is_predefined_cmap = isinstance(explicit_encoding, Name) and explicit_encoding in predefined_cmap_names
+    if bool(explicit_cmap):
+        cmap = explicit_cmap.resource
+    elif is_predefined_cmap:
+        # Get predefined cmap by name
+        cmap = PredefinedCmaps.get(explicit_encoding)
+
+    if not is_predefined_cmap:
+        encoding = explicit_encoding
+
+    return cmap, encoding
+
+
 class BaseDecoder(object):
     def __init__(self, font):
-        self.cmap = font.get("ToUnicode")
-        self.encoding = font.get('Encoding')
+        self.cmap, self.encoding = _get_cmap_encoding(font)
         self.base_font = font.get('BaseFont')
 
     def decode_string(self, s):
-        s_hex = HexString("".join(hex(b)[2:].zfill(2) for b in s))
-        return self.decode_hexstring(s_hex)
+        raise NotImplementedError()
 
     def decode_hexstring(self, s: HexString):
         raise NotImplementedError()
@@ -31,7 +64,7 @@ class CMAPDecoder(BaseDecoder):
         for i in range(0, len(s), 2):
             code += s[i:i + 2]
             try:
-                ch = self.cmap.resource.bf_ranges[code]
+                ch = self.cmap.bf_ranges[code]
             except KeyError:
                 if len(code) < 4:
                     continue
@@ -81,5 +114,12 @@ default_decoder = EncodingDecoder(dict(Encoding="latin1"))
 
 
 def Decoder(font):
-    klass = CMAPDecoder if font.get("ToUnicode") else EncodingDecoder
-    return klass(font)
+    cmap, encoding = _get_cmap_encoding(font)
+    if cmap:
+        decoder = CMAPDecoder(font)
+    elif encoding:
+        decoder = EncodingDecoder(font)
+    else:
+        logging.warning("Can't build Decoder for font {}. Trying to use default.".format(font))
+        decoder = default_decoder
+    return decoder
