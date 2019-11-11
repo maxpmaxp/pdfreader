@@ -120,6 +120,8 @@ def Decoder(font):
     elif encoding:
         decoder = EncodingDecoder(font)
     else:
+        # Encoding can be defined as a part of PostScript Font program, which is not supported.
+        # Anyway, let's try do decode somehow.
         logging.warning("Can't build Decoder for font {}. Trying to use default.".format(font))
         decoder = default_decoder
     return decoder
