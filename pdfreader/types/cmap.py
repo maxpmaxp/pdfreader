@@ -1,5 +1,4 @@
 from .constants import PS_CHARNAMES
-from ..constants import DEFAULT_ENCODING
 from .native import HexString
 
 

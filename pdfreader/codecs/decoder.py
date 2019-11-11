@@ -57,10 +57,30 @@ class BaseDecoder(object):
 
 
 class CMAPDecoder(BaseDecoder):
+    """
+
+    >>> font = dict(Encoding=Name("Identity-V"))
+    >>> decoder = CMAPDecoder(font)
+    >>> decoder.decode_hexstring('004100420043003100320033')
+    'ABC123'
+
+    >>> font = dict(Encoding=Name("83pv-RKSJ-H"))
+    >>> decoder = CMAPDecoder(font)
+    >>> decoder.decode_hexstring('82A88D7B0057') == "\\u82A8\\u8D7BW"
+    True
+
+    >>> from unittest.mock import Mock
+    >>> cmap = Mock()
+    >>> cmap.resource.bf_ranges = {'0001': 'A', '0002': 'B', '0003': 'C', '0004': '1',  '0005': '2',  '0006': '3'}
+    >>> font = dict(ToUnicode=cmap)
+    >>> decoder = CMAPDecoder(font)
+    >>> decoder.decode_hexstring('000100020003000400050006')
+    'ABC123'
+
+    """
 
     def decode_hexstring(self, s: HexString):
         res, code = "", ""
-
         for i in range(0, len(s), 2):
             code += s[i:i + 2]
             try:
@@ -70,7 +90,10 @@ class CMAPDecoder(BaseDecoder):
                     continue
                 else:
                     # leave as is
-                    ch = HexString(code).to_string()
+                    try:
+                        ch = chr(int(code, 16))
+                    except ValueError:
+                        ch = HexString(code)
             res += ch
             code = ""
 
@@ -125,3 +148,8 @@ def Decoder(font):
         logging.warning("Can't build Decoder for font {}. Trying to use default.".format(font))
         decoder = default_decoder
     return decoder
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

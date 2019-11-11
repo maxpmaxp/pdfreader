@@ -1,13 +1,14 @@
 import unittest
 import doctest
 
-from . import codec, differences
+from . import codec, differences, decoder
 
 
 def suite():
     suite = unittest.TestSuite()
     suite.addTests(doctest.DocTestSuite(codec))
     suite.addTests(doctest.DocTestSuite(differences))
+    suite.addTests(doctest.DocTestSuite(decoder))
     return suite
 
 
