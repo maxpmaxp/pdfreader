@@ -1,0 +1,11 @@
+include README.rst
+include CONTRIBUTING.rst
+include LICENSE
+include THIRD-PARTY-NOTICES
+include pdfreader/codec/cmaps *
+global-include *.txt
+recursive-include doc *.rst
+recursive-include doc *.py
+recursive-include doc *.conf
+recursive-include doc *.png
+recursive-include doc *.pdf
