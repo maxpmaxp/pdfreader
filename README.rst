@@ -18,6 +18,7 @@ About
     * to split PDF files into pages or other pieces
     * convert PDFs to any other format
 
+Nevertheless it can be used as a part of such tools.
 
 Features
 ========
