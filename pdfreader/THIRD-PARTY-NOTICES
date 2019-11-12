@@ -11,6 +11,10 @@ The attached notices are provided for information only.
 For any licenses that require disclosure of source, sources are available at
 https://github.com/maxpmaxp/pdfreader.
 
+The package contains PDF files examples taken from publicly available sources.
+These files are provided as examples only and can be found on the sites listed
+under p.6.
+
 
 1) License Notice for *bitarray* (https://github.com/ilanschnell/bitarray)
 
@@ -184,3 +188,15 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+6) The package contains PDF files examples taken from publicly available sources.
+   These files are provided as examples only and can be found on:
+
+    - https://police.billericaps.com/index.php/logs/
+    - https://www.cumberlandso.org/325/Cumberland-County-Arrest-Logs
+    - https://lcr-pjr.doleta.gov/index.cfm?event=ehLCJRExternal.dspAdvCertSearch
+    - https://leecountyil.com/pdf/Sheriffs_Department/
+    - https://services.dps.ohio.gov/CrashOnline/CrashRetrieval
+    - https://web6.seattle.gov/courts/ECFPortal/
+    - https://publicaccess.courts.oregon.gov/PublicAccessLogin/
+    - https://www.city.waltham.ma.us/police-department/pages/police-blotter-arrest-log
