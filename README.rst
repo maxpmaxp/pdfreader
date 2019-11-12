@@ -22,7 +22,7 @@ What it is and what it is not
 Features
 ========
 
-* Python 3.4+
+* Python 3.6+
 * Follows `PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_
 * Lazy objects access allows to process huge PDF documents quite fast
 * Allows to extract texts (pure strings and formatted text objects)
