@@ -1,7 +1,8 @@
 =========
 pdfreader
 =========
-:Info: See `the tutorials & documentation <http://....>`_ for more information. See `GitHub <https://github.com/maxpmaxp/pdfreader>`_ for the latest source.
+:Info: See `the tutorials & documentation <https://pdfreader.readthedocs.io>`_ for more information.
+See `GitHub <https://github.com/maxpmaxp/pdfreader>`_ for the latest source.
 :Author & Maintainer: Maksym Polshcha <maxp@sterch.net>
 
 
@@ -53,7 +54,7 @@ You can also download the project source and do::
 Tutorial and Documentation
 ===========================
 
-`Tutorial, real-life examples and documentation <http://....>`_
+`Tutorial, real-life examples and documentation <https://pdfreader.readthedocs.io>`_
 
 
 Support, Bugs & Feature Requests
