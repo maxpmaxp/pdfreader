@@ -58,7 +58,7 @@ Tutorial and Documentation
 Support, Bugs & Feature Requests
 ============================================
 
-*pdfreader* uses GitHub `issues <https://github.com/maxpmaxp/pdfreader/issues>`_ to keep track of bugs,
+*pdfreader* uses `GitHub issues <https://github.com/maxpmaxp/pdfreader/issues>`_ to keep track of bugs,
 feature requests, etc.
 
 
