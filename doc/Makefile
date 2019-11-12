@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = ../venv/bin/sphinx-build
 PAPER         =
 BUILDDIR      = _build
 
@@ -63,7 +63,7 @@ qthelp:
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
 	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/pdfreader.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/pdfreader.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/pdfreader..qhc"
 
 latex:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex

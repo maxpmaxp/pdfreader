@@ -69,3 +69,6 @@ target/
 /*.html
 
 *proxies.txt
+
+_build
+doc/*.png
