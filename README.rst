@@ -5,8 +5,8 @@ pdfreader
 :Author & Maintainer: Maksym Polshcha <maxp@sterch.net>
 
 
-What it is and what it is not
-=============================
+About
+=====
 
 *pdfreader* is a Pythonic API for:
     * extracting texts, images and other data from PDF documents
@@ -32,10 +32,34 @@ Features
 * Allows to access any document objects, resources and extract any data you need (fonts, annotations, metadata, multimedia, etc.)
 
 
+Installation
+============
+
+*pdfreader* can be installed with `pip <http://pypi.python.org/pypi/pip>`_::
+
+  $ python -m pip install pdfreader
+
+Or ``easy_install`` from
+`setuptools <http://pypi.python.org/pypi/setuptools>`_::
+
+  $ python -m easy_install pdfreader
+
+You can also download the project source and do::
+
+  $ python setup.py install
+
+
 Tutorial and Documentation
 ===========================
 
 `Tutorial, real-life examples and documentation <http://....>`_
+
+
+Support, Bugs & Feature Requests
+============================================
+
+*pdfreader* uses GitHub `issues <https://github.com/maxpmaxp/pdfreader/issues>`_ to keep track of bugs,
+feature requests, etc.
 
 
 Related Projects

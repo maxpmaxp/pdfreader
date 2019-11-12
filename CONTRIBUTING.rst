@@ -11,5 +11,5 @@ Contributing to pdfreader
 * Documentation improvements
 
 
-*pdfreader* uses GitHub `issues <https://github.com/maxpmaxp/pdfreader/issues>` to keep track of bugs,
+*pdfreader* uses GitHub `issues <https://github.com/maxpmaxp/pdfreader/issues>`_ to keep track of bugs,
 feature requests, etc.
