@@ -37,8 +37,8 @@ The first step when working with **pdfreader** is to create a
   >>> fd = open(file_name, "rb")
   >>> doc = PDFDocument(fd)
 
-As *pdfreader* implements lazy PDF reading (it never reads more then you ask from the file)
-it's important to keep the file opened while you are working with the document.
+As *pdfreader* implements lazy PDF reading (it never reads more then you ask from the file),
+so it's important to keep the file opened while you are working with the document.
 Make sure you don't close it until you're done.
 
 It is also possible to use a binary file-like object to create an instance, for example:
@@ -50,7 +50,7 @@ It is also possible to use a binary file-like object to create an instance, for 
   ...     stream = BytesIO(f.read())
   >>> doc2 = PDFDocument(stream)
 
-Let's check the version of the document
+Let's check the PDF version of the document
 
 .. doctest::
 
@@ -82,7 +82,7 @@ For the full list of document root attributes see PDF-1.7 specification
 How to walk document pages
 --------------------------
 
-There is a generator :meth:`~pdfreader.document.PDFDocument.pages` we can use to walk the pages one by one.
+There is a generator :meth:`~pdfreader.document.PDFDocument.pages` to walk the pages one by one.
 It yields :class:`~pdfreader.types.objects.Page` instances.
 
 .. doctest::
@@ -103,16 +103,14 @@ You may wish to get some specific page if your document contains hundreds and th
 Doing this is just a little bit trickier.
 To get the 6th page you need to walk through the previous five.
 
-Don't forget, that all PDF viewers start page numbering from 1,
-however Python lists start their indexes from 0.
-
 .. doctest::
 
   >>> from itertools import islice
   >>> page_six = next(islice(doc.pages(), 5, 6))
   >>> page_five = next(islice(doc.pages(), 4, 5))
 
-Or just:
+Don't forget, that all PDF viewers start page numbering from 1,
+however Python lists start their indexes from 0.
 
 .. doctest::
 
@@ -127,7 +125,7 @@ Now we can access all page attributes:
   >>> page_six.Annots[0].Subj
   b'Text Box'
 
-It's possible to access Pages Tree Node for the page, aka :class:`~pdfreader.types.objects.Pages` instance
+It's possible to access parent Pages Tree Node for the page, aka :class:`~pdfreader.types.objects.Pages` instance
 and all it's kids:
 
 .. doctest::
@@ -154,8 +152,7 @@ There are 2 kinds of images in PDF documents:
 
 Every kind has its own class
 (:class:`~pdfreader.types.objects.Images` and :class:`~pdfreader.types.content.InlineImage`)
-and generators :meth:`~pdfreader.types.objects.Page.images` and :meth:`~pdfreader.types.objects.Page.inline_images`
-
+and generators: :meth:`~pdfreader.types.objects.Page.images` and :meth:`~pdfreader.types.objects.Page.inline_images`
 
 Let's extract some pictures now!
 
@@ -178,7 +175,7 @@ object and save!
 
 Voila! Enjoy opening it in your favorite editor!
 
-See the complete list of `Image (sec. 8.9.5) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=206>`_
+Check the complete list of `Image (sec. 8.9.5) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=206>`_
 and `InlineImage (sec. 8.9.7) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=214>`_
 attributes.
 
