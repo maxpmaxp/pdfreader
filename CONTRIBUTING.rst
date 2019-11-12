@@ -7,6 +7,7 @@ Contributing to pdfreader
 * Code patches
 * Bug reports
 * Patch reviews
+* Introduce new features
 * Documentation improvements
 
 
