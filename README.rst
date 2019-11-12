@@ -51,7 +51,7 @@ Related Projects
 References
 ==========
 
-* `Document management - Potable document format <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_
+* `Document management - Potable document format - PDF 1.7 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_
 * `Adobe CMap and CIDFont Files Specification <https://www.adobe.com/content/dam/acom/en/devnet/font/pdfs/5014.CIDFont_Spec.pdf>`_
 * `PostScript Language Reference Manual <https://www-cdf.fnal.gov/offline/PostScript/PLRM2.pdf>`_
 * `Adobe CMap resources <https://github.com/adobe-type-tools/cmap-resources>`_
