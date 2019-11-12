@@ -28,10 +28,8 @@ Features
 * Allows to extract texts (pure strings and formatted text objects)
 * Allows to extract PDF forms data (pure strings and formatted text objects)
 * Supports all PDF encodings, CMap, predefined cmaps.
-* Allows to extract images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_
-without loosing any quality
-* Allows to access any document objects, resources and extract any data you need
-(fonts, annotations, metadata, multimedia, etc.)
+* Allows to extract images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_ without loosing any quality
+* Allows to access any document objects, resources and extract any data you need (fonts, annotations, metadata, multimedia, etc.)
 
 
 Tutorial and Documentation
