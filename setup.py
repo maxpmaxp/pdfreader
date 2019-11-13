@@ -37,10 +37,10 @@ except ImportError:
 
 class doc(Command):
 
-    description = "generate or test documentation"
+    description = "Generate or Test Documentation"
 
     user_options = [("test", "t",
-                     "run doctests instead of generating documentation")]
+                     "Run Doctests instead of generating documentation")]
 
     boolean_options = ["test"]
 
@@ -85,7 +85,14 @@ class doc(Command):
 
 
 class test(Command):
-    description = "run the tests"
+    description = "Run tests"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
 
     def run(self):
         # Installing required packages, running egg_info are
@@ -95,8 +102,6 @@ class test(Command):
                 self.distribution.install_requires)
         if self.distribution.tests_require:
             self.distribution.fetch_build_eggs(self.distribution.tests_require)
-        if self.xunit_output:
-            self.distribution.fetch_build_eggs(["unittest-xml-reporting"])
         self.run_command('egg_info')
 
         import unittest
