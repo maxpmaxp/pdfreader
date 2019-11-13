@@ -3,7 +3,7 @@ pdfreader |release| Documentation
 
 Overview
 --------
-**pdfreader** s a Pythonic API to PDF documents which follows
+**pdfreader** is a Pythonic API to PDF documents which follows
 `PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_.
 
 It allows to parse documents, extract texts, images, fonts,

@@ -183,4 +183,28 @@ attributes.
 Extracting texts
 ----------------
 
+Getting texts from a page is super easy. Just call :meth:`~pdfreader.types.objects.Page.text` to get plain texts.
 
+.. doctest::
+
+  >>> page_one.text()
+  " Plaintiff’s Complaint ... 1:49 PM19CV47031"
+
+If you wish to see the markdown of all BT/ET blocks and other PDF commands (you may need this for further parsing),
+just run :meth:`~pdfreader.types.objects.Page.text_sources`:
+
+.. doctest::
+
+  >>> print(page_one.text_sources())
+  BT
+  0 0 0 rg
+  /GS0 gs
+  /T1_0 9.96001 Tf
+  ...
+  22.35001 -13.79883 Td
+  (19CV47031)Tj
+  ET
+
+
+*pdfreader* takes care of decoding binary streams, character encodings, CMap, fonts etc.
+So finally you have human-readable texts and markdown.
