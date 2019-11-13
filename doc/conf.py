@@ -87,7 +87,7 @@ html_theme_options = {
 }
 
 # Additional static files.
-html_static_path = ['static']
+html_static_path = ['examples/img']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

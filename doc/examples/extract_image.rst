@@ -18,7 +18,7 @@ Let's open a sample document.
   >>> fd = open(file_name, "rb")
   >>> doc = PDFDocument(fd)
 
-Let's have a look at the sample file :download:`sample file <examples/pdfs/example-image-xobject.pdf>`
+Let's have a look at the sample file :download:`sample file <pdfs/example-image-xobject.pdf>`
 It contains a logo on the first page. Let's extract it.
 
 .. doctest::
@@ -96,7 +96,7 @@ Extracting Image Masks
 Image Mask is just a specific kind of image actually. Except it is not always visible directly in your PDF Viewer.
 Nevertheless it can be accessed absolutely the same way.
 
-Let's have a look at the :download:`example <examples/pdfs/tutorial-example.pdf>` from :ref:`tutorial-images`,
+Let's have a look at the :download:`example <pdfs/tutorial-example.pdf>` from :ref:`tutorial-images`,
 and see what image masks it contains.
 
   >>> file_name = os.path.join(samples_dir, 'tutorial-example.pdf')

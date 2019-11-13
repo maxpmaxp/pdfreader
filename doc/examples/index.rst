@@ -15,19 +15,15 @@ Advanced PDF data extraction techniques with real-life examples.
 
   Instructions on how to extract text data from PDF Forms.
 
-:doc:`extract_cmap`
-
-  What if you need to see font CMap?
-
-:doc:`extract_font`
+:doc:`extract_fonts`
 
   It's possible to extract an embedded font. Let's read how to do that.
 
+:doc:`extract_cmap`
+
+  What if you need to see font's CMap?
+
+
 :doc:`walking_through_document`
 
-  Instructions on how to navigate PDF documents. Advanced techniques.
-
-:doc:`read_raw_content`
-
-  How to access raw binary data, decode it for further processing.
-
+  Instructions on how to navigate PDF documents and access it's objects. Advanced techniques.

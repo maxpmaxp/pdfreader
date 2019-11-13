@@ -8,9 +8,9 @@ Tutorial
 
 Have a look at the :download:`sample file <examples/pdfs/tutorial-example.pdf>`.
 In this tutorial we will learn simple methods on
-    - how to open it
-    - navigate pages
-    - exract images and texts.
+- how to open it
+- navigate pages
+- exract images and texts.
 
 
 Prerequisites
