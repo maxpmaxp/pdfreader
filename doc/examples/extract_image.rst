@@ -69,15 +69,15 @@ Extracting Images: a very simple way
 ------------------------------------
 
 A very simple way also exisit.
-To extract all XObject and Inline Images use `:meth:~pdfreader.types.objects.Page.images` and
-`:meth:~pdfreader.types.objects.Page.inline_images` generators:
+To extract all XObject and Inline Images use :meth:`~pdfreader.types.objects.Page.images` and
+:meth:`~pdfreader.types.objects.Page.inline_images` generators:
 
 .. doctest::
 
    >>> all_page_images = list(page.images())
    >>> all_page_inline_images = list(page.inline_images())
 
-or even `:meth:~pdfreader.document.PDFDocument.images` and `:meth:~pdfreader.document.PDFDocument.inline_images`
+or even :meth:`~pdfreader.document.PDFDocument.images` and :meth:`~pdfreader.document.PDFDocument.inline_images`
 generators:
 
 .. doctest::

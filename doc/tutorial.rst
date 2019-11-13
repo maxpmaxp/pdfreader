@@ -183,6 +183,7 @@ Check the complete list of `Image (sec. 8.9.5) <https://www.adobe.com/content/da
 and `InlineImage (sec. 8.9.7) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=214>`_
 attributes.
 
+.. _tutorial-texts:
 
 Extracting texts
 ----------------

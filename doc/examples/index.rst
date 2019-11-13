@@ -24,6 +24,16 @@ Advanced PDF data extraction techniques with real-life examples.
   What if you need to see font's CMap?
 
 
-:doc:`walking_through_document`
+:doc:`navigate_objects`
 
   Instructions on how to navigate PDF documents and access it's objects. Advanced techniques.
+
+.. toctree::
+   :maxdepth: 2
+
+   extract_image
+   extract_page_text
+   extract_form_text
+   extract_cmap
+   extract_fonts
+   navigate_objects
