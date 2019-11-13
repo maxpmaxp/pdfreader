@@ -6,8 +6,11 @@ Tutorial
   from pdfreader import PDFDocument
   import pkg_resources
 
-This tutorial is intended as an introduction to working with
-**pdfreader**.
+Have a look at the :download:`sample file <examples/pdfs/tutorial-example.pdf>`.
+In this tutorial we will learn simple methods on
+    - how to open it
+    - navigate pages
+    - exract images and texts.
 
 
 Prerequisites
@@ -142,6 +145,7 @@ By accident our example contains the only one Pages Tree Node, which is not alwa
 For the complete list Page and Pages attributes see PDF-1.7 specification
 `sections 7.7.3.2-7.7.3.3 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=76>`_
 
+.. _tutorial-images:
 
 Extracting Page Images
 ----------------------

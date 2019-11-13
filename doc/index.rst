@@ -74,7 +74,7 @@ Indices and tables
 * :ref:`search`
 
 .. toctree::
-   :hidden:
+   :maxdepth: 4
 
    installation
    tutorial
