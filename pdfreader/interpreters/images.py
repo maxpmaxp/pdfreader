@@ -3,4 +3,12 @@ from .base import Interpreter
 
 class ImagesExtractor(Interpreter):
 
-    parser_class =
+    par
+
+    def __init__(self, *args, **kwargs):
+
+
+    def get_stream(self):
+        resources = self.current_page.Resources
+        if
+
