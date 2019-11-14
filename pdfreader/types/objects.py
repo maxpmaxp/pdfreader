@@ -1,6 +1,7 @@
 from ..codecs.decoder import Decoder
 from ..utils import cached_property
 from .content import TextObject, InlineImage
+from .graphicsstate import GraphicsState
 from .imagesaver import PILImageMixin
 from .native import Stream, Dictionary, Array, Name
 
@@ -39,6 +40,18 @@ class Trailer(object):
         return self.params == other.params
 
 
+def _get_inherited_attr(obj, attr, parent_attr='Parent'):
+    val = obj.__getattr__(attr)
+    if val is None:
+        parent = obj.__getattr__(parent_attr)
+        while parent is not None:
+            val = parent.__getattr__(attr)
+            if val is not None:
+                break
+            parent = parent.__getattr__(parent_attr)
+    return val
+
+
 class StreamBasedObject(Stream):
     """ Stream-based object. Can solve indirect references """
 
@@ -64,6 +77,8 @@ class StreamBasedObject(Stream):
                     obj = hook(obj)
         self._cache[item] = obj
         return self._cache[item]
+
+    get_inherited_attr = _get_inherited_attr
 
 
 class ArrayBasedObject(Array):
@@ -137,6 +152,8 @@ class DictBasedObject(Dictionary):
         k = next(iter(super(DictBasedObject, self).keys()))
         return k, self.pop(k)
 
+    get_inherited_attr = _get_inherited_attr
+
 
 def obj_factory(doc, obj):
     klass = None
@@ -182,9 +199,20 @@ class PageTreeNode(DictBasedObject):
 
 class PageContentMixin(object):
 
+    # ToDo: this need to be refactored to support Resources inheritance.
+    # Also need to clarify if Form can manipulate with Page's graphics state, or it has it's own one.
+
     @cached_property
     def fonts(self):
         return self.Resources.get("Font", dict())
+
+    @cached_property
+    def graphics_states(self):
+        gs = dict()
+        egs_dict = self.Resources.get("ExtGState")
+        if egs_dict:
+            gs.update({k: GraphicsState.from_ExtGState(egs) for k, egs in egs_dict.items()})
+        return gs
 
     @cached_property
     def decoders(self):

@@ -1,25 +1,37 @@
 import logging
 
+from io import BytesIO
+
 from ..codecs.decoder import default_decoder
 from ..constants import DEFAULT_ENCODING
 from ..exceptions import ParserException
-from ..types.content import TextObject
+from ..types.content import TextObject, Operator
+from ..utils import pdf_escape_string
 from .base import BasicTypesParser
 
 
 class TextParser(BasicTypesParser):
     """ BT/ET section parser """
 
+    # ToDo: There is an architectural issue here: parsers must just parse streams
+    # and some other class (Viewer/Interpreter) must take care of decoding.
+    # Refactoring needed.
+
     def __init__(self, context, *args, **kwargs):
-        self.context = context
+        self.context = context # content stream parser
         super(TextParser, self).__init__(*args, **kwargs)
-        self.current_font_name = None
         self.current_strings = []
 
     @property
+    def page(self):
+        """ Returns ContentParser context, which normally should be a Page object """
+        return self.context.context
+
+    @property
     def decoder(self):
-        if self.current_font_name:
-            decoder = self.context.decoders[self.current_font_name[1:]]
+        if self.context.graphics_state:
+            font, _ = self.context.graphics_state.Tf
+            decoder = self.page.decoders[font]
         else:
             decoder = default_decoder
         return decoder
@@ -101,6 +113,7 @@ class TextParser(BasicTypesParser):
         block = ""
         args = []
         self.current_strings = []
+        operators = []
         try:
             token = self.object()
             block += token
@@ -112,16 +125,28 @@ class TextParser(BasicTypesParser):
                     self.prev()
                     self.prev()
                     raise ParserException("BT without enclosing ET")
-                if token == "Tf":
-                    self.current_font_name = args[0]
                 if self.is_command(token):
+                    op = Operator(token, args)
                     args = []
+                    self.context.execute(op)
+                    operators.append(op)
                 else:
-                    args.append(token)
-        except ParserException:
-            logging.warning("Inconsistent BT ET block detected. Possibly a bug:\n{}".format(block))
+                    # ToDo: There is an architectural issue here: parsers must just parse streams
+                    # and some other class (Viewer/Interpreter) must take care of decoding.
+                    # Refactoring needed.
 
-        res = TextObject(block, self.current_strings)
+                    # Temporary fixture: an operand must come as an object
+                    try:
+                        operand = BasicTypesParser(BytesIO(token.encode("utf-8"))).object()
+                        args.append(operand)
+                    except ParserException:
+                        logging.exception("Possibly a bug. Leaving token unparsed")
+                        args.append(token)
+
+        except ParserException:
+            logging.exception("Inconsistent BT ET block detected. Possibly a bug:\n{}".format(block))
+
+        res = TextObject(block, self.current_strings, operators)
         self.current_strings = []
         return res
 
@@ -130,14 +155,14 @@ class TextParser(BasicTypesParser):
         if self.decoder:
             s = self.decoder.decode_hexstring(s)
         self.on_string_parsed(s)
-        return "({})".format(s)
+        return "({})".format(pdf_escape_string(s))
 
     def string(self):
         s = super(TextParser, self).string()
         if self.decoder:
             s = self.decoder.decode_string(s)
         self.on_string_parsed(s)
-        return "({})".format(s)
+        return "({})".format(pdf_escape_string(s))
 
     def maybe_spaces(self):
         res = ''
