@@ -2,7 +2,11 @@ from ..filters import apply_filter
 from ..types.imagesaver import PILImageMixin
 
 
-class TextObject(object):
+class StreamContent(object):
+    pass
+
+
+class TextObject(StreamContent):
     """ BT/ET data
 
         The object is a bit tricky. It's goal to hold text content suitable for data extraction.
@@ -17,15 +21,16 @@ class TextObject(object):
 
     """
 
-    def __init__(self, source, strings):
+    def __init__(self, source, strings, operators):
         self.source = source
         self.strings = strings
+        self.operators = operators
 
     def to_string(self, glue=""):
         return glue.join(self.strings)
 
 
-class InlineImage(PILImageMixin):
+class InlineImage(PILImageMixin, StreamContent):
     """ BI/EI data
 
         Inline image looks like a stream-based object but really it is not.
@@ -84,6 +89,13 @@ class InlineImage(PILImageMixin):
         if self.Filter:
             binary = apply_filter(self.Filter, binary, self.dictionary.get('DecodeParms'))
         return binary
+
+
+class Operator(object):
+    """ Content stream operator """
+    def __init__(self, name, args):
+        self.name = name
+        self.args = args
 
 
 if __name__ == "__main__":
