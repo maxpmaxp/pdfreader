@@ -1,3 +1,5 @@
+.. _examples-parse-texts:
+
 How to parse PDF texts
 ======================
 
