@@ -59,37 +59,15 @@ class ContentParser(BasicTypesParser):
         self.maybe_spaces_or_comments()
         while self.current:
             obj = self.object()
-            if isinstance(obj, StreamContent):
-                if operands:
-                    logging.warning("Skipping unexpected operands: {}".format(operands))
-                    operands = []
-                yield obj
-            elif self.is_operator(obj):
+            if self.is_operator(obj):
                 op = Operator(obj, operands)
-                self.execute(op)
                 yield op
                 operands = []
             else:
                 operands.append(obj)
             self.maybe_spaces_or_comments()
         if operands:
-            logging.warning("Skipping unexpected operands at the end of stream: {}".format(operands))
-
-    def execute(self, op):
-        if op.name == 'q':
-            # push current graphics state on the top of stack
-            self.save_graphics_state()
-        elif op.name == 'Q':
-            # restore previous current graphics state on the top of stack
-            self.restore_graphics_state()
-        elif op.name == 'gs':
-            self.set_graphics_state(op.args[0])
-        if op.name == "Tf":
-            self.graphics_state.Tf = op.args  # agrs shally be [font, size]
-        else:
-            # ToDo: what commands we need to implement?
-            # Need to support graphical states related to images transformations
-            pass
+            logging.warning("Skipping trailing operands at the end of stream: {}".format(operands))
 
     def is_operator(self, obj):
         return isinstance(obj, Token) and obj[0] not in '/01234567890+-.<[('

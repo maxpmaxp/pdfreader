@@ -1,3 +1,6 @@
+from typing import List
+
+
 class GraphicsState(object):
     # See PDF 1.7 specification sec. 8.4 - Graphics state
     # We don't care about most of the attrs. Tf is in use only at this time.
@@ -31,3 +34,10 @@ class GraphicsState(object):
     def font_name(self):
         if self.Tf:
             return self.Tf[0]
+
+
+class GraphicsStateStack(List[GraphicsState]):
+
+    def execute_operator(self, op):
+        pass
+
