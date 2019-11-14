@@ -113,7 +113,7 @@ Let's save it as a text file and analyze how can we extract the data we need.
 
   >>> with open("example-crash-markdown.txt", "w") as f:
   ...     f.write(markdown)
-  26700
+  26718
 
 Open your favorite editor and have a look at :download:`the file <downloads/example-crash-markdown.txt>`.
 

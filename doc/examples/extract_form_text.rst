@@ -7,7 +7,7 @@ In most cases texts come within page binary content streams and can be extracted
 There is one more place where data can be found: page forms. Form is a special subtype of XObject which
 is a part of page resources and can be referenced from regular page content using `do` command.
 
-Have a look at one :download:`filled PDF form <pdf/example-form.pdf>`.
+Have a look at one :download:`filled PDF form <pdfs/example-form.pdf>`.
 
 Let's open the document and get the 1st page.
 
@@ -24,6 +24,8 @@ Let's open the document and get the 1st page.
 And now, let's try to locate a string, located under section *B.3 SOC (ONET/OES) occupation title*
 
 .. image:: img/example-parse-form.png
+
+.. doctest::
 
   >>> plain_text = page.text()
   >>> "Farmworkers and Laborers" in plain_text
