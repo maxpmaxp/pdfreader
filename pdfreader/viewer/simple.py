@@ -1,8 +1,10 @@
 import logging
+from base64 import b85encode
 
 from ..codecs.decoder import Decoder, default_decoder
 from ..parsers.content import ContentParser
-from ..types.native import HexString, String
+from ..types.content import Operator, InlineImage
+from ..types.native import HexString, String, Dictionary, Array, Boolean, Name, Decimal, Integer
 from ..types.objects import Image, Form
 from ..utils import pdf_escape_string
 from .base import Viewer
@@ -10,7 +12,33 @@ from .canvas import SimpleCanvas
 
 
 def object_to_string(obj):
-    return ""
+    if obj is None:
+        val = "null"
+    elif isinstance(obj, Boolean):
+        val = str(obj).lower()
+    elif isinstance(obj, Name):
+        val = "/" + obj
+    elif isinstance(obj, str):
+        val = obj
+    elif isinstance(obj, (int, Integer, Decimal)):
+        val = str(obj)
+    elif isinstance(obj, Array):
+        val = "[" + " ".join([object_to_string(elm) for elm in obj]) + "]"
+    elif isinstance(obj, Dictionary):
+        val = "<<" + " ".join(["/{} {}".format(k, object_to_string(v)) for k, v in obj.items()]) + ">>"
+    elif isinstance(obj, Operator):
+        operands = " ".join([object_to_string(a) for a in obj.args])
+        val = "\n{} {}".format(operands, obj.name)
+    elif isinstance(obj, InlineImage):
+        # Convert bytes to string representation
+        entries = " ".join(["/{} {}".format(k, object_to_string(v))
+                            for k, v in obj.dictionary.items()
+                            if k not in ('F', 'Filter', 'DecodeParms')])
+        content = b85encode(obj.filtered) + b'~>'
+        val = "\nBI\n{entries}\nID\n{content}\nEI".format(entries=entries, content=content.decode('ascii'))
+    else:
+        raise ValueError("Unexpected object: {}".format(obj))
+    return val
 
 
 class SimpleViewer(Viewer):
@@ -21,8 +49,8 @@ class SimpleViewer(Viewer):
                              '"': "quotation",
                              'T*': "Tstar"}
 
-    def __init__(self, doc):
-        super(SimpleViewer, self).__init__(doc)
+    def __init__(self, fobj):
+        super(SimpleViewer, self).__init__(fobj)
         self.bracket_commands_stack = [] # one day we may start support BX/EX, MDC/BMC/EMC.
                                          # BI/EI comes as a part of ContentParser due to inline image object nature
         self._decoders = dict()
@@ -53,7 +81,7 @@ class SimpleViewer(Viewer):
 
     def after_handler(self, obj):
         """ Put object on canvas """
-        self.canvas.text += object_to_string(obj)
+        self.canvas.text_content += object_to_string(obj)
 
     def on_inline_image(self, obj):
         self.canvas.inline_images.append(obj)
@@ -96,11 +124,12 @@ class SimpleViewer(Viewer):
 
     def on_TJ(self, op):
         """ Show one or more text strings  """
-        for i in len(op.args):
-            if isinstance(op.args[i], (HexString, String)):
-                s = self.decode_string(op.args[i])
+        arr = op.args[0]
+        for i in range(len(arr)):
+            if isinstance(arr[i], (HexString, String)):
+                s = self.decode_string(arr[i])
                 self.canvas.strings.append(s)
-                op.args[i] = "({})".format(pdf_escape_string(s))
+                arr[i] = "({})".format(pdf_escape_string(s))
 
     on_quotation = on_TJ
 
@@ -110,3 +139,16 @@ class SimpleViewer(Viewer):
             Do nothing until figure out
         """
         pass
+
+
+if __name__ == "__main__":
+    import pkg_resources
+    from ..document import PDFDocument
+
+    fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-inline-image.pdf')
+    import pdb;
+
+    pdb.set_trace()
+    viewer = SimpleViewer(fd)
+    viewer.render()
+    import pdb; pdb.set_trace()

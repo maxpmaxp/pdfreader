@@ -11,6 +11,6 @@ class SimpleCanvas(object):
     def reset(self):
         self.images = dict()
         self.forms = dict()
-        self.content = ""
+        self.text_content = ""
         self.inline_images = []
         self.strings = []

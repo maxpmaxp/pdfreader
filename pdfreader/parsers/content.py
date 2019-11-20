@@ -21,7 +21,7 @@ class ContentParser(BasicTypesParser):
         self.maybe_spaces_or_comments()
         while self.current:
             obj = self.object()
-            if isinstance(InlineImage, object):
+            if isinstance(obj, InlineImage):
                 if operands:
                     logging.warning("Skipping heading operands for inline image: {}".format(operands))
                 operands = []

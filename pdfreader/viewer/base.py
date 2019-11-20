@@ -26,38 +26,34 @@ class Viewer(object):
 
     operators_to_handlers = dict()
 
-    def __init__(self, doc):
-        self.doc = doc
+    def __init__(self, fobj):
+        self._pages = dict()  # pages cache
+        self.stream = None
         self.current_page_number = None
+        self.doc = PDFDocument(fobj)
         self.canvas = self.canvas_class()
         self.gss = self.graphics_state_stack_class()
         self.resources = Resources()
         self.on_document_load()
-        self.stream = None
-        self._pages = dict() # pages cache
+
 
     @property
     def current_page(self):
-        return self.navigate_page(self.current_page)
-
-    @classmethod
-    def from_file(cls, fobj):
-        doc = PDFDocument(fobj)
-        return cls(doc)
+        return self._pages[self.current_page_number]
 
     def navigate_page(self, n):
         self.before_navigate_page(n)
         if n not in self._pages:
-            self._pages[n] = islice(self.doc.pages(), self.current_page - 1, self.current_page)
+            self._pages[n] = next(islice(self.doc.pages(), self.current_page_number - 1, self.current_page_number))
         val = self._pages[n]
         self.after_navigate_page(n)
         return val
 
     def next_page(self):
-        return self.navigate_page(self.current_page + 1)
+        return self.navigate_page(self.current_page_number + 1)
 
     def prev_page(self):
-        return self.navigate_page(self.current_page - 1)
+        return self.navigate_page(self.current_page_number - 1)
 
     def get_handler_name(self, obj, stage):
         name = stage
@@ -99,7 +95,8 @@ class Viewer(object):
     # Events
 
     def on_document_load(self):
-        self.navigate_page(1)
+        self.current_page_number = 1
+        self.navigate_page(self.current_page_number)
 
     def before_navigate_page(self, n):
         pass
@@ -169,7 +166,7 @@ class Viewer(object):
         name = obj.args[0]
         state = self.resources.ExtGState.get(name)
         if state:
-            self.gss.state = self.graphics_state_stack_class(**state)
+            self.gss.state = GraphicsState(**state)
         else:
             logging.warning("Graphics state {} was not found on resources".format(name))
 
