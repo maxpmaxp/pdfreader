@@ -1,57 +1,19 @@
 import logging
 
-from copy import deepcopy
-
 from .base import BasicTypesParser
-from ..types.content import StreamContent, Operator
-from ..types.graphicsstate import GraphicsState
+from ..types.content import Operator, InlineImage
 from ..types.native import null, Token
 from .inlineimage import InlineImageParser
-from .text import TextParser
 
 
 class ContentParser(BasicTypesParser):
-    """ Page.Content parser """
+    """ Page.Content parser
 
-    # ToDo: There is an architectural issue here: parsers must just parse streams
-    # and some other class (Viewer/Interpreter) must take care of decoding.
-    # Refactoring needed.
+        Generates page stream objects:
+        - Commands with operands, which are native PDF types (bool, Decimal, String etc.)
+        - Inline images
 
-    def __init__(self, context, *args, **kwargs):
-        self.context = context
-        # potentially graphics state may be defined on Page description level
-        # See PDF 1.7 specification sec. 8.4.2 - Graphics State Stack
-        self.graphics_state_stack = []
-        super(ContentParser, self).__init__(*args, **kwargs)
-
-    @property
-    def graphics_state(self):
-        # current graphics state is on the top of graphics_state_stack
-        if not self.graphics_state_stack:
-            self.graphics_state_stack.append(GraphicsState())
-        return self.graphics_state_stack[-1]
-
-    def save_graphics_state(self):
-        copy = deepcopy(self.graphics_state)
-        self.graphics_state_stack.append(copy)
-
-    def set_graphics_state(self, name):
-        if self.graphics_state_stack:
-            self.graphics_state_stack.pop()
-        try:
-            state = self.context.graphics_states[name]
-            self.graphics_state_stack.append(state)
-        except KeyError:
-            logging.warning("Named graphics state was not found. Ignoring: {}".format(name))
-
-    def restore_graphics_state(self):
-        if self.graphics_state_stack:
-            self.graphics_state_stack.pop()
-        else:
-            # q/Q commands shall be balanced within a given content stream or within the sequence of streams
-            # specified by Content. But real-life examples show that `Q` sometimes comes after `do` without preceeding
-            # `q`
-            logging.debug("Can't restore graphics stack. It's empty. Leaving as is.")
+    """
 
     def objects(self):
         """ Returns list of content objects as they follow in the document """
@@ -59,7 +21,12 @@ class ContentParser(BasicTypesParser):
         self.maybe_spaces_or_comments()
         while self.current:
             obj = self.object()
-            if self.is_operator(obj):
+            if isinstance(InlineImage, object):
+                if operands:
+                    logging.warning("Skipping heading operands for inline image: {}".format(operands))
+                operands = []
+                yield obj
+            elif self.is_operator(obj):
                 op = Operator(obj, operands)
                 yield op
                 operands = []
@@ -95,18 +62,11 @@ class ContentParser(BasicTypesParser):
             val = method()
             for i in range(len(val)):
                 self.prev()
-            if val == 'BT':
-                method = self.bt_et
-            elif val == 'BI':
+            if val == 'BI':
                 method = self.bi_ei
         return method
 
-    def bt_et(self):
-        """ returns TextObject """
-        p = TextParser(self, self.buffer)
-        return p.text_object()
-
     def bi_ei(self):
         """ returns InlineImage """
-        p = InlineImageParser(self, self.buffer)
+        p = InlineImageParser(self.buffer)
         return p.inline_image()

@@ -5,7 +5,7 @@ from io import BytesIO
 from bitarray import bitarray
 from PIL import Image
 
-from ..types import Array
+from .types.native import Array
 
 
 class PILImageMixin(object):
