@@ -72,12 +72,13 @@ class CMAPDecoder(BaseDecoder):
     >>> decoder.decode_hexstring('82A88D7B0057') == "\\u82A8\\u8D7BW"
     True
 
-    >>> from unittest.mock import Mock
+    >>> from unittest.mock import Mock, patch
+    >>> import pdfreader.codecs.decoder
     >>> cmap = Mock()
-    >>> cmap.resource.bf_ranges = {'0001': 'A', '0002': 'B', '0003': 'C', '0004': '1',  '0005': '2',  '0006': '3'}
-    >>> font = dict(ToUnicode=cmap)
-    >>> decoder = CMAPDecoder(font)
-    >>> decoder.decode_hexstring('000100020003000400050006')
+    >>> cmap.bf_ranges = {'0001': 'A', '0002': 'B', '0003': 'C', '0004': '1',  '0005': '2',  '0006': '3'}
+    >>> with patch.object(pdfreader.codecs.decoder, '_get_cmap_encoding', return_value=(cmap, None)) as _:
+    ...     decoder = CMAPDecoder(Mock())
+    ...     decoder.decode_hexstring('000100020003000400050006')
     'ABC123'
 
     """

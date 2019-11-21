@@ -9,6 +9,10 @@ from .graphicsstate import GraphicsStateStack, GraphicsState
 from .resources import Resources
 
 
+class PageDoesNotExists(ValueError):
+    pass
+
+
 class PDFViewer(object):
 
     parser_class = None
@@ -41,9 +45,12 @@ class PDFViewer(object):
         return self._pages[self.current_page_number]
 
     def navigate(self, n):
-        self.before_navigate(n)
         if n not in self._pages:
-            self._pages[n] = next(islice(self.doc.pages(), n - 1, n))
+            try:
+                self._pages[n] = next(islice(self.doc.pages(), n - 1, n))
+            except StopIteration:
+                raise PageDoesNotExists(n)
+        self.before_navigate(n)
         self.current_page_number = n
         self.after_navigate(n)
 
