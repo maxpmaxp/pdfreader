@@ -9,7 +9,7 @@ from .graphicsstate import GraphicsStateStack, GraphicsState
 from .resources import Resources
 
 
-class Viewer(object):
+class PDFViewer(object):
 
     parser_class = None
     operator_flow = ('before', 'on', 'after')

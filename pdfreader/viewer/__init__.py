@@ -1,2 +1,2 @@
-from .base import Viewer
-from .simple import SimpleViewer
+from .pdfviewer import PDFViewer
+from .simple import SimplePDFViewer

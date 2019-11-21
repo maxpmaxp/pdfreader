@@ -167,6 +167,9 @@ PDF_TYPES = (type(null), IndirectReference, IndirectObject, Comment, Stream, Dic
 ATOMIC_TYPES = (Integer, Real, Boolean, String, HexString, Name, type(null))
 
 
+is_atomic = lambda obj: isinstance(obj, (ATOMIC_TYPES))
+
+
 class Token(str):
     """ That's not a PDF type itself. We used it to reflect other than PDF types tokens.
         For example: * CMap - def, findresource, begin

@@ -7,7 +7,7 @@ from ..types.content import Operator, InlineImage
 from ..types.native import HexString, String, Dictionary, Array, Boolean, Name, Decimal, Integer
 from ..types.objects import Image, Form
 from ..utils import pdf_escape_string
-from .base import Viewer
+from .pdfviewer import PDFViewer
 from .canvas import SimpleCanvas
 
 
@@ -41,7 +41,7 @@ def object_to_string(obj):
     return val
 
 
-class SimpleViewer(Viewer):
+class SimplePDFViewer(PDFViewer):
 
     parser_class = ContentParser
     canvas_class = SimpleCanvas
@@ -50,7 +50,7 @@ class SimpleViewer(Viewer):
                              'T*': "Tstar"}
 
     def __init__(self, fobj):
-        super(SimpleViewer, self).__init__(fobj)
+        super(SimplePDFViewer, self).__init__(fobj)
         self.bracket_commands_stack = [] # one day we may start support BX/EX, MDC/BMC/EMC.
                                          # BI/EI comes as a part of ContentParser due to inline image object nature
         self._decoders = dict()
@@ -143,12 +143,9 @@ class SimpleViewer(Viewer):
 
 if __name__ == "__main__":
     import pkg_resources
-    from ..document import PDFDocument
 
     fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-inline-image.pdf')
-    import pdb;
-
-    pdb.set_trace()
-    viewer = SimpleViewer(fd)
+    import pdb; pdb.set_trace()
+    viewer = SimplePDFViewer(fd)
     viewer.render()
     import pdb; pdb.set_trace()

@@ -14,3 +14,4 @@ class SimpleCanvas(object):
         self.text_content = ""
         self.inline_images = []
         self.strings = []
+

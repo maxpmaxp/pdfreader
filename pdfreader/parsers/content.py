@@ -36,7 +36,20 @@ class ContentParser(BasicTypesParser):
         if operands:
             logging.warning("Skipping trailing operands at the end of stream: {}".format(operands))
 
-    def is_operator(self, obj):
+    @staticmethod
+    def is_operator(obj):
+        """
+        >>> ContentParser.is_operator(Token("Tj"))
+        True
+        >>> ContentParser.is_operator(Token("T*"))
+        True
+        >>> ContentParser.is_operator(Token("'"))
+        True
+        >>> ContentParser.is_operator(Token('"'))
+        True
+        >>> ContentParser.is_operator(Token('1rna'))
+        False
+        """
         return isinstance(obj, Token) and obj[0] not in '/01234567890+-.<[('
 
     def null_false_true_token(self):
