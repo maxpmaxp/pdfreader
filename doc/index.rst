@@ -16,7 +16,7 @@ Features:
 * Fast document processing due to lazy objects access
 * Extracts texts (plain and formatted)
 * Extracts forms data (plain and formatted)
-* Extracts images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_ without loosing any quality
+* Extracts images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_ without any quality loose
 * Supports all PDF encodings, CMap, predefined cmaps.
 * Allows to access any document objects, resources and extract any data you need (fonts, annotations, metadata, multimedia, etc.)
 * Document history access and access to previous document versions if incremental updates are in place.
