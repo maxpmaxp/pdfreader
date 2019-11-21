@@ -1,0 +1,36 @@
+How to parse PDF Forms
+======================
+
+In most cases texts come within page binary content streams and can be extracted as it is shown in the tutorial
+:ref:`tutorial-texts`, and in the section :ref:`examples-parse-texts`.
+
+There is one more place where data can be found: page forms. Form is a special subtype of XObject which
+is a part of page resources and can be referenced from regular page content using `do` command.
+
+Have a look at one :download:`filled PDF form <pdfs/example-form.pdf>`.
+
+Let's open the document and get the 1st page.
+
+.. doctest::
+
+  >>> from pdfreader import PDFDocument
+  >>> import pkg_resources, os.path
+  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  >>> file_name = os.path.join(samples_dir, 'example-form.pdf')
+  >>> fd = open(file_name, "rb")
+  >>> doc = PDFDocument(fd)
+  >>> page = next(doc.pages())
+
+And now, let's try to locate a string, located under section *B.3 SOC (ONET/OES) occupation title*
+
+.. image:: img/example-parse-form.png
+
+.. doctest::
+
+  >>> plain_text = page.text()
+  >>> "Farmworkers and Laborers" in plain_text
+  False
+
+Apparently, the texts typed into the form are in some other place. They are in Form XObjects,
+listed under page resources.
+
