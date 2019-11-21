@@ -37,7 +37,7 @@ def object_to_string(obj):
         content = b85encode(obj.filtered) + b'~>'
         val = "\nBI\n{entries}\nID\n{content}\nEI".format(entries=entries, content=content.decode('ascii'))
     else:
-        raise ValueError("Unexpected object: {}".format(obj))
+        raise ValueError("Unexpected object: {}. Possibly a bug.".format(obj))
     return val
 
 
@@ -45,9 +45,9 @@ class SimplePDFViewer(PDFViewer):
 
     parser_class = ContentParser
     canvas_class = SimpleCanvas
-    operators_to_handlers = {"'": "apostrophe",
-                             '"': "quotation",
-                             'T*': "Tstar"}
+    operators_aliases = {"'": "apostrophe",
+                         '"': "quotation",
+                         'T*': "Tstar"}
 
     def __init__(self, fobj):
         super(SimplePDFViewer, self).__init__(fobj)

@@ -23,12 +23,12 @@ class PDFViewer(object):
     # custom Operator.name to handler name mapping to handle non-pythonic names like T*
     # for example:
     #
-    # operators_to_handlers = {'T*': 'Tstar}
+    # operators_aliases = {'T*': 'Tstar'}
     #
     # def on_Tstar(self, op):
     #     ...
 
-    operators_to_handlers = dict()
+    operators_aliases = dict()
 
     def __init__(self, fobj):
         self._pages = dict()  # pages cache
@@ -63,7 +63,8 @@ class PDFViewer(object):
     def get_handler_name(self, obj, stage):
         name = stage
         if isinstance(obj, Operator):
-            name = "{stage}_{op.name}".format(op=obj, stage=stage)
+            opname = self.operators_aliases.get(obj.name, obj.name)
+            name = "{stage}_{opname}".format(opname=opname, stage=stage)
         elif isinstance(obj, InlineImage):
             name = "{stage}_inline_image".format(stage=stage)
         else:

@@ -7,7 +7,7 @@ so let's focus on XObject Images and Image Masks.
 Extracting XObject Image
 ------------------------
 
-Let's open a sample document.
+Open a sample document.
 
 .. doctest::
 
@@ -18,8 +18,8 @@ Let's open a sample document.
   >>> fd = open(file_name, "rb")
   >>> doc = PDFDocument(fd)
 
-Let's have a look at the sample file :download:`sample file <pdfs/example-image-xobject.pdf>`
-It contains a logo on the first page. Let's extract it.
+Have a look at the sample file :download:`sample file <pdfs/example-image-xobject.pdf>`.
+There is a logo on the first page. Let's extract it.
 
 .. doctest::
 
@@ -33,7 +33,7 @@ Let's check a dictionary of XObject resources for the page:
   {'img0': <IndirectReference:n=11,g=0>}
 
 This stands for an XObject named `img0`, and referenced under number 11 and generation 0.
-The object is not read by *pdfreader* still. We are lazy readers, do you remember?
+The object has not been read by *pdfreader* still. We are lazy readers. We read objects only when we need them.
 Let's see what the object is.
 
 .. doctest::
@@ -47,7 +47,7 @@ We just read the object (`__getitem__` does this implicitly) and now we may acce
   >>> xobj.Type, xobj.Subtype
   ('XObject', 'Image')
 
-Wow! It's really a PDF Image. Should we care about it's internal PDF representation?
+Wow! It's really an image. Should we care about it's internal PDF representation?
 Of course no, let's just convert it to
 a `Pillow/PIL Image <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_ and save.
 
@@ -62,14 +62,14 @@ And here we are!
 
 Try to open it and see any differences. It's absolutely the same as in the document.
 
-Now you can manipulate `pil_image` with usual PIL methods: manipulate, rotate, convert, blur, split, inverse, merge
+Now you can manipulate `pil_image` with usual PIL methods: rotate, convert, blur, split, inverse, merge
 and so on, so on, so on.
 
 Extracting Images: a very simple way
 ------------------------------------
 
-A very simple way also exisit.
-To extract all displayed XObject and Inline Images on the page :class:`~pdfreader.SimplePDFViewer`:
+A very simple way also exisits.
+Use :class:`~pdfreader.SimplePDFViewer` To extract all displayed XObject and Inline Images on the page:
 
 .. doctest::
 
@@ -99,18 +99,28 @@ Nevertheless it can be accessed absolutely the same way.
 Let's have a look at the :download:`example <pdfs/tutorial-example.pdf>` from :ref:`tutorial-images`,
 and see what image masks it contains.
 
+.. doctest::
+
+  >>> from pdfreader import SimplePDFViewer
   >>> file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
   >>> fd = open(file_name, "rb")
-  >>> doc = PDFDocument(fd)
+  >>> viewer = SimplePDFViewer(fd)
 
 We use `Image.ImageMask` attribute to filter image masks from another images.
 Let's take the first image mask:
 
-  >>> image_mask = next(img for img in doc.inline_images() if img.ImageMask)
+.. doctest::
+
+  >>> viewer.navigate(5)
+  >>> viewer.render()
+  >>> inline_images = viewer.canvas.inline_images
+  >>> image_mask = next(img for img in inline_images if img.ImageMask)
 
 Now convert them to Pillow object and save:
 
-  >>> pil_img = img.to_Pillow()
+.. doctest::
+
+  >>> pil_img = image_mask.to_Pillow()
   >>> pil_img.save("mask.png")
 
 Have a look! What a beautiful QR-code!

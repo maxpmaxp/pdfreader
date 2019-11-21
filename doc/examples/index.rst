@@ -34,6 +34,7 @@ Advanced PDF data extraction techniques with real-life examples.
 
 .. toctree::
 
+   document_vs_viewer
    extract_image
    extract_page_text
    extract_form_text
