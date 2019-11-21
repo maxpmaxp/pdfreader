@@ -69,26 +69,26 @@ Extracting Images: a very simple way
 ------------------------------------
 
 A very simple way also exisit.
-To extract all XObject and Inline Images use :meth:`~pdfreader.types.objects.Page.images` and
-:meth:`~pdfreader.types.objects.Page.inline_images` generators:
+To extract all displayed XObject and Inline Images on the page :class:`~pdfreader.SimplePDFViewer`:
 
 .. doctest::
 
-   >>> all_page_images = list(page.images())
-   >>> all_page_inline_images = list(page.inline_images())
+   >>> from pdfreader import SimplePDFViewer
+   >>> fd = open(file_name, "rb")
+   >>> viewer = SimplePDFViewer(fd)
+   >>> viewer.render()
 
-or even :meth:`~pdfreader.document.PDFDocument.images` and :meth:`~pdfreader.document.PDFDocument.inline_images`
-generators:
+After rendering all 1st page images are on the canvas
 
 .. doctest::
 
-   >>> all_doc_images = list(doc.images())
-   >>> all_doc_inline_images = list(doc.inline_images())
+   >>> all_page_images = viewer.canvas.images
+   >>> all_page_inline_images = viewer.canvas.inline_images
+   >>> img = all_page_images['img0']
+   >>> img.Type, img.Subtype
+   ('XObject', 'Image')
 
-There is one disadvantage: when you apply `list(...)` the generators really read all image objects from a document
-(images and necessary data only, they are lazy readers still).
-It may take a while, if your document contains many pages or pictures.
-
+Now you can convert it with magic :meth:`~pdfreader.types.objects.Image.to_Pillow` method, save or do whatever you want!
 
 Extracting Image Masks
 ----------------------

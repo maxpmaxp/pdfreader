@@ -2,8 +2,11 @@ import codecs
 import logging
 import pkg_resources
 
+from io import BytesIO
+
 from ..codecs.differences import DifferencesCodec
 from ..constants import DEFAULT_ENCODING, predefined_cmap_names
+from ..parsers.cmap import CMapParser
 from ..types.native import HexString, Name
 from . import register_pdf_encodings
 
@@ -33,7 +36,7 @@ def _get_cmap_encoding(font):
     explicit_encoding = font.get('Encoding')
     is_predefined_cmap = isinstance(explicit_encoding, Name) and explicit_encoding in predefined_cmap_names
     if bool(explicit_cmap):
-        cmap = explicit_cmap.resource
+        cmap = CMapParser(BytesIO(explicit_cmap.filtered)).cmap()
     elif is_predefined_cmap:
         # Get predefined cmap by name
         cmap = PredefinedCmaps.get(explicit_encoding)

@@ -8,6 +8,7 @@ class BasicTypesParser(object):
     """ can parse basic PDF types  """
 
     exception_class = ParserException
+    indirect_references_allowed = True
 
     def __init__(self, fileobj_or_buffer, offset=0):
         if isinstance(fileobj_or_buffer, Buffer):
@@ -609,7 +610,10 @@ class BasicTypesParser(object):
         elif self.current in b'+-.':
             method = self.numeric
         elif self.current in b'1234567890':
-            method = self.numeric_or_indirect_reference
+            if self.indirect_references_allowed:
+                method = self.numeric_or_indirect_reference
+            else:
+                method = self.numeric
         elif self.current == b"/":
             method = self.name
         return method

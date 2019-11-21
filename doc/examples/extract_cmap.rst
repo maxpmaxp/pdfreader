@@ -50,27 +50,27 @@ Font's `ToUnicode` attribute contains a reference to the CMap file data stream:
 
   >>> cmap = font.ToUnicode
 
-The Cmap file is a :class:`~pdfreader.types.objects.CMap` instance which is a flate encoded binary stream.
+The Cmap file is a :class:`~pdfreader.types.objects.StreamBasedObject` instance which is a flate encoded binary stream.
 
 .. doctest::
 
   >>> type(cmap)
-  <class 'pdfreader.types.objects.CMap'>
+  <class 'pdfreader.types.objects.StreamBasedObject'>
   >>> cmap.Filter
   'FlateDecode'
 
-which can be decoded by accessing :attr:`~pdfreader.types.objects.CMap.filtered`:
+which can be decoded by accessing :attr:`~pdfreader.types.objects.StreamBasedObject.filtered`:
 
 .. doctest::
 
   >>> data = cmap.filtered
   >>> data
   b'/CIDInit /ProcSet findresource ... end\n'
-  >>> with open("sample-cmap.cmap", "wb") as f:
+  >>> with open("sample-cmap.txt", "wb") as f:
   ...     f.write(data)
   229
 
 Voila! `229` bytes written :-)
 
-As it is a text file you can open it with your favorite text editor.
+As it is a text file you can :download:`open it <downloads/sample-cmap.txt>` with your favorite text editor.
 

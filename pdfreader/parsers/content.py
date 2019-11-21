@@ -15,6 +15,8 @@ class ContentParser(BasicTypesParser):
 
     """
 
+    indirect_references_allowed = False
+
     def objects(self):
         """ Returns list of content objects as they follow in the document """
         operands = []

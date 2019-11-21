@@ -1,6 +1,6 @@
 import logging
 
-from ..types.native import Dictionary, Array
+from ..types.native import Dictionary, Array, Name
 from ..types.objects import Page
 
 
@@ -50,7 +50,11 @@ class Resources(object):
                 elif isinstance(dict_or_array, Array):
                     if entry not in kwargs:
                         kwargs[entry] = set()
-                    kwargs[entry].update(dict_or_array)
+                    for pname in dict_or_array:
+                        if isinstance(pname, Name):
+                            kwargs[entry].add(pname)
+                        else:
+                            kwargs[entry].update(pname)
                 else:
                     logging.warning("Skipping unexpected resources entry type: {} -> {}"
                                     .format(entry, type(dict_or_array)))

@@ -17,90 +17,55 @@ from the first page. The parser can be applied to all crash reports like that.
 
 .. image:: img/example-text-crash-report.png
 
-Let's open the document and get the first page:
+Let's open the document and render the first page:
 
 .. doctest::
 
-  >>> from pdfreader import PDFDocument
+  >>> from pdfreader import SimplePDFViewer
   >>> import pkg_resources, os.path
   >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
   >>> file_name = os.path.join(samples_dir, 'example-text-crash-report.pdf')
   >>> fd = open(file_name, "rb")
-  >>> doc = PDFDocument(fd)
-  >>> page = next(doc.pages())
+  >>> viewer = SimplePDFViewer(fd)
+  >>> viewer.render()
 
-
-Introduction to text objects
-----------------------------
 
 Every PDF page has one or more binary content streams associated with it. Streams may contain inline images,
-text blocks, text formatting instructions, display device commands etc. In this example we stay focused on text blocks.
+text blocks, text formatting instructions, display device operators etc.
+In this example we stay focused on text blocks.
 
-Every text block in a stream is surrounded by BT/ET instructions
-and represented as :class:`~pdfreader.types.content.TextObject` instance.
-Typically a single page has one or more text blocks.
+Every text block in a stream is surrounded by BT/ET instructions and usually tricky encoded.
+Fortunately the viewer understands lot of PDF operators and encoding methods, so after rendering
+we may access human-readable PDF markup containing decoded strings.
 
-:meth:`~pdfreader.types.obects.Page.text_objects` is a generator yielding all
-:class:`~pdfreader.types.content.TextObject` instances for a page.
-
-
-How text objects work
----------------------
-
-Let's have a look at the first text object on the page.
 
 .. doctest::
 
-  >>> tobj = next(page.text_objects())
-  >>> tobj.source
-  'BT /F3 6.0 Tf 0 0 0 rg 314.172 TL 168.624 759.384 Td (LOCAL INFORMATION) Tj T* ET'
+  >>> markdown = viewer.canvas.text_content
+  >>> markdown
+  "... BT\n/F3 6.0 Tf\n0 0 0 rg\n314.172 TL\n168.624 759.384 Td\n(LOCAL INFORMATION) Tj\n ..."
 
 This text block contains instructions for a viewer (font, positioning etc.) and one string surrounded by brackets.
 
 .. doctest::
 
-  >>> tobj.strings
-  ['LOCAL INFORMATION']
+  >>> viewer.canvas.strings
+  ['LOCAL INFORMATION', 'P19010300000457', ...]
 
-:class:`~pdfreader.types.content.TextObject` attributes are:
+:class:`~pdfreader.viewver.canvas.Canvas` attributes are:
 
-- :attr:`~pdfreader.types.content.TextObject.source` - contains all data within a single BT/ET block:
+- :attr:`~pdfreader.viewver.canvas.Canvas.text_content` - contains all data within a single BT/ET block:
   commands and text strings. All text strings are surrounded by brackets and decoded
-  according to the used font settings (`Tf` command).
+  according to the current graphical state (_q_, _Q_, _gs_, _Tf_ and few other commands).
   The value can be used to parse text content by PDF markdown.
 
-- :attr:`~pdfreader.types.content.TextObject.strings` - list of all strings within the text block. No PDF markdown here.
-
-
-Method :meth:`~pdfreader.types.content.TextObject.to_string` is just a syntax sugar to join `TextObject.strings` using
-some glue characters.
-
-.. doctest::
-
-  >>> tobj.to_string()
-  'LOCAL INFORMATION'
-
-Let's extract all text objects from the page. This can be done either by getting all text objects
-and joining the sources
-
-.. doctest::
-
-  >>> all_sources = [to.source for to in page.text_objects()]
-  >>> markdown_from_tobjs = "\n".join(all_sources)
-
-or by calling :meth:`~pdfreader.types.obects.Page.text_sources`, which is a syntax sugar for the above.
-
-.. doctest::
-
-  >>> markdown = page.text_sources()
-  >>> markdown == markdown_from_tobjs
-  True
+- :attr:`~pdfreader.viewver.canvas.Canvas.strings` - list of all strings. Just plain text. No PDF markdown here.
 
 
 How to parse PDF markdown
 -------------------------
 
-At this point a string variable `markdown` contains all texts with PDF markdown from the page.
+At this point `markdown` contains all texts with PDF markdown from the page.
 
 .. doctest::
 
@@ -113,7 +78,7 @@ Let's save it as a text file and analyze how can we extract the data we need.
 
   >>> with open("example-crash-markdown.txt", "w") as f:
   ...     f.write(markdown)
-  26718
+  52643
 
 Open your favorite editor and have a look at :download:`the file <downloads/example-crash-markdown.txt>`.
 
@@ -136,33 +101,9 @@ Now we may use any text processing tools like regular expressions, grep, custom 
 Here we are!
 
 
-More ways to extract texts
---------------------------
-
-There are more ways to extract texts from documents.
-
-:meth:`~pdfreader.types.obects.Page.texts` - returns all page strings as a plain text
-
-.. doctest::
-
-  >>> page_plain_text = page.text()
-
-:meth:`~pdfreader.document.PDFDocument.text_sources` - returns all document texts with markdown.
-
-.. doctest::
-
-  >>> doc_text_markdown = doc.text_sources()
-
-:meth:`~pdfreader.document.PDFDocument.text_objects` - yields all document text objects page by page.
-
-.. doctest::
-
-  >>> tobj_generator = doc.text_objects()
-  >>> first_obj = next(tobj_generator)
-
-
 Useful links
 ------------
 
-Detailed description of PDF texts is
-`here (see sec. 9) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=237>`_
+  - Detailed description of PDF texts is `here (see sec. 9) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=237>`_
+  - Conforming reader graphical state reading is `here (see sec. 8.4) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=121>`_
+

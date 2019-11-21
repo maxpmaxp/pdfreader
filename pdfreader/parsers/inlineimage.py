@@ -18,6 +18,8 @@ class InlineImageParser(BasicTypesParser):
 
     """
 
+    indirect_references_allowed = False
+
     def _get_parser(self):
         method = super(InlineImageParser, self)._get_parser()
         if method is None:

@@ -93,9 +93,9 @@ class SimplePDFViewer(PDFViewer):
             logging.warning("Can't locate XObject {}".format(name))
         else:
             if isinstance(xobj, Image):
-                self.canvas.images.append(xobj)
+                self.canvas.images[name] = xobj
             elif isinstance(xobj, Form):
-                self.canvas.forms.append(xobj)
+                self.canvas.forms[name] = xobj
 
     def on_BT(self, op):
         if self.mode == "BT":
@@ -140,12 +140,3 @@ class SimplePDFViewer(PDFViewer):
         """
         pass
 
-
-if __name__ == "__main__":
-    import pkg_resources
-
-    fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-inline-image.pdf')
-    import pdb; pdb.set_trace()
-    viewer = SimplePDFViewer(fd)
-    viewer.render()
-    import pdb; pdb.set_trace()

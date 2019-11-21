@@ -36,24 +36,22 @@ class PDFViewer(object):
         self.resources = Resources()
         self.on_document_load()
 
-
     @property
     def current_page(self):
         return self._pages[self.current_page_number]
 
-    def navigate_page(self, n):
-        self.before_navigate_page(n)
+    def navigate(self, n):
+        self.before_navigate(n)
         if n not in self._pages:
-            self._pages[n] = next(islice(self.doc.pages(), self.current_page_number - 1, self.current_page_number))
-        val = self._pages[n]
-        self.after_navigate_page(n)
-        return val
+            self._pages[n] = next(islice(self.doc.pages(), n - 1, n))
+        self.current_page_number = n
+        self.after_navigate(n)
 
-    def next_page(self):
-        return self.navigate_page(self.current_page_number + 1)
+    def next(self):
+        self.navigate(self.current_page_number + 1)
 
-    def prev_page(self):
-        return self.navigate_page(self.current_page_number - 1)
+    def prev(self):
+        self.navigate(self.current_page_number - 1)
 
     def get_handler_name(self, obj, stage):
         name = stage
@@ -90,18 +88,17 @@ class PDFViewer(object):
         parser = self.parser_class(self.stream)
         for obj in parser.objects():
             self.notify(obj)
-        return self.canvas
 
     # Events
 
     def on_document_load(self):
         self.current_page_number = 1
-        self.navigate_page(self.current_page_number)
+        self.navigate(self.current_page_number)
 
-    def before_navigate_page(self, n):
+    def before_navigate(self, n):
         pass
 
-    def after_navigate_page(self, n):
+    def after_navigate(self, n):
         self.canvas.reset()
         self.gss = GraphicsStateStack()
         self.resources = Resources.from_page(self.current_page)

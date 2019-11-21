@@ -42,10 +42,7 @@ class GraphicsState(object):
 class GraphicsStateStack(List[GraphicsState]):
 
     def save_state(self):
-        if self:
-            self.append(deepcopy(self[-1]))
-        else:
-            logging.warning("Can't save empty state")
+        self.append(deepcopy(self.state))
 
     def restore_state(self):
         if self:

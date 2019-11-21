@@ -3,6 +3,10 @@ Examples and HowTos
 
 Advanced PDF data extraction techniques with real-life examples.
 
+:doc:`document_vs_viewer`
+
+  What is the difference? The usecases.
+
 :doc:`extract_image`
 
   Instructions on how to extract different image types for further manipulations.
@@ -31,6 +35,7 @@ Advanced PDF data extraction techniques with real-life examples.
 .. toctree::
    :maxdepth: 2
 
+   document_vs_viewer
    extract_image
    extract_page_text
    extract_form_text

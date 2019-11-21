@@ -13,13 +13,12 @@ Let's open the document and get the 1st page.
 
 .. doctest::
 
-  >>> from pdfreader import PDFDocument
+  >>> from pdfreader import SimplePDFViewer
   >>> import pkg_resources, os.path
   >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
   >>> file_name = os.path.join(samples_dir, 'example-form.pdf')
   >>> fd = open(file_name, "rb")
-  >>> doc = PDFDocument(fd)
-  >>> page = next(doc.pages())
+  >>> viewer = SimplePDFViewer(fd)
 
 And now, let's try to locate a string, located under section *B.3 SOC (ONET/OES) occupation title*
 
@@ -27,7 +26,8 @@ And now, let's try to locate a string, located under section *B.3 SOC (ONET/OES)
 
 .. doctest::
 
-  >>> plain_text = page.text()
+  >>> viewer.render()
+  >>> plain_text = "".join(viewer.canvas.strings)
   >>> "Farmworkers and Laborers" in plain_text
   False
 
