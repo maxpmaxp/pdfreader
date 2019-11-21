@@ -15,25 +15,24 @@ In this tutorial we will learn simple methods on
 
 Prerequisites
 -------------
-Before we start, let's make sure that you have the **pdfreader** distribution
+Before we start, let's make sure that you have the *pdfreader* distribution
 :doc:`installed <installation>`. In the Python shell, the following
 should run without raising an exception:
 
 .. doctest::
 
   >>> import pdfreader
-  >>> from pdfreader import PDFDocument
+  >>> from pdfreader import PDFDocument, SimplePDFViewer
 
 
 How to start
 ------------
 
-The first step when working with **pdfreader** is to create a
+The first step when working with *pdfreader* is to create a
 :class:`~pdfreader.document.PDFDocument` instance from a binary file. Doing so is easy:
 
 .. doctest::
 
-  >>> from pdfreader import PDFDocument, SimplePDFViewer
   >>> import pkg_resources, os.path
   >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
   >>> file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
@@ -149,17 +148,18 @@ How to start extracting PDF content
 -----------------------------------
 
 It's possible to extract raw data with :class:`~pdfreader.document.PDFDocument` instance but it just represents raw
-document structure. It knows nothing about interpretation.
+document structure. It can't interpret PDF content operators, that's why it might be hard.
 
 Fortunately there is :class:`~pdfreader.viewer.SimplePDFDocument`, which understands a lot.
-It is a simple PDF interpreter which can "display" one document page on :class:`~pdfreader.viewer.SimpleCanvas`.
+It is a simple PDF interpreter which can "display" (whatever this means)
+a page on :class:`~pdfreader.viewer.SimpleCanvas`.
 
 .. doctest::
 
   >>> fd = open(file_name, "rb")
   >>> viewer = SimplePDFViewer(fd)
 
-The instance can extract content from pages. Just navigate a page with
+The viewer instance gets content you see in your Adobe Acrobat Reader. Just navigate a page with
 :meth:`~pdfreader.viewer.SimplePDFDocument.navigate` and call :meth:`~pdfreader.viewer.SimplePDFDocument.render`
 
 .. doctest::
@@ -183,11 +183,11 @@ There are 2 kinds of images in PDF documents:
     - XObject images
     - inline images
 
-Every kind has its own class
-(:class:`~pdfreader.types.objects.Images` and :class:`~pdfreader.types.content.InlineImage`)
+Every kind represented by its own class
+(:class:`~pdfreader.types.objects.Image` and :class:`~pdfreader.types.content.InlineImage`)
 
 Let's extract some pictures now! They are accessible through :attr:`~pdfreader.viewer.SimplePDFDocument.canvas`
-Have a look at `page 8  <examples/pdfs/tutorial-example.pdf#page=8>`
+Have a look at `page 8  <examples/pdfs/tutorial-example.pdf#page=8>`_
 of the sample document. It contains a fax message, and is is available
 on :attr:`~pdfreader.viewer.SimpleCanvas.inline_images` list.
 
@@ -202,7 +202,7 @@ on :attr:`~pdfreader.viewer.SimpleCanvas.inline_images` list.
   (1800, 3113)
 
 This would be nothing if you can't see the image itself :-)
-Fortunately we can convert it to a `Pillow/PIL Image <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_
+Now let's convert it to a `Pillow/PIL Image <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_
 object and save!
 
 .. doctest::
@@ -216,7 +216,6 @@ Check the complete list of `Image (sec. 8.9.5) <https://www.adobe.com/content/da
 and `InlineImage (sec. 8.9.7) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=214>`_
 attributes.
 
-More on Images extraction
 
 .. _tutorial-texts:
 
@@ -226,7 +225,7 @@ Extracting texts
 Getting texts from a page is super easy. They are available on :attr:`~pdfreader.viewer.SimpleCanvas.strings`
  and :attr:`~pdfreader.viewer.SimpleCanvas.text_content`
 
-Let's go to the previous page (`#7  <examples/pdfs/tutorial-example.pdf#page=7>`) and extract some data.
+Let's go to the previous page (`#7  <examples/pdfs/tutorial-example.pdf#page=7>`_) and extract some data.
 
 .. doctest::
 
@@ -253,7 +252,7 @@ Let's render the page and see the texts.
 
 As you see every character comes as an individual string in the page content stream here. Which is not usual.
 
-Let's go to the very `first page  <examples/pdfs/tutorial-example.pdf#page=1>`
+Let's go to the very `first page  <examples/pdfs/tutorial-example.pdf#page=1>`_
 
 .. doctest::
 
@@ -277,8 +276,6 @@ And the strings are decoded properly. Have a look at
   ...     f.write(viewer.canvas.text_content)
   19339
 
-
->>>
 
 *pdfreader* takes care of decoding binary streams, character encodings, CMap, fonts etc.
 So finally you have human-readable content sources and markdown.

@@ -33,9 +33,7 @@ Advanced PDF data extraction techniques with real-life examples.
   Instructions on how to navigate PDF documents and access it's objects. Advanced techniques.
 
 .. toctree::
-   :maxdepth: 2
 
-   document_vs_viewer
    extract_image
    extract_page_text
    extract_form_text

@@ -68,12 +68,10 @@ following command from the root directory of the **pdfreader** source:
 
   $ python setup.py doc
 
-Indices and tables
-------------------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Table of Contents
+-----------------
+
 
 .. toctree::
    :maxdepth: 3

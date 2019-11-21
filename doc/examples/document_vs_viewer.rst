@@ -20,9 +20,19 @@ What is the difference?
   - can render document content properly decoding it and interpreting PDF operators
   - has graphical state
 
-Use :class:`~pdfreader.PDFDocument`  to navigate document and have access raw data.
+Use :class:`~pdfreader.PDFDocument`  to navigate document and access raw data.
 
-Use :class:`~pdfreader.SimplePDFViewer` to extract pages content which you see in your favorite viewer
+Use :class:`~pdfreader.SimplePDFViewer` to extract content you see in your favorite viewer
 (`Adobe Acrobat Reader <https://acrobat.adobe.com/us/en/acrobat/pdf-reader.html>`_, hehe :-).
 
 Let's see several usecases.
+
+.. toctree::
+   :maxdepth: 3
+
+   extract_image
+   extract_page_text
+   extract_form_text
+   extract_cmap
+   extract_fonts
+   navigate_objects
