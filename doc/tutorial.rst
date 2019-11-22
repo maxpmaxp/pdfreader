@@ -61,6 +61,8 @@ Let's check the PDF version of the document
 
 Now we can go ahead to the document catalog and walking through pages.
 
+.. _tutorial-document-catalog:
+
 How to access Document Catalog
 ------------------------------
 
