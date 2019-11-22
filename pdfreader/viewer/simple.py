@@ -31,9 +31,11 @@ def object_to_string(obj):
         val = "\n{} {}".format(operands, obj.name)
     elif isinstance(obj, InlineImage):
         # Convert bytes to string representation
+        # We encode the image with ASCII85 to make it a unicode string
         entries = " ".join(["/{} {}".format(k, object_to_string(v))
                             for k, v in obj.dictionary.items()
                             if k not in ('F', 'Filter', 'DecodeParms')])
+        entries += " /Filter /ASCII85Decode"
         content = b85encode(obj.filtered) + b'~>'
         val = "\nBI\n{entries}\nID\n{content}\nEI".format(entries=entries, content=content.decode('ascii'))
     else:
