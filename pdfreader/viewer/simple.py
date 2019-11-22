@@ -1,5 +1,6 @@
 import logging
 from base64 import b85encode
+from copy import deepcopy
 
 from ..codecs.decoder import Decoder, default_decoder
 from ..parsers.content import ContentParser
@@ -7,8 +8,9 @@ from ..types.content import Operator, InlineImage
 from ..types.native import HexString, String, Dictionary, Array, Boolean, Name, Decimal, Integer
 from ..types.objects import Image, Form
 from ..utils import pdf_escape_string
-from .pdfviewer import PDFViewer
 from .canvas import SimpleCanvas
+from .resources import Resources
+from .pdfviewer import PDFViewer, ContextualViewer
 
 
 def object_to_string(obj):
@@ -43,7 +45,7 @@ def object_to_string(obj):
     return val
 
 
-class SimplePDFViewer(PDFViewer):
+class TextOperatorsMixin(object):
 
     parser_class = ContentParser
     canvas_class = SimpleCanvas
@@ -51,8 +53,8 @@ class SimplePDFViewer(PDFViewer):
                          '"': "quotation",
                          'T*': "Tstar"}
 
-    def __init__(self, fobj):
-        super(SimplePDFViewer, self).__init__(fobj)
+    def __init__(self, *args, **kwargs):
+        super(TextOperatorsMixin, self).__init__(*args, **kwargs)
         self.bracket_commands_stack = [] # one day we may start support BX/EX, MDC/BMC/EMC.
                                          # BI/EI comes as a part of ContentParser due to inline image object nature
         self._decoders = dict()
@@ -88,16 +90,6 @@ class SimplePDFViewer(PDFViewer):
     def on_inline_image(self, obj):
         self.canvas.inline_images.append(obj)
 
-    def on_Do(self, op):
-        name = op.args[0]
-        xobj = self.resources.XObject.get(name)
-        if not xobj:
-            logging.warning("Can't locate XObject {}".format(name))
-        else:
-            if isinstance(xobj, Image):
-                self.canvas.images[name] = xobj
-            elif isinstance(xobj, Form):
-                self.canvas.forms[name] = xobj
 
     def on_BT(self, op):
         if self.mode == "BT":
@@ -142,3 +134,27 @@ class SimplePDFViewer(PDFViewer):
         """
         pass
 
+
+class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
+
+    def on_Do(self, op):
+        name = op.args[0]
+        xobj = self.resources.XObject.get(name)
+        if not xobj:
+            logging.warning("Can't locate XObject {}".format(name))
+        else:
+            if isinstance(xobj, Image) and name not in self.canvas.forms:
+                self.canvas.images[name] = xobj
+            elif isinstance(xobj, Form) and name not in self.canvas.forms:
+                # render form and save
+                resources = Resources.from_page(self.current_page,
+                                                resources_stack=[xobj.Resources])
+                subviewer = FormViewer(xobj.filtered, resources, self.gss)
+                subviewer.render()
+                self.canvas.forms[name] = subviewer.canvas
+
+
+class FormViewer(TextOperatorsMixin, ContextualViewer):
+    """ Forms sub-viewer  """
+
+    pass

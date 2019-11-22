@@ -32,5 +32,22 @@ And now, let's try to locate a string, located under section *B.3 SOC (ONET/OES)
   False
 
 Apparently, the texts typed into the form are in some other place. They are in Form XObjects,
-listed under page resources.
+listed under page resources. The viewer puts them on canvas:
 
+.. doctest::
+
+  >>> list(viewer.canvas.forms.keys())
+  ['Fm1', 'Fm2', ... 'Fm29', 'Fm30', 'Fm31']
+
+As Form is a kind of "sub-document" every entry in *viewer.canvas.forms* dictionary maps to
+:class:`~pdfreader.viewer.canvas.SimpleCanvas` instance:
+
+.. doctest::
+
+  >>> form9_canvas = viewer.canvas.forms['Fm9']
+  >>> "".join(form9_canvas.strings)
+  'Farmworkers and Laborers, Crop, Nursery, and Greenhouse'
+
+Here we are!
+
+More on PDF Form objects: `see sec. 8.10 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=217>`_

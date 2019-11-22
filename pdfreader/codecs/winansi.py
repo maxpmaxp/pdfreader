@@ -2,6 +2,7 @@ from .codec import Codec
 
 
 class WinAnsiCodec(Codec):
+    use_ZapfDingbats = True
     name = "WinAnsiEncoding"
 
     encode_table = {'A': b'A', 'Æ': b'\xc6', 'Á': b'\xc1', 'Â': b'\xc2', 'Ä': b'\xc4', 'À': b'\xc0', 'Å': b'\xc5',

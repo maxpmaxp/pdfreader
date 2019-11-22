@@ -30,6 +30,23 @@ class PredefinedCmaps(object):
         return PredefinedCmaps._cache[name]
 
 
+def _guess_encoding_by_font_name(name):
+    """ Try to guess encoding from font name if it is one of 14 PostScript predefined or some other
+        PDF can recognize.
+    """
+    encoding = None
+    if name == 'Symbol':
+        # ToDo: It must be cp1038 decoder, which is missing now. it's one of predefined PostScript fonts
+        logging.warning("Symbol (aka cp1038) codec not implemented")
+        encoding = 'Identity-H'
+    elif name in ('Times-Roman', 'Helvetica', 'Courier', 'Symbol', 'Times-Bold', 'Helvetica-Bold', 'Courier-Bold',
+                  'Times-Italic', 'Helvetica-Qblique', 'Courier-Oblique', 'Times-BoldItalic', 'Helvetica-BoldOblique',
+                  'Courier-BoldOblique', 'ZapfDingbats'):
+        # Predefined PostScript fonts
+        encoding = 'Identity-H'
+    return encoding
+
+
 def _get_cmap_encoding(font):
     cmap = encoding = None
     explicit_cmap = font.get("ToUnicode")
@@ -44,13 +61,15 @@ def _get_cmap_encoding(font):
     if not is_predefined_cmap:
         encoding = explicit_encoding
 
+    if cmap is None and encoding is None:
+        encoding = _guess_encoding_by_font_name(font.get('BaseFont'))
+
     return cmap, encoding
 
 
 class BaseDecoder(object):
     def __init__(self, font):
         self.cmap, self.encoding = _get_cmap_encoding(font)
-        self.base_font = font.get('BaseFont')
 
     def decode_string(self, s):
         raise NotImplementedError()
@@ -130,7 +149,7 @@ class EncodingDecoder(BaseDecoder):
         elif isinstance(self.encoding, Encoding):
             # Encoding object - See PDF spec PDF32000_2008.pdf p.255 sec 9.6.1
             # Base encoding with differences
-            codec = DifferencesCodec(self.encoding, self.base_font)
+            codec = DifferencesCodec(self.encoding)
         else:
             # This should never happen
             raise TypeError("Unexpected type. Probably a bug: {} type of {}".format(self.encoding, type(self.encoding)))
@@ -149,6 +168,7 @@ def Decoder(font):
     else:
         # Encoding can be defined as a part of PostScript Font program, which is not supported.
         # Anyway, let's try do decode somehow.
+        import pdb; pdb.set_trace()
         logging.warning("Can't build Decoder for font {}. Trying to use default.".format(font))
         decoder = default_decoder
     return decoder

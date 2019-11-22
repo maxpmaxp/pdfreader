@@ -2,6 +2,7 @@ from .codec import Codec
 
 
 class StandardCodec(Codec):
+    use_ZapfDingbats = True
     name = "StandardEncoding"
 
     encode_table = {'A': b'A', 'Æ': b'\xe1', 'B': b'B', 'C': b'C', 'D': b'D', 'E': b'E', 'F': b'F', 'G': b'G', 'H': b'H',

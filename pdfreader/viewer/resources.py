@@ -19,10 +19,10 @@ class Resources(object):
         self.Properties = kwargs.get('Properties') or dict()
 
     @classmethod
-    def from_page(cls, page: Page):
+    def from_page(cls, page: Page, resources_stack=None):
         """ Creates Resources object from Page instance """
 
-        resources_stack = []
+        resources_stack = resources_stack or []
         # get current page resources
         node = page
         if node.Resources:
