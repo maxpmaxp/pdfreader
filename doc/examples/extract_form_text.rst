@@ -40,7 +40,7 @@ listed under page resources. The viewer puts them on canvas:
   ['Fm1', 'Fm2', ... 'Fm29', 'Fm30', 'Fm31']
 
 As Form is a kind of "sub-document" every entry in *viewer.canvas.forms* dictionary maps to
-:class:`~pdfreader.viewer.canvas.SimpleCanvas` instance:
+:class:`~pdfreader.viewer.SimpleCanvas` instance:
 
 .. doctest::
 

@@ -9,7 +9,8 @@ from .graphicsstate import GraphicsStateStack, GraphicsState
 from .resources import Resources
 
 
-class PageDoesNotExists(ValueError):
+class PageDoesNotExist(ValueError):
+    """ Exception. Supposed to be raised by PDF viewers on navigation to non-existing pages.  """
     pass
 
 
@@ -73,6 +74,9 @@ class ContextualViewer(object):
         self.after_handler(obj)
 
     def render(self):
+        """ Renders current page onto current canvas by interpreting content stream(s) commands.
+            Charnges: graphical state, canvas.
+        """
         parser = self.parser_class(self.stream)
         for obj in parser.objects():
             self.notify(obj)
@@ -172,6 +176,7 @@ class PDFViewer(ContextualViewer):
     operators_aliases = dict()
 
     def __init__(self, fobj):
+        """ Constructor method """
         self._pages = dict()  # pages cache
         self.current_page_number = None
         self.doc = PDFDocument(fobj)
@@ -179,22 +184,45 @@ class PDFViewer(ContextualViewer):
 
     @property
     def current_page(self):
+        """ :return: Current :class:`~pdfreader.types.objects.Page` instance """
         return self._pages[self.current_page_number]
 
     def navigate(self, n):
+        """
+        Navigates viewer to n-th page of the document.
+        Side-effects: clears canvas, resets page resources, resets graphics state
+
+        :param n: page number. The very first page has number 1
+
+        :raises PageDoesNotExist: if there is no n-th page
+
+        """
         if n not in self._pages:
             try:
                 self._pages[n] = next(islice(self.doc.pages(), n - 1, n))
             except StopIteration:
-                raise PageDoesNotExists(n)
+                raise PageDoesNotExist(n)
         self.before_navigate(n)
         self.current_page_number = n
         self.after_navigate(n)
 
     def next(self):
+        """
+        Navigates viewer to the next page of the document.
+        Side-effects: clears canvas, resets page resources, resets graphics state
+
+        :raises PageDoesNotExist: if there is no next page
+
+        """
         self.navigate(self.current_page_number + 1)
 
     def prev(self):
+        """
+        Navigates viewer to the previous page of the document.
+        Side-effects: clears canvas, resets page resources, resets graphics state
+
+        :raises PageDoesNotExist: if there is no previous page
+        """
         self.navigate(self.current_page_number - 1)
 
     def get_handler_name(self, obj, stage):

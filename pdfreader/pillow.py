@@ -50,6 +50,10 @@ class PILImageMixin(object):
         return mode
 
     def to_Pillow(self):
+        """ Converts image into PIL.Image object.
+
+            :return:  PIL.Image instance
+        """
         size = self.Width, self.Height
         filter = self.Filter
         if isinstance(self.Filter, Array):
@@ -76,37 +80,3 @@ class PILImageMixin(object):
                 cs = self.get_pil_colorspace(self.ColorSpace)
                 img = Image.frombytes(cs, size, bytes(self.filtered))
         return img
-
-
-# if __name__ == '__main__':
-#
-#     import pkg_resources
-#     from pdfreader import PDFDocument
-#     fd = pkg_resources.resource_stream('pdfreader', 'samples/billerica-pd-logs.pdf')
-#     doc = PDFDocument(fd)
-#     page = next(doc.pages())
-#     img = page.Resources['XObject']['img0']
-#     pil_img = img.to_Pillow()
-#     pil_img.save("pd-logo.png")
-#
-#
-#     fd = pkg_resources.resource_stream('pdfreader', 'samples/tyler-or-inline-image.pdf')
-#     doc = PDFDocument(fd)
-#     pages = [p for p in doc.pages()]
-#     page = pages[7]
-#     img = next(page.inline_images())
-#     pil_img = img.to_Pillow()
-#     pil_img.save("fax.png")
-#
-#     import pkg_resources
-#     fd = pkg_resources.resource_stream('pdfreader', 'samples/waltham-pd-logs.pdf')
-#     from pdfreader import PDFDocument
-#     doc = PDFDocument(fd)
-#     images = [i for i in doc.images()]
-#     for i, img in enumerate(images):
-#         img.to_Pillow().save("xobj-{}.png".format(i))
-#
-#     images = [i for i in doc.inline_images()]
-#     for i, img in enumerate(images):
-#         img.to_Pillow().save("inline-{}.png".format(i))
-

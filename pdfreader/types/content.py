@@ -11,13 +11,17 @@ class StreamContent(object):
 
 
 class InlineImage(PILImageMixin, StreamContent):
-    """ BI/EI data
+    """ BI/ID/EI operators content.
 
         Inline image looks like a stream-based object but really it is not.
         We just follow Stream interface to have an option to interact with InlineImage
         the same way as with XObject/Image
 
     """
+    #: key-value image properties
+    dictionary = None
+    #: bytes, encoded image stream
+    data = None
 
     def __init__(self, entries, data):
         self.dictionary = entries
@@ -65,6 +69,7 @@ class InlineImage(PILImageMixin, StreamContent):
 
     @property
     def filtered(self):
+        """ :return: bytes, decoded image stream as it defined by image properties """
         binary = self.data
         if self.Filter:
             binary = apply_filter(self.Filter, binary, self.dictionary.get('DecodeParms'))
@@ -72,7 +77,14 @@ class InlineImage(PILImageMixin, StreamContent):
 
 
 class Operator(StreamContent):
-    """ Content stream operator """
+    """ Page content stream operator. For example: */F01 12 Tf*
+
+    """
+    #: operator name
+    name = None
+    #: list of operands
+    args = None
+
     def __init__(self, name, args):
         self.name = name
         self.args = args

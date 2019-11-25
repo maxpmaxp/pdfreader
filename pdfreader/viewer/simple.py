@@ -136,6 +136,29 @@ class TextOperatorsMixin(object):
 
 
 class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
+    """ Simple PDF document interpreter (viewer).
+          - uses :class:`~pdfreader.document.PDFDocument` as document navigation engine
+          - renders document page content onto :class:`~pdfreader.viewer.SimpleCanvas`
+          - has graphical state
+
+        On document read automatically navigates to the 1st page.
+
+        :param fobj: file-like object: binary file descriptor, BytesIO stream etc.
+
+
+    """
+
+    #: Current page canvas - :class:`~pdfreader.viewer.SimpleCanvas` instance
+    canvas = None
+
+    #: Reflects current graphical state. :class:`~pdfreader.viewer.GraphicsStateStack` instance.
+    gss = None
+
+    #: Current page resources. :class:`~pdfreader.viewer.Resources` instance.
+    resources = None
+
+    #: Contains current page number
+    current_page_number = None
 
     def on_Do(self, op):
         name = op.args[0]
@@ -156,5 +179,4 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
 
 class FormViewer(TextOperatorsMixin, ContextualViewer):
     """ Forms sub-viewer  """
-
     pass

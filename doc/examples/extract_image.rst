@@ -69,7 +69,7 @@ Extracting Images: a very simple way
 ------------------------------------
 
 A very simple way also exisits.
-Use :class:`~pdfreader.SimplePDFViewer` To extract all displayed XObject and Inline Images on the page:
+Use :class:`~pdfreader.viewer.SimplePDFViewer` To extract all displayed XObject and Inline Images on the page:
 
 .. doctest::
 

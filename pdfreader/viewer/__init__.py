@@ -1,3 +1,5 @@
 from .canvas import SimpleCanvas
-from .pdfviewer import PDFViewer, PageDoesNotExists
+from .graphicsstate import GraphicsStateStack, GraphicsState
+from .pdfviewer import PDFViewer, PageDoesNotExist
+from .resources import Resources
 from .simple import SimplePDFViewer

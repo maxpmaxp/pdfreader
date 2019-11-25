@@ -8,7 +8,7 @@ Let's see several examples with :class:`~pdfreader.document.PDFDocument`.
 Accessing document objects
 --------------------------
 
-Let's take a sample file from :ref:`_tutorial-document-catalog` tutorial.
+Let's take a sample file from :ref:`tutorial-document-catalog` tutorial.
 We already discussed there how to locate document catalog.
 
 .. doctest::

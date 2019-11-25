@@ -5,31 +5,47 @@ from copy import deepcopy
 
 
 class GraphicsState(object):
+    """ Viewer's graphics state. See PDF 1.7 specification
+    `sec. 8.4 - Graphics state <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=121>`_,
+    `sec. 9.3 - Text State Parameters and Operators <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=243>`_
+
+    :param kwargs: dict of attributes to set
+    """
+
+    #: current transformation matrix
+    CTM = None
+    #: line width
+    LW = None
+    #: line cap
+    LC = None
+    #: line join style
+    LJ = None
+    #: miter limit
+    ML = None
+    #: line dash
+    D = None
+    #: color rendering intent
+    RI = None
+    #: flatness tolerance
+    I = None
+
+    #: shall be a list if exists - [font_name, font_size] (Tf operator)
+    Font = None
+    #: char spacing
+    Tc = 0
+    #: word spacing
+    Tw = 0
+    #: horizontlal scaling
+    Tz = 0
+    #: text leading
+    TL = 0
+    #: text rendering mode
+    Tr = 0
+    #: text rise
+    Ts = 0
 
     def __init__(self, **kwargs):
-        # See PDF 1.7 specification sec. 8.4 - Graphics state
-        # We don't care about most of the attrs. Tf is in use only at this time.
 
-        # Attrs managed by graphics state commands
-        self.CTM = None  # current transformation matrix
-        self.LW = None  # line width
-        self.LC = None  # line cap
-        self.LJ = None  # line join style
-        self.ML = None  # miter limit
-        self.D = None  # line dash
-        self.RI = None  # color rendering intent
-        self.I = None  # flatness tolerance
-
-        # See PDF 1.7 specification sec. 9.3 - Text State Parameters and Operators
-        self.Font = None  # shall be a list if exists - [font_name, font_size] (Tf operator)
-        self.Tc = 0     # char spacing
-        self.Tw = 0     # word spacing
-        self.Tz = 0     # horizontla scaling
-        self.TL = 0     # text leading
-        self.Tr = 0     # text rendering mode
-        self.Ts = 0     # text rise
-
-        # There are lot of other not supported attrs
         for k, v in kwargs.items():
             setattr(self, k, v)
 
@@ -40,11 +56,18 @@ class GraphicsState(object):
 
 
 class GraphicsStateStack(List[GraphicsState]):
+    """ Graphics state stack.
+    See PDF 1.7 specification
+    `sec. 8.4.2 - Graphics State Stack <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=124>`_
+
+    """
 
     def save_state(self):
+        """ Put the current state on the top on the stack """
         self.append(deepcopy(self.state))
 
     def restore_state(self):
+        """ Restore previously saved state """
         if self:
             self.pop()
         else:
@@ -61,4 +84,5 @@ class GraphicsStateStack(List[GraphicsState]):
             self.pop()
         self.append(val)
 
+    #: Sets/gets current graphics state, which is on the top of the stack.
     state = property(_get_state, _set_state)

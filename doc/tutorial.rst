@@ -129,7 +129,7 @@ Now we can access all page attributes:
   >>> page_six.Annots[0].Subj
   b'Text Box'
 
-It's possible to access parent Pages Tree Node for the page, aka :class:`~pdfreader.types.objects.Pages` instance
+It's possible to access parent Pages Tree Node for the page, aka :class:`~pdfreader.types.objects.PageTreeNode` instance
 and all it's kids:
 
 .. doctest::

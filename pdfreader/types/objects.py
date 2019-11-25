@@ -38,7 +38,8 @@ class Trailer(object):
 
 
 class StreamBasedObject(Stream):
-    """ Stream-based object. Can solve indirect references """
+    """ Stream-based object.
+        Automatically resolves indirect references on attributes access """
 
     def __init__(self, doc, stream):
         super(StreamBasedObject, self).__init__(stream.dictionary, stream.stream)
@@ -60,7 +61,8 @@ class StreamBasedObject(Stream):
 
 
 class ArrayBasedObject(Array):
-    """ Array-based object. Can solve indirect references """
+    """ Array-based object.
+        Automatically resolves indirect references on items access """
 
     def __init__(self, doc, lst):
         self.doc = doc
@@ -71,7 +73,8 @@ class ArrayBasedObject(Array):
 
 
 class DictBasedObject(Dictionary):
-    """ Dictionary-based object. Can solve indirect references """
+    """ Dictionary-based object.
+        Automatically resolves indirect references on attributes/items access """
 
     def __init__(self, doc, *args, **kwargs):
         super(DictBasedObject, self).__init__(*args, **kwargs)
@@ -148,16 +151,25 @@ class ObjectStream(StreamBasedObject):
 
 
 class Catalog(DictBasedObject):
-    """ Type = Catalog
+    """
+    Dictionary based object. (Type = Catalog)
+    See PDF 1.7 specification `sec. 7.7.2 - DocumentCatalog <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=71>`_
     """
     pass
 
 
 class PageTreeNode(DictBasedObject):
-    """ Type = Pages
+    """
+        Dictionary based object. (Type = Pages)
+        See PDF 1.7 specification `sec. 7.7.3.2 - Page Tree Nodes <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=76>`_
     """
 
     def pages(self, node=None):
+        """
+        Yields tree node pages one by one.
+
+        :return:  :class:`~pdfreader.types.objects.Page` generator.
+        """
         if node is None:
             node = self
         for child in node.Kids:
@@ -169,14 +181,17 @@ class PageTreeNode(DictBasedObject):
 
 
 class Page(DictBasedObject):
-    """ Type = Page
+    """
+    Dictionary based Page object. (Type = Page)
+    See PDF 1.7 specification `sec. 7.7.3.3 - Page Objects <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=77>`_
     """
 
 
 class XObject(StreamBasedObject):
-    """ Type = XObject
     """
-    pass
+    Stream based XObject object. (Type = XObject)
+    See PDF 1.7 specification `sec. 8.8 - External Objects <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=201>`_
+    """
 
 
 class CMap(StreamBasedObject):
@@ -189,15 +204,18 @@ class Metadata(StreamBasedObject):
         Subtype = XML
     """
 
+
 class Image(PILImageMixin, XObject):
-    """ Type = XObject
-        Subtype = Image
+    """
+    Stream based XObject object. (Type = XObject, Subtype = Image)
+    See PDF 1.7 specification `sec. 8.9 - Images <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=203>`_
     """
 
 
 class Form(XObject):
-    """ Type = XObject
-        Subtype = Form
+    """
+    Stream based XObject object. (Type = XObject, Subtype = Form)
+    See PDF 1.7 specification `sec. 8.10 - Form XObjects <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=217>`_
     """
 
     stream_content = XObject.filtered
