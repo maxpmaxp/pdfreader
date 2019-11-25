@@ -1,8 +1,5 @@
-from ..codecs.decoder import Decoder
 from ..utils import cached_property
-from .content import TextObject, InlineImage
-from .graphicsstate import GraphicsState
-from .imagesaver import PILImageMixin
+from ..pillow import PILImageMixin
 from .native import Stream, Dictionary, Array, Name
 
 
@@ -40,18 +37,6 @@ class Trailer(object):
         return self.params == other.params
 
 
-def _get_inherited_attr(obj, attr, parent_attr='Parent'):
-    val = obj.__getattr__(attr)
-    if val is None:
-        parent = obj.__getattr__(parent_attr)
-        while parent is not None:
-            val = parent.__getattr__(attr)
-            if val is not None:
-                break
-            parent = parent.__getattr__(parent_attr)
-    return val
-
-
 class StreamBasedObject(Stream):
     """ Stream-based object. Can solve indirect references """
 
@@ -70,15 +55,8 @@ class StreamBasedObject(Stream):
             return self._cache[item]
         obj = super(StreamBasedObject, self).__getattr__(item)
         obj = self.doc.build(obj, lazy=True)
-        if (isinstance(obj, StreamBasedObject) and not obj.dictionary.get("Type"))\
-            or (isinstance(obj, DictBasedObject) and not obj.get("Type")):
-                hook = super(StreamBasedObject, self).__getattr__('_type__{}'.format(item))
-                if hook and callable(hook):
-                    obj = hook(obj)
         self._cache[item] = obj
         return self._cache[item]
-
-    get_inherited_attr = _get_inherited_attr
 
 
 class ArrayBasedObject(Array):
@@ -108,11 +86,6 @@ class DictBasedObject(Dictionary):
             return self._cache[item]
         obj = super(DictBasedObject, self).__getitem__(item)
         obj = self.doc.build(obj, lazy=True)
-        if (isinstance(obj, StreamBasedObject) and not obj.dictionary.get("Type"))\
-            or (isinstance(obj, DictBasedObject) and not obj.get("Type")):
-                hook = getattr(self, '_type__{}'.format(item), None)
-                if hook and callable(hook):
-                    obj = hook(obj)
         self._cache[item] = obj
         return self._cache[item]
 
@@ -151,8 +124,6 @@ class DictBasedObject(Dictionary):
             raise KeyError()
         k = next(iter(super(DictBasedObject, self).keys()))
         return k, self.pop(k)
-
-    get_inherited_attr = _get_inherited_attr
 
 
 def obj_factory(doc, obj):
@@ -197,70 +168,9 @@ class PageTreeNode(DictBasedObject):
                     yield page
 
 
-class PageContentMixin(object):
-
-    # ToDo: this need to be refactored to support Resources inheritance.
-    # Also need to clarify if Form can manipulate with Page's graphics state, or it has it's own one.
-
-    @cached_property
-    def fonts(self):
-        return self.Resources.get("Font", dict())
-
-    @cached_property
-    def graphics_states(self):
-        gs = dict()
-        egs_dict = self.Resources.get("ExtGState")
-        if egs_dict:
-            gs.update({k: GraphicsState.from_ExtGState(egs) for k, egs in egs_dict.items()})
-        return gs
-
-    @cached_property
-    def decoders(self):
-        return {name: Decoder(self.fonts[name]) for name in self.fonts.keys()}
-
-    def text_objects(self):
-        from ..parsers.content import ContentParser
-        p = ContentParser(self, self.stream_content)
-        for obj in p.objects():
-            if isinstance(obj, TextObject):
-                yield obj
-
-    def inline_images(self):
-        from ..parsers.content import ContentParser
-        p = ContentParser(self, self.stream_content)
-        for obj in p.objects():
-            if isinstance(obj, InlineImage):
-                yield obj
-
-    def text(self, glue=""):
-        return glue.join([to.to_string(glue) for to in self.text_objects()])
-
-    def text_sources(self, glue="\n"):
-        return glue.join([to.source for to in self.text_objects()])
-
-    def images(self):
-        if self.Resources:
-            xobjs = self.Resources.get('XObject')
-            if xobjs:
-                for k in xobjs.keys():
-                    val = xobjs[k]
-                    if isinstance(val, Image):
-                        yield val
-
-
-class Page(PageContentMixin, DictBasedObject):
+class Page(DictBasedObject):
     """ Type = Page
     """
-
-    @cached_property
-    def stream_content(self):
-        """ ToDo: Can BT instruction come in one content stream and have enclosing ET in a following one??
-        """
-        if isinstance(self.Contents, StreamBasedObject):
-            res = self.Contents.filtered
-        else:
-            res = b''.join([ct.filtered for ct in self.Contents])
-        return res
 
 
 class XObject(StreamBasedObject):
@@ -272,10 +182,6 @@ class XObject(StreamBasedObject):
 class CMap(StreamBasedObject):
     """ Type = CMap
     """
-    def __init__(self, *args, **kwargs):
-        super(CMap, self).__init__(*args, **kwargs)
-        from ..parsers.cmap import CMapParser
-        self.resource = CMapParser(self.filtered).cmap()
 
 
 class Metadata(StreamBasedObject):
@@ -289,7 +195,7 @@ class Image(PILImageMixin, XObject):
     """
 
 
-class Form(PageContentMixin, XObject):
+class Form(XObject):
     """ Type = XObject
         Subtype = Form
     """
@@ -318,16 +224,6 @@ class OCMD(DictBasedObject):
 class Font(DictBasedObject):
     """ Type = Font
     """
-
-    def _type__ToUnicode(self, obj):
-        return CMap(obj.doc, obj)
-
-    def _type__Encoding(self, obj):
-        if isinstance(obj, (Name, Encoding)):
-            val = obj
-        else:
-            val = Encoding(obj.doc, obj)
-        return val
 
 
 class Encoding(DictBasedObject):

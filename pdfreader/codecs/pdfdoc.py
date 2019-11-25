@@ -2,8 +2,8 @@ from .codec import Codec
 
 
 class PdfDocCodec(Codec):
-
     name = "PDFDocEncoding"
+    use_ZapfDingbats = True
 
     encode_table = {'A': b'A', 'Æ': b'\xc6', 'Á': b'\xc1', 'Â': b'\xc2', 'Ä': b'\xc4', 'À': b'\xc0', 'Å': b'\xc5',
                     'Ã': b'\xc3', 'B': b'B', 'C': b'C', 'Ç': b'\xc7', 'D': b'D', 'E': b'E', 'É': b'\xc9', 'Ê': b'\xca',

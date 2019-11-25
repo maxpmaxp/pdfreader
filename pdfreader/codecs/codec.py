@@ -16,7 +16,7 @@ class Codec(object):
     encode_table = NotImplemented
     decode_table = NotImplemented
     name = NotImplemented
-    font_name = None
+    use_ZapfDingbats = False
 
     @classmethod
     def glyph_name_to_string(cls, name):
@@ -69,7 +69,7 @@ class Codec(object):
 
         for glyph in components:
             val = ""
-            if cls.font_name == "ZapfDingbats" and glyph in ZAPFDINGBATS_GL:
+            if cls.use_ZapfDingbats and glyph in ZAPFDINGBATS_GL:
                 val = ZAPFDINGBATS_GL[glyph]
             elif glyph in AGL:
                 val = AGL[glyph]
@@ -114,6 +114,8 @@ class Codec(object):
 
 class ZapfDingbatsCodec(Codec):
     """
+        Supports ZapfDingbats symbol names
+
         See See https://github.com/adobe-type-tools/agl-specification
 
         >>> ZapfDingbatsCodec.glyph_name_to_string("a100") == '\\u275E'
@@ -127,7 +129,7 @@ class ZapfDingbatsCodec(Codec):
         >>> ZapfDingbatsCodec.glyph_name_to_string("a100_uni013B.alternate") == '\\u275E\\u013B'
         True
     """
-    font_name = "ZapfDingbats"
+    use_ZapfDingbats = True
 
 
 if __name__ == "__main__":

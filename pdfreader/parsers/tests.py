@@ -1,12 +1,13 @@
 import unittest
 import doctest
 
-from . import base, cmap, document, inlineimage
+from . import base, cmap, document, inlineimage, content
 
 
 def suite():
     suite = unittest.TestSuite()
     suite.addTests(doctest.DocTestSuite(base))
+    suite.addTests(doctest.DocTestSuite(content))
     suite.addTests(doctest.DocTestSuite(cmap))
     suite.addTests(doctest.DocTestSuite(document))
     suite.addTests(doctest.DocTestSuite(inlineimage))

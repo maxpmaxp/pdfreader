@@ -1,0 +1,53 @@
+How to parse PDF Forms
+======================
+
+In most cases texts come within page binary content streams and can be extracted as it is shown in the tutorial
+:ref:`tutorial-texts`, and in the section :ref:`examples-parse-texts`.
+
+There is one more place where data can be found: page forms. Form is a special subtype of XObject which
+is a part of page resources and can be referenced from regular page content using `do` command.
+
+Have a look at one :download:`filled PDF form <pdfs/example-form.pdf>`.
+
+Let's open the document and get the 1st page.
+
+.. doctest::
+
+  >>> from pdfreader import SimplePDFViewer
+  >>> import pkg_resources, os.path
+  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  >>> file_name = os.path.join(samples_dir, 'example-form.pdf')
+  >>> fd = open(file_name, "rb")
+  >>> viewer = SimplePDFViewer(fd)
+
+And now, let's try to locate a string, located under section *B.3 SOC (ONET/OES) occupation title*
+
+.. image:: img/example-parse-form.png
+
+.. doctest::
+
+  >>> viewer.render()
+  >>> plain_text = "".join(viewer.canvas.strings)
+  >>> "Farmworkers and Laborers" in plain_text
+  False
+
+Apparently, the texts typed into the form are in some other place. They are in Form XObjects,
+listed under page resources. The viewer puts them on canvas:
+
+.. doctest::
+
+  >>> list(viewer.canvas.forms.keys())
+  ['Fm1', 'Fm2', ... 'Fm29', 'Fm30', 'Fm31']
+
+As Form is a kind of "sub-document" every entry in *viewer.canvas.forms* dictionary maps to
+:class:`~pdfreader.viewer.canvas.SimpleCanvas` instance:
+
+.. doctest::
+
+  >>> form9_canvas = viewer.canvas.forms['Fm9']
+  >>> "".join(form9_canvas.strings)
+  'Farmworkers and Laborers, Crop, Nursery, and Greenhouse'
+
+Here we are!
+
+More on PDF Form objects: `see sec. 8.10 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=217>`_

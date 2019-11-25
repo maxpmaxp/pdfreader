@@ -5,10 +5,8 @@ known_base_codecs = (winansi.WinAnsiCodec, pdfdoc.PdfDocCodec, macroman.MacRoman
 base_encodings_map = {c.name: c for c in known_base_codecs}
 
 
-def DifferencesCodec(encoding_obj, font=None):
+def DifferencesCodec(encoding_obj):
     """
-        Note: We need font name here just because of ZapfDingbats font which has more glyph names
-
         >>> from unittest.mock import Mock
         >>> obj = Mock()
         >>> obj.BaseEncoding = 'WinAnsiEncoding'
@@ -23,7 +21,7 @@ def DifferencesCodec(encoding_obj, font=None):
         >>> obj.BaseEncoding = 'WinAnsiEncoding'
         >>> obj.Differences = [65, 'a100', 'copyright', 'Aring']
         >>> obj.Type = 'Encoding'
-        >>> codec = DifferencesCodec(obj, 'ZapfDingbats')
+        >>> codec = DifferencesCodec(obj)
         >>> codec.decode(b'ABC123DEF')
         ('❞©Å123DEF', 9)
 
@@ -58,7 +56,7 @@ def DifferencesCodec(encoding_obj, font=None):
         name = "{}-WithDifferences".format(codec.name)
         encode_table = codec.encode_table
         decode_table = dt
-        font_name = font
+        use_ZapfDingbats = True
 
     return CustomCodec
 

@@ -3,6 +3,7 @@ from .codec import Codec
 
 class MacRomanCodec(Codec):
     name = "MacRomanEncoding"
+    use_ZapfDingbats = True
 
     encode_table = {'A': b'A', 'Æ': b'\xae', 'Á': b'\xe7', 'Â': b'\xe5', 'Ä': b'\x80', 'À': b'\xcb', 'Å': b'\x81',
                     'Ã': b'\xcc', 'B': b'B', 'C': b'C', 'Ç': b'\x82', 'D': b'D', 'E': b'E', 'É': b'\x83', 'Ê': b'\xe6',

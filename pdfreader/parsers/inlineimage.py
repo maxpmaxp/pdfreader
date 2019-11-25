@@ -8,7 +8,7 @@ class InlineImageParser(BasicTypesParser):
     """ BI/EI section parser
 
     >>> content = b'BI/D [1 0]/IM true /W 1800 /H 3113 /BPC 1 /F /CCITTFaxDecode /DecodeParms << /K -1 /Columns 1800 /Rows 3113 /BlackIs1 true >> ID <SOME-BINARY-CONTENT> EI'
-    >>> img = InlineImageParser(None, content).inline_image()
+    >>> img = InlineImageParser(content).inline_image()
     >>> img.dictionary['W']
     1800
     >>> img.dictionary['D']
@@ -17,10 +17,8 @@ class InlineImageParser(BasicTypesParser):
     b'<SOME-BINARY-CONTENT>'
 
     """
-    def __init__(self, context, *args, **kwargs):
-        self.context = context
-        # ToDo: we should take into account current graphics state
-        super(InlineImageParser, self).__init__(*args, **kwargs)
+
+    indirect_references_allowed = False
 
     def _get_parser(self):
         method = super(InlineImageParser, self)._get_parser()

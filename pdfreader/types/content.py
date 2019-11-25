@@ -1,33 +1,13 @@
 from ..filters import apply_filter
-from ..types.imagesaver import PILImageMixin
+from ..pillow import PILImageMixin
 
 
 class StreamContent(object):
-    pass
 
-
-class TextObject(StreamContent):
-    """ BT/ET data
-
-        The object is a bit tricky. It's goal to hold text content suitable for data extraction.
-        That's why it contains:
-        - decoded text
-        - text flow/positioning/markup etc.
-
-        instance.string - list of all string literals (decoded)
-        instance.source - BT/ET section source containing decoded strings.
-                          And here might be an issue. As flow/positioning/markup etc. commands, comments and args
-                          are actually bytes, we decode it with DEFAULT_ENCODING to concat with decoded strings.
-
-    """
-
-    def __init__(self, source, strings, operators):
-        self.source = source
-        self.strings = strings
-        self.operators = operators
-
-    def to_string(self, glue=""):
-        return glue.join(self.strings)
+    @property
+    def as_source_code(self):
+        """ Shall return a string containing meaningful PDF source for the object """
+        raise NotImplementedError
 
 
 class InlineImage(PILImageMixin, StreamContent):
@@ -91,7 +71,7 @@ class InlineImage(PILImageMixin, StreamContent):
         return binary
 
 
-class Operator(object):
+class Operator(StreamContent):
     """ Content stream operator """
     def __init__(self, name, args):
         self.name = name
