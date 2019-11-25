@@ -5,6 +5,8 @@ pdfreader.types submodule
 
  .. autoclass:: pdfreader.types.objects.StreamBasedObject
 
+    .. autoproperty:: filtered
+
  .. autoclass:: pdfreader.types.objects.ArrayBasedObject
 
  .. autoclass:: pdfreader.types.objects.Catalog
@@ -17,12 +19,17 @@ pdfreader.types submodule
 
  .. autoclass:: pdfreader.types.objects.Image
 
+    .. autoproperty:: filtered
     .. automethod:: to_Pillow
 
 
  .. autoclass:: pdfreader.types.objects.Form
 
+    .. autoproperty:: filtered
+
  .. autoclass:: pdfreader.types.objects.XObject
+
+    .. autoproperty:: filtered
 
  .. autoclass:: pdfreader.types.content.InlineImage
 

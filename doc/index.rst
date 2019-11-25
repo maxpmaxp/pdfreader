@@ -61,8 +61,8 @@ About This Documentation
 This documentation is generated using the `Sphinx
 <http://sphinx.pocoo.org/>`_ documentation generator. The source files
 for the documentation are located in the *doc/* directory of the
-**pdfreader** distribution. To generate the docs locally run the
-following command from the root directory of the **pdfreader** source:
+*pdfreader* distribution. To generate the docs locally run the
+following command from the root directory of the *pdfreader* source:
 
 .. code-block:: bash
 

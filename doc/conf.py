@@ -79,12 +79,12 @@ from pdfreader import PDFDocument
 # -- Options for HTML output ---------------------------------------------------
 
 # Theme gratefully vendored from CPython source.
-html_theme = "pydoctheme"
-html_theme_path = ["."]
-html_theme_options = {
-    'collapsiblesidebar': True,
-    'googletag': False
-}
+#html_theme = "pydoctheme"
+#html_theme_path = ["."]
+#html_theme_options = {
+#    'collapsiblesidebar': True,
+#    'googletag': False
+#}
 
 # Additional static files.
 html_static_path = ['examples/img', 'examples/downloads']

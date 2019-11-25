@@ -49,7 +49,7 @@ Attribute names are cases sensitive. Missing or non-existing attributes have val
   >>> catalog.Metadata.UnkNown_AttriBute is None
   True
 
-If an object is an array object, just get it by index:
+If an object is an array, access its items by index:
 
 .. doctest::
 
@@ -85,7 +85,7 @@ Locate objects by number and generation
 ---------------------------------------
 
 On the file structure level all objects have unique number an generation to identify them.
-If you need to get an object by numebr and generation
+To get an object by number and generation
 (for example to track object changes if incremental updates took place on file), just run:
 
 .. doctest::

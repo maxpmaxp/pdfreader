@@ -152,7 +152,7 @@ How to start extracting PDF content
 It's possible to extract raw data with :class:`~pdfreader.document.PDFDocument` instance but it just represents raw
 document structure. It can't interpret PDF content operators, that's why it might be hard.
 
-Fortunately there is :class:`~pdfreader.viewer.SimplePDFDocument`, which understands a lot.
+Fortunately there is :class:`~pdfreader.viewer.SimplePDFViewer`, which understands a lot.
 It is a simple PDF interpreter which can "display" (whatever this means)
 a page on :class:`~pdfreader.viewer.SimpleCanvas`.
 
@@ -162,7 +162,7 @@ a page on :class:`~pdfreader.viewer.SimpleCanvas`.
   >>> viewer = SimplePDFViewer(fd)
 
 The viewer instance gets content you see in your Adobe Acrobat Reader. Just navigate a page with
-:meth:`~pdfreader.viewer.SimplePDFDocument.navigate` and call :meth:`~pdfreader.viewer.SimplePDFDocument.render`
+:meth:`~pdfreader.viewer.SimplePDFViewer.navigate` and call :meth:`~pdfreader.viewer.SimplePDFViewer.render`
 
 .. doctest::
 
@@ -171,7 +171,7 @@ The viewer instance gets content you see in your Adobe Acrobat Reader. Just navi
 
 The viewer extracts:
   - page images (XObject)
-  - page inline images (BI/EI operators)
+  - page inline images (BI/ID/EI operators)
   - page forms (XObject)
   - decoded page strings (PDF encodings & CMap support)
   - human (and robot) readable page markdown - original PDF commands containing decoded strings.
@@ -185,11 +185,11 @@ There are 2 kinds of images in PDF documents:
     - XObject images
     - inline images
 
-Every kind represented by its own class
+Every one is represented by its own class
 (:class:`~pdfreader.types.objects.Image` and :class:`~pdfreader.types.content.InlineImage`)
 
-Let's extract some pictures now! They are accessible through :attr:`~pdfreader.viewer.SimplePDFDocument.canvas`
-Have a look at `page 8  <examples/pdfs/tutorial-example.pdf#page=8>`_
+Let's extract some pictures now! They are accessible through :attr:`~pdfreader.viewer.SimplePDFViewer.canvas`
+attribute. Have a look at `page 8  <examples/pdfs/tutorial-example.pdf#page=8>`_
 of the sample document. It contains a fax message, and is is available
 on :attr:`~pdfreader.viewer.SimpleCanvas.inline_images` list.
 
@@ -224,8 +224,8 @@ attributes.
 Extracting texts
 ----------------
 
-Getting texts from a page is super easy. They are available on :attr:`~pdfreader.viewer.SimpleCanvas.strings`
- and :attr:`~pdfreader.viewer.SimpleCanvas.text_content`
+Getting texts from a page is super easy. They are available on :attr:`~pdfreader.viewer.SimpleCanvas.strings` and
+:attr:`~pdfreader.viewer.SimpleCanvas.text_content` attributes.
 
 Let's go to the previous page (`#7  <examples/pdfs/tutorial-example.pdf#page=7>`_) and extract some data.
 

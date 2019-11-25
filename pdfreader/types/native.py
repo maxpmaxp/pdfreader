@@ -80,6 +80,7 @@ class Stream(object):
 
     @cached_property
     def filtered(self):
+        """ :return: bytes, decoded image stream as it defined by image properties """
         filters = self.get('Filter')
         if not filters:
             return self.stream
