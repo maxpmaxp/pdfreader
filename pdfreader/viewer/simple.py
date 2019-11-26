@@ -1,6 +1,7 @@
 import logging
 from base64 import b85encode
-from copy import deepcopy
+
+from pdfreader.constants import DEFAULT_ENCODING
 
 from ..codecs.decoder import Decoder, default_decoder
 from ..parsers.content import ContentParser
@@ -40,6 +41,10 @@ def object_to_string(obj):
         entries += " /Filter /ASCII85Decode"
         content = b85encode(obj.filtered) + b'~>'
         val = "\nBI\n{entries}\nID\n{content}\nEI".format(entries=entries, content=content.decode('ascii'))
+    elif isinstance(obj, bytes):
+        logging.warning("Binary data. Using default encoding. Possibly arg of unsupported operator: {}"
+                        .format(repr(bytes)))
+        val = obj.decode(DEFAULT_ENCODING, 'replace')
     else:
         raise ValueError("Unexpected object: {}. Possibly a bug.".format(obj))
     return val
@@ -90,7 +95,6 @@ class TextOperatorsMixin(object):
     def on_inline_image(self, obj):
         self.canvas.inline_images.append(obj)
 
-
     def on_BT(self, op):
         if self.mode == "BT":
             raise ValueError("BT operator without enclosing ET")
@@ -133,6 +137,19 @@ class TextOperatorsMixin(object):
             Do nothing until figure out
         """
         pass
+
+    def _decode_prop_contents(self, op):
+        """ Decode content on properties list.
+            But doesn't add on canvas strings.
+        """
+        tag, props = op.args
+        if isinstance(props, dict):
+            contents = props.get('Contents')
+            if isinstance(contents, bytes):
+                props['Contents'] = self.decode_string(contents)
+
+    on_DP = _decode_prop_contents
+    on_BDC = _decode_prop_contents
 
 
 class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
