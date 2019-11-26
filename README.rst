@@ -2,9 +2,9 @@
 pdfreader
 =========
 :Info: See `the tutorials & documentation <https://pdfreader.readthedocs.io>`_ for more information.
-See `GitHub <https://github.com/maxpmaxp/pdfreader>`_ for the latest source.
 :Author & Maintainer: Maksym Polshcha <maxp@sterch.net>
 
+See `GitHub <https://github.com/maxpmaxp/pdfreader>`_ for the latest source.
 
 About
 =====
