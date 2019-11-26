@@ -168,7 +168,6 @@ def Decoder(font):
     else:
         # Encoding can be defined as a part of PostScript Font program, which is not supported.
         # Anyway, let's try do decode somehow.
-        import pdb; pdb.set_trace()
         logging.warning("Can't build Decoder for font {}. Trying to use default.".format(font))
         decoder = default_decoder
     return decoder
