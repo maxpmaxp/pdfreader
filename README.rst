@@ -90,5 +90,5 @@ Donation
 ========
 If this project is helpful, you can treat me to coffee :-)
 
-.. image:: _https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif
-   :target: _https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VMVFZSDHDFVK6&item_name=PDFReader+support&currency_code=USD&source=url
+.. image:: https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif
+   :target: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VMVFZSDHDFVK6&item_name=PDFReader+support&currency_code=USD&source=url
