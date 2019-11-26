@@ -22,8 +22,8 @@ We already discussed there how to locate document catalog.
   >>> catalog = doc.root
 
 To walk through the document you need to know object attributes and possible values.
-It can be found on `PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_
-Then simply use the attribute name in your python code.
+It can be found on `PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_.
+ Then simply use attribute names in your python code.
 
 .. doctest::
 
@@ -38,7 +38,7 @@ Then simply use the attribute name in your python code.
   'Pages'
 
 
-Attribute names are cases sensitive. Missing or non-existing attributes have value of None
+Attribute names are cases sensitive. Missing or non-existing attributes have value of *None*
 
 .. doctest::
 
@@ -49,7 +49,7 @@ Attribute names are cases sensitive. Missing or non-existing attributes have val
   >>> catalog.Metadata.UnkNown_AttriBute is None
   True
 
-If an object is an array, access its items by index:
+If object is an array, access its items by index:
 
 .. doctest::
 
@@ -59,7 +59,7 @@ If an object is an array, access its items by index:
   >>> first_page.Contents.Length
   3890
 
-If an object is a stream you can get either raw data (deflated in this example):
+If object is a stream, you can get either raw data (deflated in this example):
 
 .. doctest::
 
@@ -69,7 +69,7 @@ If an object is a stream you can get either raw data (deflated in this example):
   >>> first_page.Contents.Filter
   'FlateDecode'
 
-or a decoded content:
+or decoded content:
 
 .. doctest::
 
@@ -79,7 +79,7 @@ or a decoded content:
   >>> decoded_content.startswith(b'BT\n0 0 0 rg\n/GS0 gs')
   True
 
-All object reads are lazy. *pdfreader* reads an object when you accessing it for the first time.
+All object reads are lazy. *pdfreader* reads an object when you access it for the first time.
 
 Locate objects by number and generation
 ---------------------------------------

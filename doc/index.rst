@@ -12,14 +12,14 @@ access different objects within PDF documents.
 
 Features:
 
-* Follows `PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_
-* Fast document processing due to lazy objects access
 * Extracts texts (plain and formatted)
 * Extracts forms data (plain and formatted)
-* Extracts images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_ without any quality loose
+* Extracts images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_
 * Supports all PDF encodings, CMap, predefined cmaps.
-* Allows to access any document objects, resources and extract any data you need (fonts, annotations, metadata, multimedia, etc.)
+* Browse any document objects, resources and extract any data you need (fonts, annotations, metadata, multimedia, etc.)
 * Document history access and access to previous document versions if incremental updates are in place.
+* Follows `PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_
+* Fast document processing due to lazy objects access
 
 
 :doc:`installation`
@@ -55,6 +55,7 @@ Contributing
 *pdfreader* uses GitHub `issues <https://github.com/maxpmaxp/pdfreader/issues>`_ to keep track of bugs,
 feature requests, etc.
 
+See `project sources <https://github.com/maxpmaxp/pdfreader>`_
 
 Donation
 --------

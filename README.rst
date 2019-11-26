@@ -26,15 +26,13 @@ See `Tutorials & Documentation <https://pdfreader.readthedocs.io>`_.
 Features
 ========
 
-* Python 3.6+
+* Extracts texts (plain text and formatted text objects)
+* Extract PDF forms data (pure strings and formatted text objects)
+* Supports all PDF encodings, CMap, predefined cmaps.
+* Extracts images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_
+* Allows browse any document objects, resources and extract any data you need (fonts, annotations, metadata, multimedia, etc.)
 * Follows `PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_
 * Lazy objects access allows to process huge PDF documents quite fast
-* Allows to extract texts (pure strings and formatted text objects)
-* Allows to extract PDF forms data (pure strings and formatted text objects)
-* Supports all PDF encodings, CMap, predefined cmaps.
-* Allows to extract images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_ without loosing any quality
-* Allows to access any document objects, resources and extract any data you need (fonts, annotations, metadata, multimedia, etc.)
-
 
 Installation
 ============

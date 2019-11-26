@@ -52,14 +52,15 @@ This text block contains instructions for a viewer (font, positioning etc.) and 
   >>> viewer.canvas.strings
   ['LOCAL INFORMATION', 'P19010300000457', ...]
 
-:class:`~pdfreader.viewer.SimpleCanvas` attributes are:
+Text-related :class:`~pdfreader.viewer.SimpleCanvas` attributes are:
 
 - :attr:`~pdfreader.viewer.SimpleCanvas.text_content` - contains all data within a single BT/ET block:
   commands and text strings. All text strings are surrounded by brackets and decoded
   according to the current graphical state (*q, Q, gs, Tf* and few other commands).
   The value can be used to parse text content by PDF markdown.
 
-- :attr:`~pdfreader.viewer.SimpleCanvas.strings` - list of all strings. Just plain text. No PDF markdown here.
+- :attr:`~pdfreader.viewer.SimpleCanvas.strings` - list of all strings as they come in text blocks.
+  Just decoded plain text. No PDF markdown here.
 
 
 How to parse PDF markdown
