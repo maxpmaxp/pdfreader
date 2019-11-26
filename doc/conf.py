@@ -81,10 +81,9 @@ from pdfreader import PDFDocument
 # Theme gratefully vendored from CPython source.
 #html_theme = "pydoctheme"
 #html_theme_path = ["."]
-#html_theme_options = {
-#    'collapsiblesidebar': True,
-#    'googletag': False
-#}
+html_theme_options = {
+    #'github_url': 'https://github.com/maxpmaxp/pdfreader',
+}
 
 # Additional static files.
 html_static_path = ['examples/img', 'examples/downloads']

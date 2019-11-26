@@ -158,10 +158,9 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
           - renders document page content onto :class:`~pdfreader.viewer.SimpleCanvas`
           - has graphical state
 
-        On document read automatically navigates to the 1st page.
+        On initialization automatically navigates to the 1st page.
 
         :param fobj: file-like object: binary file descriptor, BytesIO stream etc.
-
 
     """
 

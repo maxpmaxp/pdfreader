@@ -1,5 +1,5 @@
-How to extract XObject or Inline Images, and Image Masks
-========================================================
+How to extract XObject or Inline Images, Image Masks
+====================================================
 
 Extracting Inline Images is discussed in tutorial :ref:`tutorial-images`,
 so let's focus on XObject Images and Image Masks.
@@ -69,7 +69,7 @@ Extracting Images: a very simple way
 ------------------------------------
 
 A very simple way also exisits.
-Use :class:`~pdfreader.viewer.SimplePDFViewer` To extract all displayed XObject and Inline Images on the page:
+Use :class:`~pdfreader.viewer.SimplePDFViewer`:
 
 .. doctest::
 
@@ -107,7 +107,7 @@ and see what image masks it contains.
   >>> viewer = SimplePDFViewer(fd)
 
 We use `Image.ImageMask` attribute to filter image masks from another images.
-Let's take the first image mask:
+Let's go to the 5th page and take the first image mask:
 
 .. doctest::
 
@@ -116,7 +116,7 @@ Let's take the first image mask:
   >>> inline_images = viewer.canvas.inline_images
   >>> image_mask = next(img for img in inline_images if img.ImageMask)
 
-Now convert them to Pillow object and save:
+Now convert it to Pillow object and save:
 
 .. doctest::
 

@@ -5,7 +5,7 @@ from ..types.objects import Page
 
 
 class Resources(object):
-    """ Page resources that is i use by PDF viewer.
+    """ Page resources.
         See `sec 7.8.3 Resource Dictionaries <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=82>`_ """
     _fields = ('ExtGState', 'ColorSpace', 'Pattern', 'Shading', 'XObject', 'Font', 'ProcSet')
 

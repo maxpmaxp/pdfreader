@@ -83,17 +83,17 @@ For the full list of document root attributes see PDF-1.7 specification
 `section 7.7.2 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=73>`_
 
 
-How to walk document pages
---------------------------
+How to browse document pages
+----------------------------
 
-There is a generator :meth:`~pdfreader.document.PDFDocument.pages` to walk the pages one by one.
+There is a generator :meth:`~pdfreader.document.PDFDocument.pages` to browse the pages one by one.
 It yields :class:`~pdfreader.types.objects.Page` instances.
 
 .. doctest::
 
   >>> page_one = next(doc.pages())
 
-You may also want to read all the pages at once
+You may read all the pages at once
 
 .. doctest::
 
@@ -129,8 +129,8 @@ Now we can access all page attributes:
   >>> page_six.Annots[0].Subj
   b'Text Box'
 
-It's possible to access parent Pages Tree Node for the page, aka :class:`~pdfreader.types.objects.PageTreeNode` instance
-and all it's kids:
+It's possible to access parent Pages Tree Node for the page, which is :class:`~pdfreader.types.objects.PageTreeNode`
+instance, and all it's kids:
 
 .. doctest::
 
@@ -141,7 +141,7 @@ and all it's kids:
   >>> len(page_six.Parent.Kids)
   15
 
-By accident our example contains the only one Pages Tree Node, which is not always true.
+Our example contains the only one Pages Tree Node. That is not always true.
 
 For the complete list Page and Pages attributes see PDF-1.7 specification
 `sections 7.7.3.2-7.7.3.3 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=76>`_

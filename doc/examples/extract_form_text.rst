@@ -1,13 +1,15 @@
 How to parse PDF Forms
 ======================
 
-In most cases texts come within page binary content streams and can be extracted as it is shown in the tutorial
-:ref:`tutorial-texts`, and in the section :ref:`examples-parse-texts`.
+In most cases texts come within page binary content streams and can be extracted as in
+:ref:`tutorial-texts` and :ref:`examples-parse-texts`.
 
-There is one more place where data can be found: page forms. Form is a special subtype of XObject which
-is a part of page resources and can be referenced from regular page content using `do` command.
+There is one more place where text data can be found: page forms. Form is a special subtype of XObject which
+is a part of page resources, and can be referenced from page by `do` command.
 
-Have a look at one :download:`filled PDF form <pdfs/example-form.pdf>`.
+You may think of Form as of "small subpage" that is stored aside main content.
+
+Have a look at one :download:`PDF form <pdfs/example-form.pdf>`.
 
 Let's open the document and get the 1st page.
 
@@ -20,7 +22,7 @@ Let's open the document and get the 1st page.
   >>> fd = open(file_name, "rb")
   >>> viewer = SimplePDFViewer(fd)
 
-And now, let's try to locate a string, located under section *B.3 SOC (ONET/OES) occupation title*
+And now, let's try to locate a string, located under the section *B.3 SOC (ONET/OES) occupation title*
 
 .. image:: img/example-parse-form.png
 

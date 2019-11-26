@@ -6,7 +6,9 @@ from copy import deepcopy
 
 class GraphicsState(object):
     """ Viewer's graphics state. See PDF 1.7 specification
-    `sec. 8.4 - Graphics state <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=121>`_,
+
+    `sec. 8.4 - Graphics state <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=121>`_
+
     `sec. 9.3 - Text State Parameters and Operators <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=243>`_
 
     :param kwargs: dict of attributes to set
@@ -63,11 +65,11 @@ class GraphicsStateStack(List[GraphicsState]):
     """
 
     def save_state(self):
-        """ Put the current state on the top on the stack """
+        """ Copies current state and puts it on the top """
         self.append(deepcopy(self.state))
 
     def restore_state(self):
-        """ Restore previously saved state """
+        """ Restore previously saved state from the top """
         if self:
             self.pop()
         else:

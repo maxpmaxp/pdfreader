@@ -1,9 +1,9 @@
 How to extract CMap for a font from PDF
 =======================================
 
-In this example we extract CMap data for a font from a PDF file.
+In this example we extract CMap data for a font from PDF file.
 
-CMaps (Character Maps) are text files that are used in PDF to map character codes to character glyphs in CID fonts.
+CMaps (Character Maps) are text files used in PDF to map character codes to character glyphs in CID fonts.
 They come to PDF from PostScript.
 
 Let's open a :download:`sample document <pdfs/tutorial-example.pdf>`.
@@ -50,7 +50,7 @@ Font's `ToUnicode` attribute contains a reference to the CMap file data stream:
 
   >>> cmap = font.ToUnicode
 
-The Cmap file is a :class:`~pdfreader.types.objects.StreamBasedObject` instance which is a flate encoded binary stream.
+Cmap file is a :class:`~pdfreader.types.objects.StreamBasedObject` instance containing flate encoded binary stream.
 
 .. doctest::
 
@@ -59,7 +59,7 @@ The Cmap file is a :class:`~pdfreader.types.objects.StreamBasedObject` instance 
   >>> cmap.Filter
   'FlateDecode'
 
-which can be decoded by accessing :attr:`~pdfreader.types.objects.StreamBasedObject.filtered`:
+that can be decoded by accessing :attr:`~pdfreader.types.objects.StreamBasedObject.filtered`:
 
 .. doctest::
 

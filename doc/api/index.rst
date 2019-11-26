@@ -13,7 +13,7 @@ pdfreader API
 
    .. autodata:: version
 
-   Navigating and interpreting PDF documents:
+   PDF data extraction, browsing objects:
 
    .. data:: PDFDocument
 
