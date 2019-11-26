@@ -4,6 +4,7 @@ be distributed under licenses different than the *pdfreader* software.
 In the event that we accidentally failed to list a required notice,
 please bring it to our attention through any of the ways detailed here:
 
+           https://github.com/maxpmaxp/pdfreader/issues
            maxp@sterch.net
 
 The attached notices are provided for information only.
@@ -189,7 +190,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-6) The package contains PDF files examples taken from publicly available sources.
+6) The package contains PDF document examples from publicly available sources.
    These files are provided as examples only and can be found on:
 
     - https://police.billericaps.com/index.php/logs/
@@ -200,3 +201,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     - https://web6.seattle.gov/courts/ECFPortal/
     - https://publicaccess.courts.oregon.gov/PublicAccessLogin/
     - https://www.city.waltham.ma.us/police-department/pages/police-blotter-arrest-log
+
+    If you have good reasons for asking to exclude one or more of examples from the distribution
+    please bring these to our attention through any of the ways detailed here:
+
+           https://github.com/maxpmaxp/pdfreader/issues
+           maxp@sterch.net

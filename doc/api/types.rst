@@ -34,11 +34,15 @@ pdfreader.types submodule
  .. autoclass:: pdfreader.types.content.InlineImage
 
     .. autoattribute:: dictionary
+      :annotation:
     .. autoattribute:: data
+      :annotation:
     .. autoproperty:: filtered
     .. automethod:: to_Pillow
 
  .. autoclass:: pdfreader.types.content.Operator
 
     .. autoattribute:: name
+      :annotation:
     .. autoattribute:: args
+      :annotation:
