@@ -1,5 +1,5 @@
-How to navigate PDF objects
-===========================
+How to browse PDF objects
+=========================
 
 There could be a reason when you need to access raw PDF objects as they are in the document.
 Or even get an object by its number and generation, which is also possible.

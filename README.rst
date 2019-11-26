@@ -84,3 +84,11 @@ References
 * `PostScript Language Reference Manual <https://www-cdf.fnal.gov/offline/PostScript/PLRM2.pdf>`_
 * `Adobe CMap resources <https://github.com/adobe-type-tools/cmap-resources>`_
 * `Adobe glyph list specification (AGL) <https://github.com/adobe-type-tools/agl-specification>`_
+
+
+Donation
+========
+If this project is helpful, you can treat me to coffee :-)
+
+.. image:: _https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif
+   :target: _https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VMVFZSDHDFVK6&item_name=PDFReader+support&currency_code=USD&source=url

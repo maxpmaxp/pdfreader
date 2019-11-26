@@ -1,5 +1,5 @@
-How to extract XObject or Inline Images, and Image Masks
-========================================================
+How to extract XObject or Inline Images, Image Masks
+====================================================
 
 Extracting Inline Images is discussed in tutorial :ref:`tutorial-images`,
 so let's focus on XObject Images and Image Masks.
