@@ -1,3 +1,12 @@
+.. testsetup::
+
+  from pdfreader import PDFDocument, SimplePDFViewer
+  import pkg_resources, os.path
+  samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  file_name = os.path.join(samples_dir, 'example-image-xobject.pdf')
+  pdf_file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
+
+
 How to extract XObject or Inline Images, Image Masks
 ====================================================
 
@@ -12,9 +21,6 @@ Open a sample document.
 .. doctest::
 
   >>> from pdfreader import PDFDocument
-  >>> import pkg_resources, os.path
-  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
-  >>> file_name = os.path.join(samples_dir, 'example-image-xobject.pdf')
   >>> fd = open(file_name, "rb")
   >>> doc = PDFDocument(fd)
 
@@ -102,8 +108,7 @@ and see what image masks it contains.
 .. doctest::
 
   >>> from pdfreader import SimplePDFViewer
-  >>> file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
-  >>> fd = open(file_name, "rb")
+  >>> fd = open(pdf_file_name, "rb")
   >>> viewer = SimplePDFViewer(fd)
 
 We use `Image.ImageMask` attribute to filter image masks from another images.

@@ -5,6 +5,10 @@ Tutorial
 
   from pdfreader import PDFDocument
   import pkg_resources
+  import pkg_resources, os.path
+  samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
+
 
 Have a look at the :download:`sample file <examples/pdfs/tutorial-example.pdf>`.
 In this tutorial we will learn simple methods on
@@ -33,9 +37,6 @@ The first step when working with *pdfreader* is to create a
 
 .. doctest::
 
-  >>> import pkg_resources, os.path
-  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
-  >>> file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
   >>> fd = open(file_name, "rb")
   >>> doc = PDFDocument(fd)
 

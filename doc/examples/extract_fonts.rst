@@ -1,3 +1,10 @@
+.. testsetup::
+
+  from pdfreader import PDFDocument
+  import pkg_resources, os.path
+  samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  file_name = os.path.join(samples_dir, 'example-font.pdf')
+
 How to extract Font data from PDF
 =================================
 
@@ -8,9 +15,6 @@ Let's open a :download:`sample document <pdfs/example-font.pdf>`.
 .. doctest::
 
   >>> from pdfreader import PDFDocument
-  >>> import pkg_resources, os.path
-  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
-  >>> file_name = os.path.join(samples_dir, 'example-font.pdf')
   >>> fd = open(file_name, "rb")
   >>> doc = PDFDocument(fd)
 

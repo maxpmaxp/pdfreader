@@ -1,3 +1,11 @@
+.. testsetup::
+
+  from pdfreader import SimplePDFViewer
+  import pkg_resources, os.path
+  samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  file_name = os.path.join(samples_dir, 'example-form.pdf')
+
+
 How to parse PDF Forms
 ======================
 
@@ -16,9 +24,6 @@ Let's open the document and get the 1st page.
 .. doctest::
 
   >>> from pdfreader import SimplePDFViewer
-  >>> import pkg_resources, os.path
-  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
-  >>> file_name = os.path.join(samples_dir, 'example-form.pdf')
   >>> fd = open(file_name, "rb")
   >>> viewer = SimplePDFViewer(fd)
 

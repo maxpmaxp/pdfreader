@@ -1,3 +1,11 @@
+.. testsetup::
+
+  from pdfreader import PDFDocument
+  import pkg_resources, os.path
+  samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
+
+
 How to extract CMap for a font from PDF
 =======================================
 
@@ -11,9 +19,6 @@ Let's open a :download:`sample document <pdfs/tutorial-example.pdf>`.
 .. doctest::
 
   >>> from pdfreader import PDFDocument
-  >>> import pkg_resources, os.path
-  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
-  >>> file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
   >>> fd = open(file_name, "rb")
   >>> doc = PDFDocument(fd)
 

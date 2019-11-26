@@ -1,3 +1,11 @@
+.. testsetup::
+
+  import pkg_resources, os.path
+  from pdfreader import PDFDocument
+  samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
+
+
 How to browse PDF objects
 =========================
 
@@ -13,10 +21,7 @@ We already discussed there how to locate document catalog.
 
 .. doctest::
 
-  >>> import pkg_resources, os.path
   >>> from pdfreader import PDFDocument
-  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
-  >>> file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
   >>> fd = open(file_name, "rb")
   >>> doc = PDFDocument(fd)
   >>> catalog = doc.root

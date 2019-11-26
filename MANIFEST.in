@@ -2,10 +2,14 @@ include README.rst
 include CONTRIBUTING.rst
 include LICENSE
 include THIRD-PARTY-NOTICES
-include pdfreader/codec/cmaps *
+graft pdfreader/codecs/cmaps
 global-include *.txt
 recursive-include doc *.rst
 recursive-include doc *.py
 recursive-include doc *.conf
 recursive-include doc *.png
 recursive-include doc *.pdf
+prune venv
+prune doc/_build
+prune dist
+exclude example-crash-markdown.txt extract-logo.png fax-from-p8.png mask.png sample-cmap.txt sample-font.type1

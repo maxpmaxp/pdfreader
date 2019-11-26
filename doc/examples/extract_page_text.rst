@@ -1,3 +1,10 @@
+.. testsetup::
+
+  from pdfreader import SimplePDFViewer
+  import pkg_resources, os.path
+  samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
+  file_name = os.path.join(samples_dir, 'example-text-crash-report.pdf')
+
 .. _examples-parse-texts:
 
 How to parse PDF texts
@@ -22,9 +29,6 @@ Let's open the document and render the first page:
 .. doctest::
 
   >>> from pdfreader import SimplePDFViewer
-  >>> import pkg_resources, os.path
-  >>> samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
-  >>> file_name = os.path.join(samples_dir, 'example-text-crash-report.pdf')
   >>> fd = open(file_name, "rb")
   >>> viewer = SimplePDFViewer(fd)
   >>> viewer.render()
