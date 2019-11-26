@@ -21,6 +21,8 @@ About
 
 Nevertheless it can be used as a part of such tools.
 
+See `Tutorials & Documentation <https://pdfreader.readthedocs.io>`_.
+
 Features
 ========
 
