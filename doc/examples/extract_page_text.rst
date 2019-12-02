@@ -1,3 +1,13 @@
+.. meta::
+   :description: pdfreader - How to parse PDF to extract texts
+   :keywords: pdfreader,python,pdf,text,parse,extract,SimplePDFViewer
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader - How to parse PDF to extract texts
+   :og:description: Real-life examples on extracting plain and formatted texts from PDF.
+   :og:site_name: pdfreader docs
+   :og:type: article
+
+
 .. testsetup::
 
   from pdfreader import SimplePDFViewer

@@ -1,3 +1,12 @@
+.. meta::
+   :description: pdfreader tutorial - basic PDF parsing techniques: extract texts, images, accessing objects.
+   :keywords: pdfreader,tutorial,parse,text,pdf,image,extract
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader tutorial
+   :og:description: pdfreader tutorial - basic PDF parsing techniques: extract texts, images, accessing objects.
+   :og:site_name: pdfreader docs
+   :og:type: article
+
 Tutorial
 ========
 

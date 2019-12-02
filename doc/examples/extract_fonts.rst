@@ -1,3 +1,12 @@
+.. meta::
+   :description: pdfreader - How to extract Font
+   :keywords: pdfreader,python,pdf,font,parse,extract,PDFDocument
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader - How to extract Font
+   :og:description: Example: how to extract Font data from PDF file.
+   :og:site_name: pdfreader docs
+   :og:type: article
+
 .. testsetup::
 
   from pdfreader import PDFDocument

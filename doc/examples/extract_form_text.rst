@@ -1,3 +1,13 @@
+.. meta::
+   :description: pdfreader - How to parse PDF Forms
+   :keywords: pdfreader,python,pdf,form,parse,extract,SimplePDFViewer
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader - How to parse PDF Forms
+   :og:description: Extracting data from PDF forms. A real life example.
+   :og:site_name: pdfreader docs
+   :og:type: article
+
+
 .. testsetup::
 
   from pdfreader import SimplePDFViewer

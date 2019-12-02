@@ -1,3 +1,14 @@
+.. meta::
+   :description: pdfreader - How to browse PDF objects
+   :keywords: pdfreader,python,pdf,objects,browse,parse,extract,raw,data,generation,history,PDFDocument
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader -  How to browse PDF objects
+   :og:description: Extracting raw data from PDF documents - direct objects access, accessing attributes,
+       getting object by number and generation, browsing object history.
+   :og:site_name: pdfreader docs
+   :og:type: article
+
+
 .. testsetup::
 
   import pkg_resources, os.path

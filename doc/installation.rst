@@ -1,3 +1,12 @@
+.. meta::
+   :description: How to install pdfreader.
+   :keywords: pdfreader,install,howto
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: How to install pdfreader
+   :og:description: Instructions on how to install, upgrade build from sources pdfreader python package
+   :og:site_name: pdfreader docs
+   :og:type: article
+
 Installing / Upgrading
 ======================
 .. highlight:: bash
