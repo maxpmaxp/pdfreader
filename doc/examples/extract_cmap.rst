@@ -1,3 +1,12 @@
+.. meta::
+   :description: pdfreader - How to extract CMap
+   :keywords: pdfreader,python,pdf,cmap,parse,extract,PDFDocument
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader - How to extract CMap
+   :og:description: Example: how to extract CMap data for a font from PDF file.
+   :og:site_name: pdfreader docs
+   :og:type: article
+
 .. testsetup::
 
   from pdfreader import PDFDocument

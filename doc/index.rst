@@ -1,3 +1,13 @@
+.. meta::
+   :description: pdfreader - Python API to parse PDF documents, extract texts, images, other objects.
+   :keywords: pdf,python,pdfreader,parse,parser,acrobat,extract,text,image,xobject,cmap.
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader - Python API for PDF
+   :og:url: http://pdfreader.readthedocs.io/
+   :og:description: Pythonic API to parse PDF documents, extract texts (plain and formatted), images, other objects.
+   :og:site_name: pdfreader docs
+   :og:type: website
+
 pdfreader |release| Documentation
 =================================
 

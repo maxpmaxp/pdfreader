@@ -1,3 +1,12 @@
+.. meta::
+   :description: pdfreader - How to extract images from PDF
+   :keywords: pdfreader,python,pdf,image,inline,xobject,mask,parse,extract,SimplePDFViewer
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader - How to extract images from PDF
+   :og:description: Real-life examples on extracting inline images, XObjects and image masks from PDF.
+   :og:site_name: pdfreader docs
+   :og:type: article
+
 .. testsetup::
 
   from pdfreader import PDFDocument, SimplePDFViewer

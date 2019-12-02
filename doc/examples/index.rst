@@ -1,3 +1,11 @@
+.. meta::
+   :description: pdfreader examples and howtos - table of contents.
+   :keywords: pdfreader,example,tutorial,pdf
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader examples - table of contents
+   :og:description: pdfreader - advanced data extraction techniques
+   :og:site_name: pdfreader docs
+
 Examples and HowTos
 ===================
 

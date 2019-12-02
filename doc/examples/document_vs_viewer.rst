@@ -1,3 +1,12 @@
+.. meta::
+   :description: pdfreader  - PDFDocument vs. SimplePDFViewer
+   :keywords: pdfreader,PDFDocument,SimplePDFViewer,pdf
+   :google-site-verification: JxOmE0CjwDilnJCbNX5DOrH78HKS6snrAxA1SGvyAzs
+   :og:title: pdfreader - PDFDocument vs. SimplePDFViewer
+   :og:description: pdfreader - choosing right method PDFDocument vs. SimplePDFViewer
+   :og:site_name: pdfreader docs
+   :og:type: article
+
 PDFDocument vs. SimplePDFViewer
 ===============================
 
