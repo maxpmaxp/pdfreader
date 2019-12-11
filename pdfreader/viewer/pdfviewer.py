@@ -140,7 +140,7 @@ class ContextualViewer(object):
         name = obj.args[0]
         state = self.resources.ExtGState.get(name)
         if state:
-            self.gss.state = GraphicsState(**state)
+            self.gss.state.update(GraphicsState(**state))
         else:
             logging.warning("Graphics state {} was not found on resources".format(name))
 

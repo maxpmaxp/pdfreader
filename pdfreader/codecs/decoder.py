@@ -86,11 +86,6 @@ class CMAPDecoder(BaseDecoder):
     >>> decoder.decode_hexstring('004100420043003100320033')
     'ABC123'
 
-    >>> font = dict(Encoding=Name("83pv-RKSJ-H"))
-    >>> decoder = CMAPDecoder(font)
-    >>> decoder.decode_hexstring('82A88D7B0057') == "\\u82A8\\u8D7BW"
-    True
-
     >>> from unittest.mock import Mock, patch
     >>> import pdfreader.codecs.decoder
     >>> cmap = Mock()
@@ -100,12 +95,32 @@ class CMAPDecoder(BaseDecoder):
     ...     decoder.decode_hexstring('000100020003000400050006')
     'ABC123'
 
+    Missing char codes must be converted as 00-FF characters (69 - "i" is missing)
+
+    >>> cmap = Mock()
+    >>> cmap.bf_ranges = {'20': ' ', '55': 'U', '6E': 'n', '74': 't',  '65': 'e',  '64': 'd'}
+    >>> with patch.object(pdfreader.codecs.decoder, '_get_cmap_encoding', return_value=(cmap, None)) as _:
+    ...     decoder = CMAPDecoder(Mock())
+    ...     decoder.decode_hexstring('20556E69746564')
+    ' United'
+
+
     """
+
+    @property
+    def _encoding_decoder(self):
+        if self.encoding:
+            res = EncodingDecoder(dict(Encoding=self.encoding))
+        else:
+            res = default_decoder
+        return res
 
     def decode_hexstring(self, s: HexString):
         res, code = "", ""
-        for i in range(0, len(s), 2):
-            code += s[i:i + 2]
+        codes = [s[i:i + 2] for i in range(0, len(s), 2)]
+
+        while codes:
+            code += codes.pop(0)
             try:
                 ch = self.cmap.bf_ranges[code]
             except KeyError:
@@ -113,17 +128,18 @@ class CMAPDecoder(BaseDecoder):
                     continue
                 else:
                     # leave as is
-                    try:
-                        ch = chr(int(code, 16))
-                    except ValueError:
-                        ch = HexString(code)
+                    if code[:2] == '00':
+                        ch = ''
+                    else:
+                        ch = self._encoding_decoder.decode_hexstring(HexString(code[:2]))
+                    codes = [HexString(code[2:])] + codes
+
             res += ch
             code = ""
 
         if code:
             hs = HexString(code)
-            res += hs.to_bytes().decode(self.encoding) if self.encoding else hs.to_string()
-
+            res += self._encoding_decoder.decode_hexstring(hs)
         return res
 
     def decode_string(self, s):
