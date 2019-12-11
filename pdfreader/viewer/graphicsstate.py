@@ -34,17 +34,19 @@ class GraphicsState(object):
     #: shall be a list if exists - [font_name, font_size] (Tf operator)
     Font = None
     #: char spacing
-    Tc = 0
+    Tc = None
     #: word spacing
-    Tw = 0
+    Tw = None
     #: horizontlal scaling
-    Tz = 0
+    Tz = None
     #: text leading
-    TL = 0
+    TL = None
     #: text rendering mode
-    Tr = 0
+    Tr = None
     #: text rise
-    Ts = 0
+    Ts = None
+
+    _fields = ('CTM', 'LW', 'LC', 'LJ', 'ML', 'D', 'RI', 'I', 'Font', 'Tc', 'Tw', 'Tz', 'TL', 'Tr', 'Ts')
 
     def __init__(self, **kwargs):
 
@@ -55,6 +57,12 @@ class GraphicsState(object):
     def font_name(self):
         if self.Font:
             return self.Font[0]
+
+    def update(self, other):
+        for f in self._fields:
+            val = getattr(other, f, None)
+            if val is not None:
+                setattr(self, f, val)
 
 
 class GraphicsStateStack(List[GraphicsState]):

@@ -158,6 +158,10 @@ class BFChar(object):
         >>> r["0000"]
         '꼀g'
 
+        >>> r = BFChar("1E", "00660069")
+        >>> r["1E"]
+        'fi'
+
         It also may contain PostScript character names
 
         >>> r = BFChar("00", "/yen")
@@ -183,13 +187,7 @@ class BFChar(object):
             val = PS_CHARNAMES.get(self.mapped[1:], self.mapped)
         else:
             # decode
-            l = len(self.begin)
-            if len(self.mapped) == 4 and self.mapped.startswith("00"):
-                # ignore leading 00
-                val = chr(HexString(self.mapped[2:]).as_int)
-            else:
-                # may encode several characters
-                val = "".join([chr(HexString(self.mapped[i:i+l]).as_int) for i in range(0, len(self.mapped), l)])
+            val = "".join([chr(HexString(self.mapped[i:i+4]).as_int) for i in range(0, len(self.mapped), 4)])
         return val
 
     def get(self, item, default=None):

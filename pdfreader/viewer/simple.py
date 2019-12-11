@@ -176,6 +176,11 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
     #: Contains current page number
     current_page_number = None
 
+    def after_navigate(self, n):
+        self._decoders = dict()
+        self.bracket_commands_stack = []
+        super(SimplePDFViewer, self).after_navigate(n)
+
     def on_Do(self, op):
         name = op.args[0]
         xobj = self.resources.XObject.get(name)
