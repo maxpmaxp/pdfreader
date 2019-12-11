@@ -68,4 +68,5 @@ class WinAnsiCodec(Codec):
                     163: 'sterling', 116: 't', 254: 'thorn', 51: 'three', 190: 'threequarters', 179: 'threesuperior',
                     152: 'tilde', 153: 'trademark', 50: 'two', 178: 'twosuperior', 117: 'u', 250: 'uacute',
                     251: 'ucircumflex', 252: 'udieresis', 249: 'ugrave', 95: 'underscore', 118: 'v', 119: 'w', 120: 'x',
-                    121: 'y', 253: 'yacute', 255: 'ydieresis', 165: 'yen', 122: 'z', 158: 'zcaron', 48: 'zero'}
+                    121: 'y', 253: 'yacute', 255: 'ydieresis', 165: 'yen', 122: 'z', 158: 'zcaron', 48: 'zero',
+                    160: 'nbspace'}

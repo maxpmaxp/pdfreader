@@ -65,4 +65,5 @@ class MacRomanCodec(Codec):
                     164: 'section', 59: 'semicolon', 55: 'seven', 54: 'six', 47: 'slash', 32: 'space',
                     163: 'sterling', 116: 't', 51: 'three', 247: 'tilde', 170: 'trademark', 50: 'two', 117: 'u',
                     156: 'uacute', 158: 'ucircumflex', 159: 'udieresis', 157: 'ugrave', 95: 'underscore', 118: 'v',
-                    119: 'w', 120: 'x', 121: 'y', 216: 'ydieresis', 180: 'yen', 122: 'z', 48: 'zero'}
+                    119: 'w', 120: 'x', 121: 'y', 216: 'ydieresis', 180: 'yen', 122: 'z', 48: 'zero',
+                    202: 'nbspace'}
