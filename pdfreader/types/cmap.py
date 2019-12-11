@@ -188,12 +188,6 @@ class BFChar(object):
         else:
             # decode
             val = "".join([chr(HexString(self.mapped[i:i+4]).as_int) for i in range(0, len(self.mapped), 4)])
-            #if len(self.mapped) == 4 and self.mapped.startswith("00"):
-            #    # ignore leading 00
-            #    val = chr(HexString(self.mapped[2:]).as_int)
-            #else:
-            #    # may encode several characters
-            #    val = "".join([chr(HexString(self.mapped[i:i+l]).as_int) for i in range(0, len(self.mapped), l)])
         return val
 
     def get(self, item, default=None):
