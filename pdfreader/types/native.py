@@ -37,6 +37,30 @@ class HexString(str):
         return bytes.fromhex(self)
 
 
+def apply_filter_multi(filters, binary, params):
+    if not filters:
+        return binary
+
+    if isinstance(filters, Array):
+        farr = filters
+    elif isinstance(filters, Name):
+        farr = Array()
+        farr.append(filters)
+    else:
+        raise TypeError("Incorrect filter type: {}".format(filters))
+
+    filters_applied = []
+    for fname in farr:
+        try:
+            binary = apply_filter(fname, binary, params)
+            filters_applied.append(fname)
+        except NotImplementedError:
+            logging.exception("Partially decoded. Filters applied: {}".format(filters_applied))
+            raise
+
+    return binary
+
+
 class Stream(object):
     """ binary stream: dictionary and binary data
         common keys:
@@ -81,29 +105,10 @@ class Stream(object):
     @cached_property
     def filtered(self):
         """ :return: bytes, decoded image stream as it defined by image properties """
-        filters = self.get('Filter')
-        if not filters:
-            return self.stream
+        return apply_filter_multi(self.get('Filter'),
+                                  self.stream,
+                                  self.dictionary.get("DecodeParms"))
 
-        if isinstance(filters, Array):
-            farr = filters
-        elif isinstance(filters, Name):
-            farr = Array()
-            farr.append(filters)
-        else:
-            raise TypeError("Incorrect filter type: {}".format(filters))
-
-        binary = self.stream
-        filters_applied = []
-        for fname in farr:
-            try:
-                binary = apply_filter(fname, binary, self.dictionary.get("DecodeParms"))
-                filters_applied.append(fname)
-            except NotImplementedError:
-                logging.exception("Partially decoded. Filters applied: {}".format(filters_applied))
-                raise
-
-        return binary
 
     def __eq__(self, other):
         return self.dictionary == other.dictionary and self.stream == other.stream
