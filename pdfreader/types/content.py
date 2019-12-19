@@ -1,5 +1,5 @@
-from ..filters import apply_filter
 from ..pillow import PILImageMixin
+from ..types.native import apply_filter_multi
 
 
 class StreamContent(object):
@@ -70,10 +70,7 @@ class InlineImage(PILImageMixin, StreamContent):
     @property
     def filtered(self):
         """ :return: bytes, decoded image stream as it defined by image properties """
-        binary = self.data
-        if self.Filter:
-            binary = apply_filter(self.Filter, binary, self.dictionary.get('DecodeParms'))
-        return binary
+        return apply_filter_multi(self.Filter, self.data, self.DecodeParms)
 
 
 class Operator(StreamContent):
