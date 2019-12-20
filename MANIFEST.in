@@ -10,6 +10,7 @@ recursive-include doc *.conf
 recursive-include doc *.png
 recursive-include doc *.pdf
 prune venv
+prune .venv
 prune doc/_build
 prune dist
 exclude example-crash-markdown.txt extract-logo.png fax-from-p8.png mask.png sample-cmap.txt sample-font.type1

@@ -361,8 +361,11 @@ class BasicTypesParser(object):
         ...                                 /Item4 (OK)
         ...                           >>
         ...         >>'''
-        >>> BasicTypesParser(s, 0).dictionary()
-        {'Type': 'Example', 'Subtype': 'DictExample', 'Version': Decimal('0.01'), 'IntegerItem': 12, 'StringItem': b'a string', 'ArrayItem': [1, 2], 'ObjRef': <IndirectReference:n=12,g=0>, 'SubDictionary': {'Item1': True, 'Item2': False, 'Item3': None, 'Item4': b'OK'}}
+        >>> expected = {'Type': 'Example', 'Subtype': 'DictExample', 'Version': Decimal('0.01'), 'IntegerItem': 12,
+        ... 'StringItem': b'a string', 'ArrayItem': [1, 2], 'ObjRef': IndirectReference(12, 0),
+        ... 'SubDictionary': {'Item1': True, 'Item2': False, 'Item3': None, 'Item4': b'OK'}}
+        >>> BasicTypesParser(s, 0).dictionary() == expected
+        True
 
         """
         pfx = self.read(2)

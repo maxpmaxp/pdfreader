@@ -194,8 +194,10 @@ class PDFParser(BasicTypesParser):
             ... /ID [<0102AA> <0102BB>]
             ... >>'''
             >>> p = PDFParser(s, 0)
-            >>> p.trailer()
-            <Trailer: {'Size': 22, 'Root': <IndirectReference:n=2,g=0>, 'Info': <IndirectReference:n=1,g=0>, 'ID': ['0102AA', '0102BB']}>
+            >>> expected_params = {'Size': 22, 'Root': IndirectReference(2,0),
+            ... 'Info': IndirectReference(1,0), 'ID': ['0102AA', '0102BB']}
+            >>> p.trailer() == Trailer(expected_params)
+            True
         """
         token = self.read(7)
         if token != b'trailer':

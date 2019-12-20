@@ -32,13 +32,12 @@ Now let's see what fonts the very first page uses:
 .. doctest::
 
   >>> page = next(doc.pages())
-  >>> page.Resources.Font
-  {'T1_0': <IndirectReference:n=22,g=0>, ... <IndirectReference:n=41,g=0>}
-
+  >>> sorted(page.Resources.Font.keys())
+  ['T1_0', 'T1_1', 'T1_2', 'TT0', 'TT1']
 
 We see 5 fonts named `T1_0`, `T1_1`, `T1_2`, `TT0` and `TT1`.
-As *pdfreader* is a lazy reader the font data has not been read yet. We just see the names and
-the references to the objects.
+As *pdfreader* is a lazy reader the font data has not been read yet.
+We just have the names and the references to the objects.
 
 Let's have a look at font `T1_0`.
 
