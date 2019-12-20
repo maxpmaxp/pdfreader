@@ -54,7 +54,7 @@ listed under page resources. The viewer puts them on canvas:
 .. doctest::
 
   >>> sorted(list(viewer.canvas.forms.keys()))
-  ['Fm1', 'Fm10', 'Fm11', 'Fm12', 'Fm13', 'Fm14' ...']
+  ['Fm1', 'Fm10', 'Fm11', 'Fm12', 'Fm13', 'Fm14',...]
 
 As Form is a kind of "sub-document" every entry in *viewer.canvas.forms* dictionary maps to
 :class:`~pdfreader.viewer.SimpleCanvas` instance:
