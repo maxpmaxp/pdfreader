@@ -32,7 +32,7 @@ Now let's see what fonts the very first page uses:
 .. doctest::
 
   >>> page = next(doc.pages())
-  >>> page.Resources.Font.keys()
+  >>> sorted(page.Resources.Font.keys())
   ['T1_0', 'T1_1', 'T1_2', 'TT0', 'TT1']
 
 We see 5 fonts named `T1_0`, `T1_1`, `T1_2`, `TT0` and `TT1`.
