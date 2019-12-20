@@ -53,7 +53,7 @@ listed under page resources. The viewer puts them on canvas:
 
 .. doctest::
 
-  >>> list(viewer.canvas.forms.keys())
+  >>> sorted(list(viewer.canvas.forms.keys()))
   ['Fm1', 'Fm2', ... 'Fm29', 'Fm30', 'Fm31']
 
 As Form is a kind of "sub-document" every entry in *viewer.canvas.forms* dictionary maps to
