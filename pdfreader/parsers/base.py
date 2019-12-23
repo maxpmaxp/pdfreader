@@ -9,6 +9,7 @@ class BasicTypesParser(object):
 
     exception_class = ParserException
     indirect_references_allowed = True
+    empty_names_allowed = False
 
     def __init__(self, fileobj_or_buffer, offset=0):
         if isinstance(fileobj_or_buffer, Buffer):
@@ -284,6 +285,12 @@ class BasicTypesParser(object):
         'Name#with!^speci_#0_als#'
 
         >>> s = b'/'
+        >>> p = BasicTypesParser(s, 0)
+        >>> p.empty_names_allowed = True
+        >>> p.name()
+        ''
+
+        >>> s = b'/'
         >>> BasicTypesParser(s, 0).name()
         Traceback (most recent call last):
         ...
@@ -315,7 +322,7 @@ class BasicTypesParser(object):
                     token += b'#' + code
             else:
                 token += self.next()
-        if not token:
+        if not self.empty_names_allowed and not token:
             self.on_parser_error("Empty /Name found")
 
         return Name(token.decode(DEFAULT_ENCODING))

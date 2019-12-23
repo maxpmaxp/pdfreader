@@ -14,6 +14,7 @@ class CMapParser(BasicTypesParser):
     """ Very poor implementation as we don't support PostScript language in full """
 
     exception_class = CMapParserException
+    empty_names_allowed = True
     indirect_references_allowed = False
 
     def object_or_token(self):
@@ -63,7 +64,7 @@ class CMapParser(BasicTypesParser):
         """
         >>> import pkg_resources
 
-        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-missing-name.txt')
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-samples/cmap-sample-missing-name.txt')
         >>> cmap = CMapParser(fd).cmap()
         >>> cmap.name is None
         True
@@ -72,7 +73,14 @@ class CMapParser(BasicTypesParser):
         >>> cmap.bf_ranges['01']
         ' '
 
-        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-3.txt')
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-samples/cmap-empty-name.txt')
+        >>> cmap = CMapParser(fd).cmap()
+        >>> cmap.name
+        ''
+        >>> len(cmap.bf_ranges.ranges)
+        1
+
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-samples/cmap-sample-3.txt')
         >>> cmap = CMapParser(fd).cmap()
         >>> cmap.name
         'Adobe-Identity-UCS'
@@ -81,7 +89,7 @@ class CMapParser(BasicTypesParser):
         >>> cmap.codespace_ranges
         <CodespaceRanges:ranges=[<Range:0000-FFFF>]>
 
-        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample.txt')
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-samples/cmap-sample.txt')
         >>> cmap = CMapParser(fd).cmap()
         >>> cmap.name
         '83pv-RKSJ-H'
@@ -96,14 +104,27 @@ class CMapParser(BasicTypesParser):
         >>> cmap.bf_ranges
         <MappedCodespaceRanges:ranges=[]>
 
-        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-2.txt')
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-samples/cmap-sample-2.txt')
         >>> cmap = CMapParser(fd).cmap()
         >>> cmap.name
         'Adobe-Identity-UCS'
         >>> len(cmap.bf_ranges.ranges)
         69
 
-        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-sample-bfrange-with-list.txt')
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-samples/cmap-sample-bfrange-with-list.txt')
+        >>> cmap = CMapParser(fd).cmap()
+        >>> cmap.name
+        'Adobe-Identity-UCS'
+        >>> len(cmap.bf_ranges.ranges)
+        70
+        >>> cmap.bf_ranges['0001']
+        ' '
+        >>> cmap.bf_ranges['0002']
+        'U'
+        >>> cmap.bf_ranges['0045']
+        '6'
+
+        >>> fd = pkg_resources.resource_stream('pdfreader.parsers', 'cmap-samples/cmap-sample-bfrange-with-list.txt')
         >>> cmap = CMapParser(fd).cmap()
         >>> cmap.name
         'Adobe-Identity-UCS'
