@@ -164,7 +164,7 @@ class PDFParser(BasicTypesParser):
 
             trailer = PDFTrailer(all_xrefs, **last_trailer.params)
         else:
-            # Assume xref as a stream which may contain liks to the previous xref streams
+            # Assume xref as a stream which may refer to the previous xref stream
             last_offset = xref_offset
             all_xrefs = []
             stream_log = []

@@ -116,9 +116,12 @@ class PDFDocument(object):
             xre = xref.compressed.get(num)
             if xre and xre.generation == gen:
                 # Need to locate Object Stream in order to locate a compressed object
-                self.locate_object(xre.number, xre.generation)
-                if self.registry.is_registered(num, gen):
-                    break
+                if xre.number != num:
+                    # Avoid infinite loops when compressed object is not listed on xref
+                    # See https://github.com/maxpmaxp/pdfreader/issues/16
+                    self.locate_object(xre.number, xre.generation)
+                    if self.registry.is_registered(num, gen):
+                        break
 
         while not self.registry.is_registered(num, gen):
             try:
