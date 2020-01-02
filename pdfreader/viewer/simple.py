@@ -39,16 +39,14 @@ def object_to_string(obj):
         # We encode the image with ASCII85 to make it a unicode string
         entries = " ".join(["/{} {}".format(k, object_to_string(v))
                             for k, v in obj.dictionary.items()
-                            if k not in ('F', 'Filter', 'DecodeParms')])
-        last_filter = obj.Filter[0] if isinstance(obj.Filter, list) else obj.Filter
-
+                            if k not in ('F', 'Filter')])
+        new_filters = obj.Filter if isinstance(obj.Filter, list) else [obj.Filter]
+        last_filter = new_filters[0]
         if last_filter in ascii_filters:
             # data stream contains ASCII characters
-            new_filters = obj.Filter
             content = obj.data
         else:
             # encode binary content with ASCII85Decode to make in human-readable
-            new_filters = obj.Filter if isinstance(obj.Filter, list) else [obj.Filter]
             new_filters = ["ASCII85Decode"] + new_filters
             content = b85encode(obj.data) + b'~>'
 
