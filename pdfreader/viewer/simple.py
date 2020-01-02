@@ -4,6 +4,7 @@ from base64 import b85encode
 from pdfreader.constants import DEFAULT_ENCODING
 
 from ..codecs.decoder import Decoder, default_decoder
+from ..filters import asciihex, ascii85
 from ..parsers.content import ContentParser
 from ..types.content import Operator, InlineImage
 from ..types.native import HexString, String, Dictionary, Array, Boolean, Name, Decimal, Integer
@@ -13,6 +14,7 @@ from .canvas import SimpleCanvas
 from .resources import Resources
 from .pdfviewer import PDFViewer, ContextualViewer
 
+ascii_filters = asciihex.filter_names + ascii85.filter_names
 
 def object_to_string(obj):
     if obj is None:
@@ -37,9 +39,19 @@ def object_to_string(obj):
         # We encode the image with ASCII85 to make it a unicode string
         entries = " ".join(["/{} {}".format(k, object_to_string(v))
                             for k, v in obj.dictionary.items()
-                            if k not in ('F', 'Filter', 'DecodeParms')])
-        entries += " /Filter /ASCII85Decode"
-        content = b85encode(obj.filtered) + b'~>'
+                            if k not in ('F', 'Filter')])
+        new_filters = obj.Filter if isinstance(obj.Filter, list) else [obj.Filter]
+        last_filter = new_filters[0]
+        if last_filter in ascii_filters:
+            # data stream contains ASCII characters
+            content = obj.data
+        else:
+            # encode binary content with ASCII85Decode to make in human-readable
+            new_filters = ["ASCII85Decode"] + new_filters
+            content = b85encode(obj.data) + b'~>'
+
+        str_filters = "".join([" /{} ".format(f) for f in new_filters])
+        entries += " /Filter [{}]".format(str_filters)
         val = "\nBI\n{entries}\nID\n{content}\nEI".format(entries=entries, content=content.decode('ascii'))
     elif isinstance(obj, bytes):
         logging.warning("Binary data. Using default encoding. Possibly arg of unsupported operator: {}"
