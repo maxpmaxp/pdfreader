@@ -55,7 +55,12 @@ class InlineImageParser(BasicTypesParser):
         data = b''
         while True:
             data += self.next()
-            if data.endswith(b'EI') and data[-3:-2] in WHITESPACES:
+            # <content><whitespace>EI or <content>EI<whitespace>
+            ei_reached = \
+                   (data.endswith(b'EI') and data[-3:-2] in WHITESPACES) \
+                or (data[-3:-1] == b'EI' and data[-1:] in WHITESPACES)
+
+            if ei_reached:
                 data = data[:-3]
                 break
 
