@@ -339,8 +339,8 @@ class BasicTypesParser(object):
             self.maybe_spaces_or_comments()
             if self.current == b's':
                 val = self._stream(val)
-        elif self.is_hex_digit or self.is_whitespace:
-            # < 09FF> is possible
+        elif self.is_hex_digit or self.is_whitespace or self.current == b'>':
+            # < 09FF> and <> are possible
             self.prev()
             val = self.hexstring()
         else:
@@ -460,16 +460,13 @@ class BasicTypesParser(object):
         >>> BasicTypesParser(s, 0).hexstring()
         '00'
 
-
         >>> s = b'<01 AA FF 1>'
         >>> BasicTypesParser(s, 0).hexstring()
         '01AAFF10'
 
         >>> s = b'<>'
         >>> BasicTypesParser(s, 0).hexstring()
-        Traceback (most recent call last):
-        ...
-        pdfreader.exceptions.ParserException: Wrong hexadecimal string
+        ''
 
         >>> s = b'<0011XX>'
         >>> BasicTypesParser(s, 0).hexstring()
@@ -486,8 +483,7 @@ class BasicTypesParser(object):
         while self.is_hex_digit:
             token += self.next()
             self.maybe_spaces_or_comments()
-        if not token:
-            self.on_parser_error("Wrong hexadecimal string")
+
         ch = self.next()
         if ch != b'>':
             self.on_parser_error("Wrong hexadecimal string")
