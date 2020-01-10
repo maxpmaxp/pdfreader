@@ -203,8 +203,8 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
                 self.canvas.images[name] = xobj
             elif isinstance(xobj, Form) and name not in self.canvas.forms:
                 # render form and save
-                resources = Resources.from_page(self.current_page,
-                                                resources_stack=[xobj.Resources])
+                rs = [xobj.Resources] if xobj.Resources else []
+                resources = Resources.from_page(self.current_page, resources_stack=rs)
                 subviewer = FormViewer(xobj.filtered, resources, self.gss)
                 subviewer.render()
                 self.canvas.forms[name] = subviewer.canvas
