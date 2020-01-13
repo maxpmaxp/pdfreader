@@ -133,7 +133,6 @@ class CMAPDecoder(BaseDecoder):
                     else:
                         ch = self._encoding_decoder.decode_hexstring(HexString(code[:2]))
                     codes = [HexString(code[2:])] + codes
-
             res += ch
             code = ""
 
@@ -153,7 +152,7 @@ class EncodingDecoder(BaseDecoder):
         return self.decode_string(s.to_bytes())
 
     def decode_string(self, s):
-        from ..types.objects import Encoding
+        from ..types.objects import DictBasedObject
 
         if isinstance(self.encoding, str):
             # encoding name
@@ -162,9 +161,10 @@ class EncodingDecoder(BaseDecoder):
             except LookupError:
                 logging.warning("Unsupported encoding {}. Using default {}".format(self.encoding, DEFAULT_ENCODING))
                 codec = codecs.lookup(DEFAULT_ENCODING)
-        elif isinstance(self.encoding, Encoding):
+        elif isinstance(self.encoding, DictBasedObject):
             # Encoding object - See PDF spec PDF32000_2008.pdf p.255 sec 9.6.1
             # Base encoding with differences
+            # Type=Encoding is optional. See https://github.com/maxpmaxp/pdfreader/issues/29
             codec = DifferencesCodec(self.encoding)
         else:
             # This should never happen
