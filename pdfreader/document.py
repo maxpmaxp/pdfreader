@@ -73,6 +73,9 @@ class PDFDocument(object):
             on_return()
         return obj
 
+    def locate_object(self, num, gen):
+        return self.parser.locate_object(num, gen)
+
     def obj_by_ref(self, objref):
         obj = self.parser.locate_object(objref.num, objref.gen)
         return obj_factory(self, obj)
