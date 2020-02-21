@@ -11,6 +11,7 @@ class PDFParser(BasicTypesParser):
     PDF_HEADER = re.compile(b"^%PDF-(\d\.\d)", re.MULTILINE)
     IPS_HEADER = re.compile(b"^%IPS-Adobe-\d\.\d PDF-(\d\.\d)", re.MULTILINE)
 
+
     @staticmethod
     def is_empty_line(bline):
         """
@@ -392,9 +393,92 @@ class RegistryPDFParser(PDFParser):
     def __init__(self, fileobj, registry):
         super(RegistryPDFParser, self).__init__(fileobj)
         self.registry = registry
+        self.header = self.pdf_header()
+        self.trailer = self.pdf_trailer()
+        self.reset(self.header.offset)
+        self.brute_force_state = self.get_state()
+
+    def set_brute_force_offset(self, offset):
+
+        self.brute_force_state = self.get_state()
 
     def on_parsed_indirect_object(self, obj):
         self.registry.register(obj)
+
+    def locate_object(self, num, gen):
+        """
+        Locates an object by it's number and generation.
+
+        Objects lookup order:
+          #. Known objects in registry (located before)
+          #. XRef tables lookups
+          #. Brute-force reading objects one by one from file start
+
+        :param num: object number
+        :type num: int
+
+        :param gen: object generation
+        :type gen: int
+
+        :return: instance of one of supported PDF types (incl. null object) if found, null object otherwise.
+                 Doesn't resolve indirect references.
+        """
+        # locate in registry
+        if self.registry.is_registered(num, gen):
+            return self.registry.get(num, gen)
+
+        # Locate by xref
+        for xref in self.trailer.xrefs:
+            # try to find in-use object
+            xre = xref.in_use.get(num)
+            if xre and xre.generation == gen:
+                try:
+                    self.reset(xre.offset)
+                    self.indirect_object()
+                except ParserException:
+                    pass
+                if self.registry.is_registered(num, gen):
+                    break
+            # Try to find a compressed object
+            xre = xref.compressed.get(num)
+            if xre and xre.generation == gen:
+                # Need to locate Object Stream in order to locate a compressed object
+                if xre.number != num:
+                    # Avoid infinite loops when compressed object is not listed on xref
+                    # See https://github.com/maxpmaxp/pdfreader/issues/16
+                    self.locate_object(xre.number, xre.generation)
+                    if self.registry.is_registered(num, gen):
+                        break
+
+        while not self.registry.is_registered(num, gen):
+            try:
+                _ = self.next_brute_force_object()
+            except ParserException:
+                # treat not-found objects as nulls
+                logging.exception("!!!Failed to locate {} {}: assuming null".format(num, gen))
+                self.registry.register(IndirectObject(num, gen, null))
+                break
+        obj = self.registry.get(num, gen)
+        return obj
+
+    def next_brute_force_object(self):
+        self.set_state(self.brute_force_state)
+        self.maybe_spaces_or_comments()
+        obj = self.body_element() # can be either indirect object, startxref or trailer
+        self.brute_force_state = self.get_state() # save state for the next BF
+        return obj
+
+    def _stream(self, d):
+        length = d['Length']
+        if isinstance(length, IndirectReference):
+            # Stream length may come as an indirect object.
+            # See https://stackoverflow.com/questions/50325459/how-to-parse-a-binary-pdf-stream-of-unknown-length/50334477#50334477
+            # And also https://github.com/maxpmaxp/pdfreader/issues/34 where an example is.
+            buffer_state = self.get_state()
+            d['Length'] = self.locate_object(length.num, length.gen)
+            self.set_state(buffer_state)
+        res = super(RegistryPDFParser, self)._stream(d)
+        return res
 
     def indirect_object(self):
         obj = super(RegistryPDFParser, self).indirect_object()
