@@ -1,5 +1,6 @@
 pdfreader 0.1.4rc1
 ---------------------------
+ - Issue #34: Stream Length can be Indirect Reference now.
  - Issue #29: Optional Type=Encoding key for Encoding dictionary
  - Issue #27: Empty XObject resources cause AttributeError
  - Issue #25: pdfreader.exceptions.ParserException: Dict, stream or hexstring expected
