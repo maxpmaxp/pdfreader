@@ -1,5 +1,6 @@
 include README.rst
 include CONTRIBUTING.rst
+include CHANGELOG.txt
 include LICENSE
 include THIRD-PARTY-NOTICES
 graft pdfreader/codecs/cmaps
