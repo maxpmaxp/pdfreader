@@ -1,4 +1,4 @@
-pdfreader 0.1.4rc1
+pdfreader 0.1.4, 2020-02-21
 ---------------------------
  - Issue #34: Stream Length can be Indirect Reference now.
  - Issue #29: Optional Type=Encoding key for Encoding dictionary
