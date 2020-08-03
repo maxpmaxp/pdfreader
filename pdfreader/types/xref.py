@@ -13,8 +13,10 @@ KNOWN_TYPES = (TYPE_COMPRESSED, TYPE_IN_USE, TYPE_FREE)
 class BaseXrefEntry(object):
 
     def __init__(self, number, generation=0, typ=None):
-        assert isinstance(number, int) and number >= 0
-        assert isinstance(generation, int) and 0 <= generation <= MAX_GEN
+        if not (isinstance(number, int) and number >= 0):
+            raise AssertionError
+        if not (isinstance(generation, int) and 0 <= generation <= MAX_GEN):
+            raise AssertionError
         self.number = number
         self.generation = generation
         self.type = typ
@@ -41,7 +43,8 @@ class XRefEntry(BaseXrefEntry):
         No compressed objects support
     """
     def __init__(self, offset, number, generation, typ):
-        assert isinstance(offset, int) and offset >=0
+        if not (isinstance(offset, int) and offset >=0):
+            raise AssertionError
         self.offset = offset
         if typ == 'n':
             typ = TYPE_IN_USE
@@ -58,7 +61,8 @@ class CompressedObjEntry(BaseXrefEntry):
         Generation is always 0 for compressed objects.
     """
     def __init__(self, number, index):
-        assert isinstance(index, int) and index >= 0
+        if not (isinstance(index, int) and index >= 0):
+            raise AssertionError
         self.index = index
         super(CompressedObjEntry, self).__init__(number, typ=TYPE_COMPRESSED)
 
@@ -105,7 +109,7 @@ class XRef(object):
     @classmethod
     def from_stream(cls, stream):
         self = cls()
-        self.compressed = dict()
+        self.compressed = {}
         self._stream = stream # Just for debugging, normally we don't need this.
 
         if stream.get("Index"):

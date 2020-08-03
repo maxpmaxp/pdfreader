@@ -378,7 +378,7 @@ class BasicTypesParser(object):
         pfx = self.read(2)
         if pfx != b'<<':
             self.on_parser_error("Dictionary expected")
-        res = dict()
+        res = {}
         self.maybe_spaces_or_comments()
         while self.current != b'>':
             key = self.name()

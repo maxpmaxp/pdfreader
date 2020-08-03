@@ -14,7 +14,7 @@ register_pdf_encodings()
 
 
 class PredefinedCmaps(object):
-    _cache = dict()
+    _cache = {}
 
     @staticmethod
     def _load(name):

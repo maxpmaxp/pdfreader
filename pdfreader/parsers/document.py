@@ -127,9 +127,9 @@ class PDFParser(BasicTypesParser):
             window = window[1:] + self.next()
             n_read += 1
             m = self.PDF_HEADER.search(window) or self.IPS_HEADER.search(window)
-        else:
-            if m is None:
-                self.on_parser_error("No PDF header found")
+            
+        if m is None:
+            self.on_parser_error("No PDF header found")
 
         # return current to the beginning of the header
         for _ in range(size):
@@ -169,7 +169,7 @@ class PDFParser(BasicTypesParser):
             last_offset = xref_offset
             all_xrefs = []
             stream_log = []
-            tdict = dict()
+            tdict = {}
             while last_offset is not None:
                 self.reset(last_offset)
                 obj = self.indirect_object()

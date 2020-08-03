@@ -72,8 +72,10 @@ class Stream(object):
     """
 
     def __init__(self, info_dict, binary_stream):
-        assert isinstance(info_dict, Dictionary)
-        assert isinstance(binary_stream, bytes)
+        if not isinstance(info_dict, Dictionary):
+            raise AssertionError
+        if not isinstance(binary_stream, bytes):
+            raise AssertionError
 
         if "Length" not in info_dict:
             raise KeyError("Missing stream length")
@@ -128,8 +130,10 @@ class Comment(str):
 class IndirectReference(object):
     def __init__(self, number, generation):
         """ 10 0 R """
-        assert isinstance(number, int)
-        assert isinstance(generation, int) and generation >= 0
+        if not isinstance(number, int):
+            raise AssertionError
+        if not (isinstance(generation, int) and generation >= 0):
+            raise AssertionError
 
         self.num = number
         self.gen = generation
@@ -147,11 +151,14 @@ class IndirectObject(object):
         endobj
     """
     def __init__(self, number, generation, value):
-        assert isinstance(number, int)
-        assert isinstance(generation, int) and generation >= 0
-        assert isinstance(value,
+        if not isinstance(number, int):
+            raise AssertionError
+        if not (isinstance(generation, int) and generation >= 0):
+            raise AssertionError
+        if not isinstance(value,
                           (type(null), Boolean, Integer, Real, Array, Dictionary, String, Name, HexString, Stream,
-                           IndirectReference))
+                           IndirectReference)):
+            raise AssertionError
         self.num = number
         self.gen = generation
         self.val = value

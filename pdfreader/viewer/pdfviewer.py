@@ -29,7 +29,7 @@ class ContextualViewer(object):
     # def on_Tstar(self, op):
     #     ...
 
-    operators_aliases = dict()
+    operators_aliases = {}
 
     def __init__(self, stream, resources, gss):
         self.canvas = self.canvas_class()
@@ -173,11 +173,11 @@ class ContextualViewer(object):
 class PDFViewer(ContextualViewer):
     """ PDF document viewer and navigator  """
 
-    operators_aliases = dict()
+    operators_aliases = {}
 
     def __init__(self, fobj):
         """ Constructor method """
-        self._pages = dict()  # pages cache
+        self._pages = {}  # pages cache
         self.current_page_number = None
         self.doc = PDFDocument(fobj)
         super(PDFViewer, self).__init__(None, Resources(), self.graphics_state_stack_class())

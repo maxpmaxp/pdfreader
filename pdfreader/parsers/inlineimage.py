@@ -28,7 +28,7 @@ class InlineImageParser(BasicTypesParser):
         return method
 
     def entities(self):
-        res = dict()
+        res = {}
         self.maybe_spaces_or_comments()
         while self.current != b'I': # all entities come before ID, then - binary data comes
             key = self.name()

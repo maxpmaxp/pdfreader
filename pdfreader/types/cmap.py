@@ -5,7 +5,8 @@ from .native import HexString
 class Range(object):
 
     def __init__(self, begin: str, end: str):
-        assert len(begin) == len(end)
+        if len(begin) != len(end):
+            raise AssertionError
         begin = HexString(begin)
         end = HexString(end)
         self.int_begin = begin.as_int
@@ -264,7 +265,7 @@ class CodespaceRanges(object):
         >>> cr.as_list
         ['02', '03', '04', '05', 'FA', 'FB', 'FC', 'FD', 'FE', 'FF']
         """
-        res = set({})
+        res = set()
         for r in self.ranges:
             int_range = sorted(list(range(r.int_begin, r.int_end + 1)))
             res.update([HexString(hex(n)[2:].upper().zfill(r.size)) for n in int_range])

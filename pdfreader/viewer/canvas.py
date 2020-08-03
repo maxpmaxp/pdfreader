@@ -28,8 +28,8 @@ class SimpleCanvas(object):
         self.reset()
 
     def reset(self):
-        self.images = dict()
-        self.forms = dict()
+        self.images = {}
+        self.forms = {}
         self.text_content = ""
         self.inline_images = []
         self.strings = []

@@ -1,6 +1,5 @@
-from ..utils import cached_property
 from ..pillow import PILImageMixin
-from .native import Stream, Dictionary, Array, Name
+from .native import Stream, Dictionary, Array
 
 
 class StartXRef(object):
@@ -44,7 +43,7 @@ class StreamBasedObject(Stream):
     def __init__(self, doc, stream):
         super(StreamBasedObject, self).__init__(stream.dictionary, stream.stream)
         self.doc = doc
-        self._cache = dict()
+        self._cache = {}
 
     @classmethod
     def from_stream(cls, other):
@@ -79,7 +78,7 @@ class DictBasedObject(Dictionary):
     def __init__(self, doc, *args, **kwargs):
         super(DictBasedObject, self).__init__(*args, **kwargs)
         self.doc = doc
-        self._cache = dict()
+        self._cache = {}
 
     def __getattr__(self, item):
         return self.get(item)
