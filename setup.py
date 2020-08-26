@@ -9,7 +9,7 @@ import warnings
 if sys.version_info[:2] < (3, 6):
     warnings.warn("Python version >= 3.6 required.")
 
-version = '0.1.4'
+version = '0.1.5-dev'
 
 
 import os.path
