@@ -1,3 +1,8 @@
+pdfreader 0.1.5, 2020-08-27
+---------------------------
+ - Issue #41: RecursionError: maximum recursion depth exceeded
+ - Issue #39: Pillow version bump
+
 pdfreader 0.1.4, 2020-02-21
 ---------------------------
  - Issue #34: Stream Length can be Indirect Reference now.
