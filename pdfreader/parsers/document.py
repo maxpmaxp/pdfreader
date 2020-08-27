@@ -7,6 +7,10 @@ from ..types import *
 from .base import BasicTypesParser
 
 
+class BruteForceRecursion(Exception):
+    pass
+
+
 class PDFParser(BasicTypesParser):
     PDF_HEADER = re.compile(b"^%PDF-(\d\.\d)", re.MULTILINE)
     IPS_HEADER = re.compile(b"^%IPS-Adobe-\d\.\d PDF-(\d\.\d)", re.MULTILINE)
@@ -396,6 +400,7 @@ class RegistryPDFParser(PDFParser):
         self.trailer = self.pdf_trailer()
         self.reset(self.header.offset)
         self.brute_force_state = self.get_state()
+        self.brute_force_lookup_stack = []
 
     def on_parsed_indirect_object(self, obj):
         self.registry.register(obj)
@@ -446,22 +451,58 @@ class RegistryPDFParser(PDFParser):
                         break
 
         while not self.registry.is_registered(num, gen):
+            if (num, gen) in self.brute_force_lookup_stack:
+                raise BruteForceRecursion()
             try:
+                self.brute_force_lookup_stack.append((num, gen))
                 _ = self.next_brute_force_object()
             except ParserException:
                 # treat not-found objects as nulls
                 logging.exception("!!!Failed to locate {} {}: assuming null".format(num, gen))
                 self.registry.register(IndirectObject(num, gen, null))
                 break
+            finally:
+                self.brute_force_lookup_stack.pop()
+
         obj = self.registry.get(num, gen)
         return obj
 
     def next_brute_force_object(self):
-        self.set_state(self.brute_force_state)
-        self.maybe_spaces_or_comments()
-        obj = self.body_element() # can be either indirect object, startxref or trailer
-        self.brute_force_state = self.get_state() # save state for the next BF
+        """ Brute-force object location.
+
+            Normally this shouldn't be done as all necessary objects must be listed on Xref.
+            However real life PDFs may contain references to objects not listed on Xref.
+            For example Streams having /Lenth as reference to an indirect object
+            which comes right after the stream.
+            See https://stackoverflow.com/questions/50325459/how-to-parse-a-binary-pdf-stream-of-unknown-length/50334477#50334477
+            And sample PDFUA-Reference-09_(English-invoice).pdf attached to:
+            https://github.com/maxpmaxp/pdfreader/issues/41
+        """
+        tasks_stack = [self.brute_force_state]
+        deepest_state = None
+        while tasks_stack:
+            bf_state = tasks_stack.pop()
+            self.set_state(bf_state)
+            self.maybe_spaces_or_comments()
+            try:
+                obj = self.body_element() # can be either indirect object, startxref or trailer
+            except BruteForceRecursion:
+                tasks_stack.append(bf_state)
+                self.skip_until_next_indirect_object()
+                deepest_state = self.get_state()
+                tasks_stack.append(deepest_state)
+
+        self.brute_force_state = deepest_state or self.get_state() # save state for the next BF
         return obj
+
+    def skip_until_next_indirect_object(self):
+        """ This method is just an attempt to locate end of the current object, and may get broken by some
+            specific example. Makes sense for brute-force objetcs lookup only
+        """
+        token = self.read(6)
+        while token != b"endobj":
+            token = token[1:] + self.read(1)
+        self.maybe_spaces_or_comments()
 
     def _stream(self, d):
         length = d['Length']
