@@ -9,7 +9,7 @@ class BasicTypesParser(object):
 
     exception_class = ParserException
     indirect_references_allowed = True
-    empty_names_allowed = False
+    empty_names_allowed = True
 
     def __init__(self, fileobj_or_buffer, offset=0):
         if isinstance(fileobj_or_buffer, Buffer):
@@ -285,13 +285,13 @@ class BasicTypesParser(object):
         'Name#with!^speci_#0_als#'
 
         >>> s = b'/'
-        >>> p = BasicTypesParser(s, 0)
-        >>> p.empty_names_allowed = True
-        >>> p.name()
+        >>> BasicTypesParser(s, 0).name()
         ''
 
         >>> s = b'/'
-        >>> BasicTypesParser(s, 0).name()
+        >>> p = BasicTypesParser(s, 0)
+        >>> p.empty_names_allowed = False
+        >>> p.name()
         Traceback (most recent call last):
         ...
         pdfreader.exceptions.ParserException: Empty /Name found

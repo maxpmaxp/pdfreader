@@ -14,7 +14,6 @@ class CMapParser(BasicTypesParser):
     """ Very poor implementation as we don't support PostScript language in full """
 
     exception_class = CMapParserException
-    empty_names_allowed = True
     indirect_references_allowed = False
 
     def object_or_token(self):
