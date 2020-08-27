@@ -11,7 +11,6 @@ class PDFParser(BasicTypesParser):
     PDF_HEADER = re.compile(b"^%PDF-(\d\.\d)", re.MULTILINE)
     IPS_HEADER = re.compile(b"^%IPS-Adobe-\d\.\d PDF-(\d\.\d)", re.MULTILINE)
 
-
     @staticmethod
     def is_empty_line(bline):
         """
@@ -396,10 +395,6 @@ class RegistryPDFParser(PDFParser):
         self.header = self.pdf_header()
         self.trailer = self.pdf_trailer()
         self.reset(self.header.offset)
-        self.brute_force_state = self.get_state()
-
-    def set_brute_force_offset(self, offset):
-
         self.brute_force_state = self.get_state()
 
     def on_parsed_indirect_object(self, obj):
