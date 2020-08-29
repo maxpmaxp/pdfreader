@@ -13,10 +13,8 @@ KNOWN_TYPES = (TYPE_COMPRESSED, TYPE_IN_USE, TYPE_FREE)
 class BaseXrefEntry(object):
 
     def __init__(self, number, generation=0, typ=None):
-        if not (isinstance(number, int) and number >= 0):
-            raise AssertionError
-        if not (isinstance(generation, int) and 0 <= generation <= MAX_GEN):
-            raise AssertionError
+        assert isinstance(number, int) and number >= 0
+        assert isinstance(generation, int) and 0 <= generation <= MAX_GEN
         self.number = number
         self.generation = generation
         self.type = typ
