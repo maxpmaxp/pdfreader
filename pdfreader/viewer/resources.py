@@ -10,14 +10,14 @@ class Resources(object):
     _fields = ('ExtGState', 'ColorSpace', 'Pattern', 'Shading', 'XObject', 'Font', 'ProcSet')
 
     def __init__(self, **kwargs):
-        self.ExtGState = kwargs.get('ExtGState') or dict()
-        self.ColorSpace = kwargs.get('ColorSpace') or dict()
-        self.Pattern = kwargs.get('Pattern') or dict()
-        self.Shading = kwargs.get('Shading') or dict()
-        self.XObject = kwargs.get('XObject') or dict()
-        self.Font = kwargs.get('Font') or dict()
+        self.ExtGState = kwargs.get('ExtGState') or {}
+        self.ColorSpace = kwargs.get('ColorSpace') or {}
+        self.Pattern = kwargs.get('Pattern') or {}
+        self.Shading = kwargs.get('Shading') or {}
+        self.XObject = kwargs.get('XObject') or {}
+        self.Font = kwargs.get('Font') or {}
         self.ProcSet = kwargs.get('ProcSet') or set() # supposed to be a set predefined procedures names
-        self.Properties = kwargs.get('Properties') or dict()
+        self.Properties = kwargs.get('Properties') or {}
 
     @classmethod
     def from_page(cls, page: Page, resources_stack=None):
@@ -36,7 +36,7 @@ class Resources(object):
                 resources_stack.append(node.Resources)
 
         # build resources inheriting from parents if missing
-        kwargs = dict()
+        kwargs = {}
         while resources_stack:
             res = resources_stack.pop()
             for entry, dict_or_array in res.items():
@@ -45,7 +45,7 @@ class Resources(object):
 
                 if isinstance(dict_or_array, Dictionary):
                     if entry not in kwargs:
-                        kwargs[entry] = dict()
+                        kwargs[entry] = {}
                     for k, v in dict_or_array.items():
                         kwargs[entry][k] = v
                 elif isinstance(dict_or_array, Array):

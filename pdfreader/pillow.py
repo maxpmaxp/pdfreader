@@ -25,7 +25,8 @@ class PILImageMixin(object):
             values.append(self.Decode[index] if self.Decode else index)
         return values
 
-    def get_pil_colorspace(self, pdf_cs):
+    @staticmethod
+    def get_pil_colorspace(pdf_cs):
         if isinstance(pdf_cs, Array) and pdf_cs[0] == "ICCBased":
             # We don't support ICCBased color spaces that's why we use number of color components
             # to determine the alternate one

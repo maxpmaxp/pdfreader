@@ -11,7 +11,7 @@ def apply_filter(name, binary, params=None):
     decoder = decoders_by_name.get(name)
     if decoder is None:
         raise NotImplementedError(decoder)
-    return decoder.decode(binary, params or dict())
+    return decoder.decode(binary, params or {})
 
 # ToDo: implement more filters:
 # - ccittfax

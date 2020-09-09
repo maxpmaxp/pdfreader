@@ -74,7 +74,7 @@ class TextOperatorsMixin(object):
         super(TextOperatorsMixin, self).__init__(*args, **kwargs)
         self.bracket_commands_stack = [] # one day we may start support BX/EX, MDC/BMC/EMC.
                                          # BI/EI comes as a part of ContentParser due to inline image object nature
-        self._decoders = dict()
+        self._decoders = {}
 
     @property
     def mode(self):
@@ -189,7 +189,7 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
     current_page_number = None
 
     def after_navigate(self, n):
-        self._decoders = dict()
+        self._decoders = {}
         self.bracket_commands_stack = []
         super(SimplePDFViewer, self).after_navigate(n)
 

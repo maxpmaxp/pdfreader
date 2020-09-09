@@ -22,7 +22,6 @@ class BitParser:
 
     def __init__(self):
         self._pos = 0
-        return
 
     @classmethod
     def add(klass, root, v, bits):
@@ -38,13 +37,11 @@ class BitParser:
             else:
                 b = 0
         p[b] = v
-        return
 
     def feedbytes(self, data):
         for b in data:
             for m in (128, 64, 32, 16, 8, 4, 2, 1):
                 self._parse_bit(b & m)
-        return
 
     def _parse_bit(self, x):
         if x:
@@ -56,7 +53,6 @@ class BitParser:
             self._state = v
         else:
             self._state = self._accept(v)
-        return
 
 
 ##  CCITTG4Parser
@@ -325,7 +321,6 @@ class CCITTG4Parser(BitParser):
         self.width = width
         self.bytealign = bytealign
         self.reset()
-        return
 
     def feedbytes(self, data):
         for b in data:
@@ -337,7 +332,6 @@ class CCITTG4Parser(BitParser):
                 self._state = self.MODE
             except self.EOFB:
                 break
-        return
 
     def _parse_mode(self, mode):
         if mode == 'p':
@@ -422,18 +416,16 @@ class CCITTG4Parser(BitParser):
         self._reset_line()
         self._accept = self._parse_mode
         self._state = self.MODE
-        return
 
-    def output_line(self, y, bits):
+    @staticmethod
+    def output_line(y, bits):
         print (y, ''.join(str(b) for b in bits))
-        return
 
     def _reset_line(self):
         self._refline = self._curline
         self._curline = array.array('b', [1]*self.width)
         self._curpos = -1
         self._color = 1
-        return
 
     def _flush_line(self):
         if self.width <= self._curpos:
@@ -442,7 +434,6 @@ class CCITTG4Parser(BitParser):
             self._reset_line()
             if self.bytealign:
                 raise self.ByteSkip
-        return
 
     def _do_vertical(self, dx):
         #print '* vertical(%d): curpos=%r, color=%r' % (dx, self._curpos, self._color)
@@ -469,7 +460,6 @@ class CCITTG4Parser(BitParser):
                 self._curline[x] = self._color
         self._curpos = x1
         self._color = 1-self._color
-        return
 
     def _do_pass(self):
         #print '* pass: curpos=%r, color=%r' % (self._curpos, self._color)
@@ -498,7 +488,6 @@ class CCITTG4Parser(BitParser):
         for x in range(self._curpos, x1):
             self._curline[x] = self._color
         self._curpos = x1
-        return
 
     def _do_horizontal(self, n1, n2):
         #print '* horizontal(%d,%d): curpos=%r, color=%r' % (n1, n2, self._curpos, self._color)
@@ -516,7 +505,6 @@ class CCITTG4Parser(BitParser):
             self._curline[x] = 1-self._color
             x += 1
         self._curpos = x
-        return
 
     def _do_uncompressed(self, bits):
         #print '* uncompressed(%r): curpos=%r' % (bits, self._curpos)
@@ -524,7 +512,6 @@ class CCITTG4Parser(BitParser):
             self._curline[self._curpos] = int(c)
             self._curpos += 1
             self._flush_line()
-        return
 
 
 
@@ -536,7 +523,6 @@ class CCITTFaxDecoder(CCITTG4Parser):
         CCITTG4Parser.__init__(self, width, bytealign=bytealign)
         self.reversed = reversed
         self._buf = b''
-        return
 
     def close(self):
         return self._buf
@@ -549,7 +535,6 @@ class CCITTFaxDecoder(CCITTG4Parser):
             if b:
                 bytes[i//8] += (128, 64, 32, 16, 8, 4, 2, 1)[i % 8]
         self._buf += bytes.tostring()
-        return
 
 
 def ccittfaxdecode(data, params):

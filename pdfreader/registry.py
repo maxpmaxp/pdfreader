@@ -9,10 +9,10 @@ class Registry(object):
     """ Registry of known indirect objects  """
 
     def __init__(self):
-        self.known_indirect_objects = dict()
+        self.known_indirect_objects = {}
         # id -> begin/end offsets. End means the next byte after obj
         # this may help to implement different indirect references resolution strategies
-        self.indirect_object_offsets = dict()
+        self.indirect_object_offsets = {}
         self.next_brute_force_offset = None
 
     def is_registered(self, n, gen):
