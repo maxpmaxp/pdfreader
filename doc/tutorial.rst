@@ -17,6 +17,7 @@ Tutorial
   import pkg_resources, os.path
   samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
   file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
+  annotations_file_name = os.path.join(samples_dir, 'annot-sample.pdf')
 
 
 Have a look at the :download:`sample file <examples/pdfs/tutorial-example.pdf>`.
@@ -284,6 +285,8 @@ PDF markdown is also available.
 And the strings are decoded properly. Have a look at
 :download:`the file <examples/downloads/tutorial-sample-content-stream-p1.txt>`:
 
+.. doctest::
+
   >>> with open("tutorial-sample-content-stream-p1.txt", "w") as f:
   ...     f.write(viewer.canvas.text_content)
   19339
@@ -291,3 +294,48 @@ And the strings are decoded properly. Have a look at
 
 *pdfreader* takes care of decoding binary streams, character encodings, CMap, fonts etc.
 So finally you have human-readable content sources and markdown.
+
+
+Hyperlinks and annotations
+--------------------------
+
+Let's Have a look at the :download:`sample file <examples/pdfs/annot-sample.pdf>`.
+
+.. doctest::
+
+  >>> fd = open(annotations_file_name, "rb")
+  >>> viewer = SimplePDFViewer(fd)
+  >>> viewer.navigate(1)
+  >>> viewer.render()
+
+It contains several hyperlinks. Let's extract them!
+
+Unlike HTML, PDF links are rectangle parts of viewing area, they are neither text properties nor attributes.
+That's why you can't find linked URLs in text content:
+
+.. doctest::
+
+  >>> plain_text = "".join(viewer.canvas.strings)
+  >>> "http" in plain_text
+  False
+
+Links can be found in `:class:`~pdfreader.types.objects.Page` annotations
+(see `12.5 Annotations <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=389>`_),
+which help user to interact with document.
+
+Annotations for a current page are accessible through :meth:`~pdfreader.viewer.SimplePDFViewer.annotations`.
+The sample document has 3 annotations:
+
+.. doctest::
+
+  >>> len(viewer.annotations)
+  3
+
+There are different types of annotations. Hyperlinks have `Subtype` of `Link`. We're ready to extract URLs:
+
+.. doctest::
+
+  >>> links = [annot.A.URI for annot in viewer.annotations
+  ...          if annot.Subtype == 'Link']
+  >>> links
+  [b'http://www.apple.com', b'http://example.com', b'mailto:example@example.com']

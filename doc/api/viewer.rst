@@ -17,6 +17,7 @@ pdfreader.viewer submodule
       .. automethod:: navigate
       .. automethod:: next
       .. automethod:: prev
+      .. autoproperty:: annotations
 
   .. autoclass:: pdfreader.viewer.SimpleCanvas
 
