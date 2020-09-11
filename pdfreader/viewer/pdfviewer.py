@@ -260,3 +260,13 @@ class PDFViewer(ContextualViewer):
         else:
             # Join array of streams
             self.stream = b''.join([ct.filtered for ct in self.current_page.Contents])
+
+    @property
+    def annotations(self):
+        """
+        Current page annotations
+
+        :getter: Returns list of annotations for current page
+        :type: string
+        """
+        return self.current_page.Annots
