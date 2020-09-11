@@ -1,6 +1,7 @@
 pdfreader 0.1.6.dev1
 ---------------------------
  - Missing `Resources.Properties` field added.
+ - Pillow >= 7.1.0 version bump (security issues)
 
 pdfreader 0.1.5, 2020-08-27
 ---------------------------

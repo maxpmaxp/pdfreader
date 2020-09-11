@@ -139,7 +139,7 @@ setup(name="pdfreader",
       packages=find_packages(exclude=["doc"]),
       package_data={'doc': ['doc/*']},
       zip_safe=False,
-      install_requires=['bitarray>=1.1.0', 'pillow>6.2.0'],
+      install_requires=['bitarray>=1.1.0', 'pillow>=7.1.0'],
       entry_points={
         'console_scripts':
                 [],
