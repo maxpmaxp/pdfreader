@@ -1,4 +1,4 @@
-pdfreader 0.1.6..dev1
+pdfreader 0.1.6.dev1
 ---------------------------
  - Missing `Resources.Properties` field added.
 
