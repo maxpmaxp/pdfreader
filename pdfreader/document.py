@@ -3,6 +3,7 @@ import logging
 from .registry import Registry
 from .parsers import RegistryPDFParser
 from .types import IndirectObject, Stream, Array, Dictionary, IndirectReference, obj_factory
+from .utils import cached_property
 
 
 class PDFDocument(object):
@@ -29,6 +30,14 @@ class PDFDocument(object):
 
         #: references to document's Catalog instance
         self.root = self.obj_by_ref(self.trailer.root)
+
+    @cached_property
+    def encrypt(self):
+        res = None
+        obj = self.trailer.encrypt
+        if obj:
+            res = self.obj_by_ref(obj) if isinstance(obj, IndirectReference) else obj
+        return res
 
     def build(self, obj, visited=None, lazy=True):
         """ Resolves all indirect references for the object.
