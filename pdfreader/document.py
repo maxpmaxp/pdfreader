@@ -31,6 +31,9 @@ class PDFDocument(object):
         #: references to document's Catalog instance
         self.root = self.obj_by_ref(self.trailer.root)
 
+        if self.encrypt and self.encrypt.Filter != "Standard":
+            raise ValueError("Unsupported encryption handler {}".format(self.encrypt.Filter))
+
     @cached_property
     def encrypt(self):
         res = None
