@@ -2,14 +2,17 @@ import logging
 
 from .registry import Registry
 from .parsers import RegistryPDFParser
+from .securityhandler import security_handler_factory
 from .types import IndirectObject, Stream, Array, Dictionary, IndirectReference, obj_factory
 from .utils import cached_property
 
 
 class PDFDocument(object):
-    """ Represents PDF document structure
+    """
+    Represents PDF document structure
 
-        :param fobj: file-like object: binary file descriptor, BytesIO stream etc.
+    :param fobj: file-like object: binary file descriptor, BytesIO stream etc.
+    :param password: Password for encrypted PDF. Optional. Default ''.
 
     """
     #: contains PDF file header data
@@ -19,23 +22,32 @@ class PDFDocument(object):
     #: references to document's Catalog instance
     root = None
 
-    def __init__(self, fobj):
+    def __init__(self, fobj, password=''):
         """ Constructor method
         """
 
         self.registry = Registry()
+
         self.parser = RegistryPDFParser(fobj, self.registry)
         self.header = self.parser.header
         self.trailer = self.parser.trailer
 
-        #: references to document's Catalog instance
-        self.root = self.obj_by_ref(self.trailer.root)
-
         if self.encrypt and self.encrypt.Filter != "Standard":
             raise ValueError("Unsupported encryption handler {}".format(self.encrypt.Filter))
 
+        self.root = self.obj_by_ref(self.trailer.root)
+
+        if self.encrypt:
+            sec_handler = security_handler_factory(self.trailer.id, self.encrypt, password)
+            self.parser.set_security_handler(sec_handler)
+
     @cached_property
     def encrypt(self):
+        """
+        Document's Encrypt dictionary (if present)
+
+        :return: dict or None
+        """
         res = None
         obj = self.trailer.encrypt
         if obj:
@@ -43,16 +55,17 @@ class PDFDocument(object):
         return res
 
     def build(self, obj, visited=None, lazy=True):
-        """ Resolves all indirect references for the object.
+        """
+        Resolves all indirect references for the object.
 
-            :param obj: an object from the document
-            :type obj: one of supported PDF types
+        :param obj: an object from the document
+        :type obj: one of supported PDF types
 
-            :param lazy: don't resolve subsequent  indirect references if True (default).
-            :type lazy: bool
+        :param lazy: don't resolve subsequent  indirect references if True (default).
+        :type lazy: bool
 
-            :param visited: Shouldn't be used. Internal param containing already resolved objects
-                            to not fall into infinite loops
+        :param visited: Shouldn't be used. Internal param containing already resolved objects
+                        to not fall into infinite loops
         """
         logging.debug("Buliding {}".format(obj))
         if visited is None:
