@@ -168,7 +168,7 @@ class IndirectObject(object):
         return self.num, self.gen
 
     def __repr__(self):
-        return "<IndirectObject:num={self.num},gen={self.gen},val={val}>".format(self=self, val=repr(self.val))
+        return "<IndirectObject:n={self.num},g={self.gen},v={val}>".format(self=self, val=repr(self.val))
 
     def __eq__(self, other):
         return self.num == other.num and self.gen == other.gen
