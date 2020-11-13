@@ -33,12 +33,11 @@ class StandardSecurityHandler(object):
     #: document access password
     password = None
 
-    PASSWORD_PADDING = (b'(\xbfN^Nu\x8aAd\x00NV\xff\xfa\x01\x08'
-                        b'..\x00\xb6\xd0h>\x80/\x0c\xa9\xfedSiz')
+    PASSWORD_PADDING = b'(\xbfN^Nu\x8aAd\x00NV\xff\xfa\x01\x08..\x00\xb6\xd0h>\x80/\x0c\xa9\xfedSiz'
     supported_revisions = (2, 3)
 
     def __init__(self, docid, encrypt, password=''):
-        self.docid = docid[0].encode("utf-8")
+        self.docid = bytes(bytearray.fromhex(docid[0]))
         self.encrypt = encrypt
         self.password = password.encode("utf-8")
         self.init()
@@ -58,7 +57,7 @@ class StandardSecurityHandler(object):
         self.o = self.encrypt['O']
         self.u = self.encrypt['U']
         self.length = self.encrypt.get('Length', 40)
-        self.encrypt_metadata = False
+        self.encrypt_metadata = True
         return
 
     def init_key(self):
@@ -78,36 +77,38 @@ class StandardSecurityHandler(object):
 
     def compute_u(self, key):
         if self.r == 2:
-            # Algorithm 3.4
-            return ARC4.new(key).encrypt(self.PASSWORD_PADDING)  # 2
+            # Algorithm 4: Computing the encryption dictionary's U (user password value). Revision 2.
+            return ARC4.new(key).encrypt(self.PASSWORD_PADDING)  # b
         else:
-            # Algorithm 3.5
-            hash = md5(self.PASSWORD_PADDING)  # 2
-            hash.update(self.docid)  # 3
-            result = ARC4.new(key).encrypt(hash.digest())  # 4
-            for i in range(1, 20):  # 5
-                k = bytes( (c ^ i) for c in key )
+            # self.r >= 3
+            # Algorithm 5: Computing the encryption dictionary's U (user password value). Revision >=3.
+            hash = md5(self.PASSWORD_PADDING)  # b
+            hash.update(self.docid)  # c
+            result = ARC4.new(key).encrypt(hash.digest())  # d
+            for i in range(1, 20):  # e
+                k = bytes((c ^ i) for c in key)
                 result = ARC4.new(k).encrypt(result)
-            result += result  # 6
+            result += b'\x00' * 16  # f
             return result
 
     def compute_encryption_key(self, password):
-        # Algorithm 3.2
-        password = (password + self.PASSWORD_PADDING)[:32]  # 1
-        hash = md5(password)  # 2
-        hash.update(self.o)  # 3
-        hash.update(struct.pack('<l', self.p))  # 4
-        hash.update(self.docid)  # 5
+        # Algorithm 2: Computing an encryption key
+        password = (password + self.PASSWORD_PADDING)[:32]  # a
+        hash = md5(password)  # b
+        hash.update(self.o)  # c
+        hash.update(struct.pack('<l', self.p))  # d
+        hash.update(self.docid)  # e
         if self.r >= 4:
             if not self.encrypt_metadata:
-                hash.update(b'\xff\xff\xff\xff')
-        result = hash.digest()
-        n = 5
-        if self.r >= 3:
+                hash.update(b'\xff\xff\xff\xff') # f
+        result = hash.digest() # g
+        if self.r >= 3: # h
             n = self.length // 8
             for _ in range(50):
                 result = md5(result[:n]).digest()
-        return result[:n]
+        else:
+            n = 5 # i
+        return result[:n] # i
 
     def authenticate(self, password):
         key = self.authenticate_user_password(password)
@@ -158,6 +159,7 @@ class StandardSecurityHandler(object):
         """
         if isinstance(obj.val, Stream):
             obj.val.stream = self.decrypt_rc4(obj.num, obj.gen, obj.val.stream)
+            obj.val.dictionary["Length"] = len(obj.val.stream)
         elif isinstance(obj.val, String):
             obj = String(self.decrypt_rc4(obj.num, obj.gen, obj.val))
         elif isinstance(obj.val, HexString):
@@ -232,6 +234,7 @@ class StandardSecurityHandlerV4(StandardSecurityHandler):
                 # metadata remains unchanged if EncryptMetadata is false
                 decryptor = self.cfm[self.stmf]
                 obj.val.stream = decryptor(obj.num, obj.gen, obj.val.stream)
+                obj.val.dictionary["Length"] = len(obj.val.stream)
         elif isinstance(obj.val, String):
             decryptor = self.cfm[self.strf]
             obj = String(decryptor(obj.num, obj.gen, obj.val))
