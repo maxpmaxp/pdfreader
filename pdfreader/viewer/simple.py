@@ -173,6 +173,7 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
         On initialization automatically navigates to the 1st page.
 
         :param fobj: file-like object: binary file descriptor, BytesIO stream etc.
+        :param password: Optional. Password to access PDF content.
 
     """
 
