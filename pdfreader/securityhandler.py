@@ -55,7 +55,11 @@ class StandardSecurityHandler(object):
         self.r = self.encrypt['R']
         self.p = self.encrypt['P']
         self.o = self.encrypt['O']
+        if isinstance(self.o, str):
+            self.o = bytes(bytearray.fromhex(self.o))
         self.u = self.encrypt['U']
+        if isinstance(self.u, str):
+            self.u = bytes(bytearray.fromhex(self.u))
         self.length = self.encrypt.get('Length', 40)
         self.encrypt_metadata = True
         return
