@@ -3,6 +3,7 @@ pdfreader 0.1.6.dev1
  - Missing `Resources.Properties` field added.
  - Pillow >= 7.1.0 version bump (security issues)
  - Issue #51: Current page annotations & hyperlinks.
+ - Issue #33: Encryption support
 
 pdfreader 0.1.5, 2020-08-27
 ---------------------------
@@ -19,8 +20,6 @@ pdfreader 0.1.4, 2020-02-21
  - Issue #18: pdfreader.parsers.cmap.CMapParserException: Regular non-digit character expected
  - Issue #17: NotImplementedError: DCTDecode
  - Issue #16: RecursionError: maximum recursion depth exceeded
-
-
 
 pdfreader 0.1.3, 2019-12-20
 ---------------------------
