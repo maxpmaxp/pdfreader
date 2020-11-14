@@ -175,11 +175,11 @@ class PDFViewer(ContextualViewer):
 
     operators_aliases = {}
 
-    def __init__(self, fobj):
+    def __init__(self, fobj, password=''):
         """ Constructor method """
         self._pages = {}  # pages cache
         self.current_page_number = None
-        self.doc = PDFDocument(fobj)
+        self.doc = PDFDocument(fobj, password=password)
         super(PDFViewer, self).__init__(None, Resources(), self.graphics_state_stack_class())
 
     @property

@@ -81,7 +81,7 @@ class Stream(object):
             raise KeyError("Missing stream length")
 
         if info_dict["Length"] != len(binary_stream):
-            raise ValueError("Inconsistend stream")
+            raise ValueError("Inconsistent stream")
 
         self.dictionary = info_dict
         self.stream = binary_stream

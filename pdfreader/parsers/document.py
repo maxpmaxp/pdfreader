@@ -393,17 +393,41 @@ class PDFParser(BasicTypesParser):
 
 class RegistryPDFParser(PDFParser):
 
-    def __init__(self, fileobj, registry):
+    def __init__(self, fileobj, registry, security_handler=None):
         super(RegistryPDFParser, self).__init__(fileobj)
         self.registry = registry
+        self.security_handler = security_handler
         self.header = self.pdf_header()
         self.trailer = self.pdf_trailer()
         self.reset(self.header.offset)
         self.brute_force_state = self.get_state()
         self.brute_force_lookup_stack = []
 
+    def set_security_handler(self, handler):
+        """
+        Sets security handler if was not set on init
+
+        :param handler: Security handler
+        :type handler: :class:`~pdfreader.securityhandler.StandardSecurityHandler`,
+                       :class:`~pdfreader.securityhandler.StandardSecurityHandlerV4`,
+                       :class:`~pdfreader.securityhandler.StandardSecurityHandlerV5`
+
+        :raises ValueError: if security handler already set
+        """
+        if not self.security_handler:
+            self.security_handler = handler
+        else:
+            raise ValueError("Security handler already set")
+
     def on_parsed_indirect_object(self, obj):
         self.registry.register(obj)
+
+    def decrypt_indirect_object_if_necessary(self, obj):
+        if self.security_handler and isinstance(obj.val, (String, Stream, HexString)):
+            res = self.security_handler.decrypt(obj)
+        else:
+            res = obj
+        return res
 
     def locate_object(self, num, gen):
         """
@@ -518,6 +542,7 @@ class RegistryPDFParser(PDFParser):
 
     def indirect_object(self):
         obj = super(RegistryPDFParser, self).indirect_object()
+        obj = self.decrypt_indirect_object_if_necessary(obj)
         # handle all known indirect objects
         self.on_parsed_indirect_object(obj)
         return obj

@@ -43,7 +43,7 @@ class PDFTrailer(object):
     @property
     def id(self):
         """ Array of two strings containing a file identifier if exists """
-        return self.params.get("Id")
+        return self.params.get("ID") or self.params.get("Id")
 
     def __repr__(self):
         return "<PDF Trailer:xrefs={self.xrefs},root={self.root},info={self.info}>".format(self=self)
