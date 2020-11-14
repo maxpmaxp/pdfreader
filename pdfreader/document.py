@@ -12,7 +12,7 @@ class PDFDocument(object):
     Represents PDF document structure
 
     :param fobj: file-like object: binary file descriptor, BytesIO stream etc.
-    :param password: Password for encrypted PDF. Optional. Default ''.
+    :param password: Optional. Password to access PDF content. Defaults to the empty string.
 
     """
     #: contains PDF file header data

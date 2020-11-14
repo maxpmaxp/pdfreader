@@ -17,6 +17,7 @@ Tutorial
   import pkg_resources, os.path
   samples_dir = pkg_resources.resource_filename('doc', 'examples/pdfs')
   file_name = os.path.join(samples_dir, 'tutorial-example.pdf')
+  protected_file_name = os.path.join(samples_dir, 'encrypted-with-qwerty.pdf')
   annotations_file_name = os.path.join(samples_dir, 'annot-sample.pdf')
 
 
@@ -339,3 +340,59 @@ There are different types of annotations. Hyperlinks have `Subtype` of `Link`. W
   ...          if annot.Subtype == 'Link']
   >>> links
   [b'http://www.apple.com', b'http://example.com', b'mailto:example@example.com']
+
+
+Encrypted and password-protected PDF files
+------------------------------------------
+
+What if your file is protected by a password? Not a big deal! *pdfreader* supports encrypted and password-protected files!
+Just specify the password when create :class:`~pdfreader.document.PDFDocument` or
+:class:`~pdfreader.viewer.SimplePDFViewer`.
+
+Let's see how this works with an encrypted password-protected file
+:download:`sample file <examples/pdfs/encrypted-with-qwerty.pdf>`.
+The password is *qwerty*.
+
+.. doctest::
+
+   >>> fd = open(protected_file_name, "rb")
+   >>> viewer = SimplePDFViewer(fd, password="qwerty")
+   >>> viewer.render()
+   >>> text = "".join(viewer.canvas.strings)
+   >>> text
+   'Sed ut perspiciatis unde omnis iste ... vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?'
+
+The same about :class:`~pdfreader.document.PDFDocument`:
+
+.. doctest::
+
+   >>> fd = open(protected_file_name, "rb")
+   >>> doc = PDFDocument(fd, password="qwerty")
+   >>> page_one = next(doc.pages())
+   >>> page_one.Contents
+   <Stream:len=1488,data=b'...'>
+
+
+What if the password is wrong? It throws an exception.
+
+.. doctest::
+
+   >>> fd = open(protected_file_name, "rb")
+   >>> doc = PDFDocument(fd, password="wrong password")
+   Traceback (most recent call last):
+   ...
+   ValueError: Incorrect password
+
+The same for :class:`~pdfreader.viewer.SimplePDFViewer`:
+
+.. doctest::
+
+   >>> fd = open(protected_file_name, "rb")
+   >>> doc = SimplePDFViewer(fd, password="wrong password")
+   Traceback (most recent call last):
+   ...
+   ValueError: Incorrect password
+
+*Note:* Do you know, that PDF format supports encrypted files protected by the default empty password?
+Despite the password is empty, such files are encrypted still. Fortunately, *pdfreader* detects end decrypts such files
+automatically, there is nothig special to do!
