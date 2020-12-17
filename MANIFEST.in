@@ -3,6 +3,7 @@ include CONTRIBUTING.rst
 include CHANGELOG.txt
 include LICENSE
 include THIRD-PARTY-NOTICES
+include SECURITY.md
 graft pdfreader/codecs/cmaps
 graft pdfreader/parsers/cmap-samples
 global-include *.txt
