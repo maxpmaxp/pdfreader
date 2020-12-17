@@ -1,4 +1,9 @@
-pdfreader 0.1.6.dev1
+pdfreader 0.1.7.dev1
+---------------------------
+ - Python 3.9 support
+ - Issue Use `pycryptodome` instead of `pycrypto`
+
+pdfreader 0.1.6
 ---------------------------
  - Missing `Resources.Properties` field added.
  - Pillow >= 7.1.0 version bump (security issues)

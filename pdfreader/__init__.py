@@ -5,4 +5,4 @@ from .viewer import SimplePDFViewer, PageDoesNotExist
 register_pdf_encodings()
 
 #: package version
-__version__ = version = '0.1.6'
+__version__ = version = '0.1.7.dev1'

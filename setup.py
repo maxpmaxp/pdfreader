@@ -9,7 +9,7 @@ import warnings
 if sys.version_info[:2] < (3, 6):
     warnings.warn("Python version >= 3.6 required.")
 
-version = '0.1.6'
+version = '0.1.7.dev1'
 
 
 import os.path
@@ -139,7 +139,7 @@ setup(name="pdfreader",
       packages=find_packages(exclude=["doc"]),
       package_data={'doc': ['doc/*']},
       zip_safe=False,
-      install_requires=['bitarray>=1.1.0', 'pillow>=7.1.0', 'pycrypto>=2.6.1'],
+      install_requires=['bitarray>=1.1.0', 'pillow>=7.1.0', 'pycryptodome>=3.9.9'],
       entry_points={
         'console_scripts':
                 [],
