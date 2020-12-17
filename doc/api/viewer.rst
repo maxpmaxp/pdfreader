@@ -18,6 +18,9 @@ pdfreader.viewer submodule
       .. automethod:: next
       .. automethod:: prev
       .. autoproperty:: annotations
+      .. automethod:: __iter__
+      .. automethod:: iter_pages
+
 
   .. autoclass:: pdfreader.viewer.SimpleCanvas
 
@@ -31,6 +34,7 @@ pdfreader.viewer submodule
           :annotation:
         .. autoattribute:: forms
           :annotation:
+
 
   .. autoclass:: pdfreader.viewer.GraphicsState
 

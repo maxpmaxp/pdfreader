@@ -33,6 +33,24 @@ class CanvasIterator(object):
         return canvas
 
 
+class PagesIterator(object):
+    """ Iterator of document pages """
+
+    def __init__(self, viewer):
+        self.viewer = viewer
+        self.last_page_reached = False
+
+    def __next__(self):
+        if self.last_page_reached:
+            raise StopIteration()
+        page = self.viewer.current_page
+        try:
+            self.viewer.next()
+        except PageDoesNotExist:
+            self.last_page_reached = True
+        return page
+
+
 class ContextualViewer(object):
     """ PDF viewer that operates with predefined context: bytes stream, resources and graphical state stack """
     parser_class = None
@@ -240,6 +258,12 @@ class PDFViewer(ContextualViewer):
         Returns document's canvas iterator.
         """
         return CanvasIterator(self)
+
+    def iter_pages(self):
+        """
+        Returns document's pages iterator.
+        """
+        return PagesIterator(self)
 
     def prev(self):
         """
