@@ -14,6 +14,25 @@ class PageDoesNotExist(ValueError):
     pass
 
 
+class CanvasIterator(object):
+    """ Iterator of canvases for all pages """
+
+    def __init__(self, viewer):
+        self.viewer = viewer
+        self.last_page_reached = False
+
+    def __next__(self):
+        if self.last_page_reached:
+            raise StopIteration()
+        self.viewer.render()
+        canvas = self.viewer.canvas.copy()
+        try:
+            self.viewer.next()
+        except PageDoesNotExist:
+            self.last_page_reached = True
+        return canvas
+
+
 class ContextualViewer(object):
     """ PDF viewer that operates with predefined context: bytes stream, resources and graphical state stack """
     parser_class = None
@@ -215,6 +234,12 @@ class PDFViewer(ContextualViewer):
 
         """
         self.navigate(self.current_page_number + 1)
+
+    def __iter__(self):
+        """
+        Returns document's canvas iterator.
+        """
+        return CanvasIterator(self)
 
     def prev(self):
         """

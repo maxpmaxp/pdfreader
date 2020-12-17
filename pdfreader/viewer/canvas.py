@@ -34,3 +34,15 @@ class SimpleCanvas(object):
         self.inline_images = []
         self.strings = []
 
+    @classmethod
+    def fromCanvas(cls, other):
+        canvas = SimpleCanvas()
+        canvas.images = list(other.images)
+        canvas.forms = dict(other.forms)
+        canvas.text_content = other.text_content
+        canvas.inline_images = list(other.inline_images)
+        canvas.strings = list(other.strings)
+        return canvas
+
+    def copy(self):
+        return self.fromCanvas(self)
