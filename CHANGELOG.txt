@@ -1,4 +1,4 @@
-pdfreader 0.1.7.dev1
+pdfreader 0.1.7
 ---------------------------
  - Issue #60: Python 3.9 support
  - Issue #59: Use `pycryptodome` instead of `pycrypto`
