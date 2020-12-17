@@ -43,6 +43,9 @@ should run without raising an exception:
 How to start
 ------------
 
+*Note:* If you need to extract texts/images or other content from PDF you can skip
+these chapters and go directly to :ref:`tutorial-content`.
+
 The first step when working with *pdfreader* is to create a
 :class:`~pdfreader.document.PDFDocument` instance from a binary file. Doing so is easy:
 
@@ -158,6 +161,8 @@ Our example contains the only one Pages Tree Node. That is not always true.
 For the complete list Page and Pages attributes see PDF-1.7 specification
 `sections 7.7.3.2-7.7.3.3 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=76>`_
 
+.. _tutorial-content:
+
 How to start extracting PDF content
 -----------------------------------
 
@@ -173,13 +178,30 @@ a page on :class:`~pdfreader.viewer.SimpleCanvas`.
   >>> fd = open(file_name, "rb")
   >>> viewer = SimplePDFViewer(fd)
 
-The viewer instance gets content you see in your Adobe Acrobat Reader. Just navigate a page with
+The viewer instance gets content you see in your Adobe Acrobat Reader.
+:class:`~pdfreader.viewer.SimplePDFViewer` provides you with :class:`~pdfreader.viewer.SimpleCanvas` objects
+for every page. This object contains page content: images, forms, texts.
+
+The code below walks through all document's pages and extracts data:
+
+.. doctest::
+
+  >>> for canvas in viewer:
+  ...     page_images = canvas.images
+  ...     page_forms = canvas.forms
+  ...     page_text = canvas.text_content
+  ...     page_inline_images = canvas.inline_images
+  ...     page_strings = canvas.strings
+  >>>
+
+Also you can navigate to some specific page with
 :meth:`~pdfreader.viewer.SimplePDFViewer.navigate` and call :meth:`~pdfreader.viewer.SimplePDFViewer.render`
 
 .. doctest::
 
   >>> viewer.navigate(8)
   >>> viewer.render()
+  >>> page_8_canvas = viewer.canvas
 
 The viewer extracts:
   - page images (XObject)

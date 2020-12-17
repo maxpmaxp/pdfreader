@@ -1,7 +1,8 @@
 pdfreader 0.1.7.dev1
 ---------------------------
- - Python 3.9 support
- - Issue Use `pycryptodome` instead of `pycrypto`
+ - Issue #60: Python 3.9 support
+ - Issue #59: Use `pycryptodome` instead of `pycrypto`
+ - Issue #31: Canvas and page iterators added to PDFViewver
 
 pdfreader 0.1.6
 ---------------------------
