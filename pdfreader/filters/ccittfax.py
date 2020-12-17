@@ -534,7 +534,7 @@ class CCITTFaxDecoder(CCITTG4Parser):
         for (i, b) in enumerate(bits):
             if b:
                 bytes[i//8] += (128, 64, 32, 16, 8, 4, 2, 1)[i % 8]
-        self._buf += bytes.tostring()
+        self._buf += bytes.tobytes()
 
 
 def ccittfaxdecode(data, params):
