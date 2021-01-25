@@ -1,3 +1,7 @@
+pdfreader 0.1.8.dev1
+---------------------------
+ - Issue #63: SimpleCanvas.fromObject images copying issue fixed
+
 pdfreader 0.1.7
 ---------------------------
  - Issue #60: Python 3.9 support

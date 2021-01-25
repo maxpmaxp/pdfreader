@@ -34,7 +34,7 @@ class SimpleCanvas(object):
     @classmethod
     def fromCanvas(cls, other):
         canvas = SimpleCanvas()
-        canvas.images = list(other.images)
+        canvas.images = dict(other.images)
         canvas.forms = dict(other.forms)
         canvas.text_content = other.text_content
         canvas.inline_images = list(other.inline_images)
@@ -42,4 +42,20 @@ class SimpleCanvas(object):
         return canvas
 
     def copy(self):
+        """
+        >>> canvas = SimpleCanvas()
+        >>> other = canvas.copy()
+        >>> other is canvas
+        False
+        >>> isinstance(other.images, dict)
+        True
+        >>> isinstance(other.forms, dict)
+        True
+        >>> isinstance(other.text_content, str)
+        True
+        >>> isinstance(other.inline_images, list)
+        True
+        >>> isinstance(other.strings, list)
+        True
+        """
         return self.fromCanvas(self)
