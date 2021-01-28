@@ -1,6 +1,7 @@
 pdfreader 0.1.8.dev1
 ---------------------------
  - Issue #63: SimpleCanvas.fromObject images copying issue fixed
+ - Issue #64: Allow indirect stream objects have missing `endobj`.
 
 pdfreader 0.1.7
 ---------------------------
