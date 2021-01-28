@@ -77,6 +77,7 @@ class PDFParser(BasicTypesParser):
             if isinstance(val, Stream):
                 # See https://github.com/maxpmaxp/pdfreader/issues/64
                 # Allow indirect stream objects without endobj
+                # TODO: Should we allow this for other objects?
                 for _ in range(6): self.prev()
             else:
                 self.on_parser_error("endobj expected")
