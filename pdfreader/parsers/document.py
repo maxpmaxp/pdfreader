@@ -46,6 +46,18 @@ class PDFParser(BasicTypesParser):
         >>> PDFParser(s, 0).indirect_object()
         <IndirectObject:n=12,g=0,v=b'Brilling'>
 
+        # Stream without `endobj`. See https://github.com/maxpmaxp/pdfreader/issues/64
+        >>> s = b'''12 0 obj
+        ... << /Length 10 >>
+        ... stream\\r\\n***data***\\nendstream
+        ... 13 0 obj
+        ... null
+        ... endobj'''
+        >>> p = PDFParser(s, 0)
+        >>> p.indirect_object()
+        <IndirectObject:n=12,g=0,v=<Stream:len=10,data=b'***data***'>>
+        >>> p.indirect_object()
+        <IndirectObject:n=13,g=0,v=None>
         """
         num = self.non_negative_int()
         self.maybe_spaces_or_comments()
@@ -62,7 +74,13 @@ class PDFParser(BasicTypesParser):
 
         token = self.read(6)
         if token != b"endobj":
-            self.on_parser_error("endobj expected")
+            if isinstance(val, Stream):
+                # See https://github.com/maxpmaxp/pdfreader/issues/64
+                # Allow indirect stream objects without endobj
+                # TODO: Should we allow this for other objects?
+                for _ in range(6): self.prev()
+            else:
+                self.on_parser_error("endobj expected")
 
         obj = IndirectObject(num, gen, val)
         return obj
