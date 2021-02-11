@@ -425,6 +425,18 @@ class BasicTypesParser(object):
         >>> BasicTypesParser(s, 0)._stream(d).stream
         b'***data***'
 
+        Work around wrong length. See https://github.com/maxpmaxp/pdfreader/issues/68
+        1. Length greater than real data length
+        >>> d = dict(Length=2)
+        >>> s = b'''stream\\n\\nendstream\\n\\n\\n\\n\\n\\n'''
+        >>> BasicTypesParser(s, 0)._stream(d).stream
+        b''
+
+        2. Length less than real data length
+        >>> d = dict(Length=1)
+        >>> s = b'''stream\\n***data***\\nendstream\\n\\n\\n\\n\\n'''
+        >>> BasicTypesParser(s, 0)._stream(d).stream
+        b'***data***'
         """
         length = d['Length']
         token = self.read(6)
@@ -435,9 +447,13 @@ class BasicTypesParser(object):
         if ch == CR:
             ch = self.next()
         if ch != LF:
-            self.on_parser_error("Wrong stream newline: [CR]LF expected")
+            logging.warning("Missing LF after `stream` token - [CR]LF expected. Trying to proceed.")
+            self.prev()
+
+        state = self.get_state()
+
         data = self.read(length)
-        # According to the spec EOL should be afterthe data and before endstream
+        # According to the spec EOL should be after the data and before endstream
         # But some files do not follow this.
         #
         # See data/leesoil-cases-2.pdf
@@ -446,7 +462,22 @@ class BasicTypesParser(object):
         self.maybe_spaces()
         token = self.read(9)
         if token != b'endstream':
-            self.on_parser_error("endstream expected")
+            # Work around wrong length. See https://github.com/maxpmaxp/pdfreader/issues/68
+            err_state = self.get_state()
+            logging.warning("Wrong stream length: {}. Trying to work around the issue.".format(length))
+            self.set_state(state)
+            data = self.read(9)
+            while not data.endswith(b'endstream'):
+                ch = self.next()
+                if ch is None:
+                    self.set_state(err_state)
+                    self.on_parser_error("endstream expected")
+                data += ch
+
+            data = data[:-9]
+            while data and data[-1:] in EOL:
+                data = data[:-1]
+
         return Stream(d, data)
 
     def hexstring(self):
