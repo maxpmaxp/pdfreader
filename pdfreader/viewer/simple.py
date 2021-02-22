@@ -189,6 +189,17 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
     #: Contains current page number
     current_page_number = None
 
+    def __init__(self, *args, **kwargs):
+        self._canvas_cache = {} # canvas cache
+        super(SimplePDFViewer, self).__init__(*args, **kwargs)
+
+    def render(self):
+        if self.current_page_number not in self._canvas_cache:
+            super(SimplePDFViewer, self).render()
+            self._canvas_cache[self.current_page_number] = self.canvas.copy()
+        else:
+            self.canvas = self._canvas_cache[self.current_page_number].copy()
+
     def after_navigate(self, n):
         self._decoders = {}
         self.bracket_commands_stack = []
