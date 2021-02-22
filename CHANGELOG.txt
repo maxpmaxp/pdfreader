@@ -1,5 +1,6 @@
-pdfreader 0.1.9.dev2
+pdfreader 0.1.9.dev3
 ---------------------------
+ - Issue #71: Unsupported security handler version: 1
  - Issue #72: Add a method to return document metadata
  - Issue #68: Work around wrong stream `Length`
 
