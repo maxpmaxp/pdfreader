@@ -325,6 +325,7 @@ class StandardSecurityHandlerV5(StandardSecurityHandlerV4):
 
 
 SECURITY_HANDLERS_BY_VERSION = {
+    1: StandardSecurityHandler,
     2: StandardSecurityHandler,
     3: StandardSecurityHandler,
     4: StandardSecurityHandlerV4,
