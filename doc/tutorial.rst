@@ -67,12 +67,15 @@ It is also possible to use a binary file-like object to create an instance, for 
   ...     stream = BytesIO(f.read())
   >>> doc2 = PDFDocument(stream)
 
-Let's check the PDF version of the document
+Let's check the PDF version of the document and it's metadata
 
 .. doctest::
 
   >>> doc.header.version
   '1.6'
+  >>> doc.metadata
+  {'CreationDate': datetime.datetime(2019, 10, 29, ... 'Producer': 'SAMBox 1.1.19 (www.sejda.org)'}
+
 
 Now we can go ahead to the document catalog and walking through pages.
 
@@ -177,6 +180,14 @@ a page on :class:`~pdfreader.viewer.SimpleCanvas`.
 
   >>> fd = open(file_name, "rb")
   >>> viewer = SimplePDFViewer(fd)
+
+Document metadata is also accessible through :class:`~pdfreader.viewer.SimplePDFViewer` instance:
+
+.. doctest::
+
+  >>> viewer.metadata
+  {'CreationDate': datetime.datetime(2019, 10, 29, ... 'Producer': 'SAMBox 1.1.19 (www.sejda.org)'}
+
 
 The viewer instance gets content you see in your Adobe Acrobat Reader.
 :class:`~pdfreader.viewer.SimplePDFViewer` provides you with :class:`~pdfreader.viewer.SimpleCanvas` objects

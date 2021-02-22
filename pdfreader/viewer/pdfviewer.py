@@ -220,6 +220,15 @@ class PDFViewer(ContextualViewer):
         super(PDFViewer, self).__init__(None, Resources(), self.graphics_state_stack_class())
 
     @property
+    def metadata(self):
+        """
+        Returns document metadata from file's trailer info dict
+
+        :return: dict, if metadata exists `None` otherwise.
+        """
+        return self.doc.metadata
+
+    @property
     def current_page(self):
         """ :return: Current :class:`~pdfreader.types.objects.Page` instance """
         return self._pages[self.current_page_number]

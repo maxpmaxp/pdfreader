@@ -1,5 +1,6 @@
-pdfreader 0.1.9.dev1
+pdfreader 0.1.9.dev2
 ---------------------------
+ - Issue #72: Add a method to return document metadata
  - Issue #68: Work around wrong stream `Length`
 
 pdfreader 0.1.8
