@@ -13,6 +13,7 @@ pdfreader.viewer submodule
       .. autoattribute:: resources
         :annotation:
 
+      .. autoproperty:: metadata
       .. automethod:: render
       .. automethod:: navigate
       .. automethod:: next

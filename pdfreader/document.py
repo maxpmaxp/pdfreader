@@ -4,7 +4,7 @@ from .registry import Registry
 from .parsers import RegistryPDFParser
 from .securityhandler import security_handler_factory
 from .types import IndirectObject, Stream, Array, Dictionary, IndirectReference, obj_factory
-from .utils import cached_property
+from .utils import cached_property, from_pdf_datetime
 
 
 class PDFDocument(object):
@@ -123,8 +123,28 @@ class PDFDocument(object):
         """
         return self.root.Pages.pages()
 
+    @property
+    def metadata(self):
+        """
+        Returns document metadata from file's trailer info dict
+
+        :return: dict, if metadata exists `None` otherwise.
+        """
+        res = None
+        info = self.trailer.info
+        if info:
+            res = self.locate_object(info.num, info.gen)
+            for k, v in res.items():
+                if isinstance(v, bytes):
+                    try:
+                        res[k] = v.decode()
+                        if k in ('CreationDate', 'ModDate'):
+                            res[k] = from_pdf_datetime(res[k])
+                    except (UnicodeDecodeError, ValueError, TypeError):
+                        pass
+        return res
+
 
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-

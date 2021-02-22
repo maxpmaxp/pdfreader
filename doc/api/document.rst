@@ -9,6 +9,7 @@ pdfreader.document submodule
       .. autoattribute:: header
       .. autoattribute:: trailer
 
+      .. autoproperty:: metadata
       .. automethod:: pages
       .. automethod:: build
       .. automethod:: locate_object
