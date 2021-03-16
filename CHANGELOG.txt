@@ -1,3 +1,8 @@
+pdfreader 0.1.10
+---------------------------
+ - Issue #77: Codecs issue
+ - minor documentation updates
+
 pdfreader 0.1.9
 ---------------------------
  - Issue #67: Canvas cache for viewer
