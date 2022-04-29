@@ -14,7 +14,11 @@ class BaseXrefEntry(object):
 
     def __init__(self, number, generation=0, typ=None):
         assert isinstance(number, int) and number >= 0
-        assert isinstance(generation, int) and 0 <= generation <= MAX_GEN
+        assert isinstance(generation, int) and generation >= 0
+
+        if generation > MAX_GEN:
+            logging.warning("Incorrect generation {} for entry {}".format(generation, number))
+
         self.number = number
         self.generation = generation
         self.type = typ
