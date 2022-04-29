@@ -1,5 +1,6 @@
 pdfreader - current
 ---------------------------
+ - issue #83 - warn on generation overflow
  - a85decode correctly handles the adobe ascii85 alphabet.
 
 pdfreader 0.1.10
