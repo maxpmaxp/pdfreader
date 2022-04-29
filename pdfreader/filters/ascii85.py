@@ -1,6 +1,6 @@
 import logging
 
-from base64 import  b85decode
+from base64 import  a85decode
 
 from ..constants import WHITESPACES
 
@@ -9,8 +9,8 @@ filter_names = ('ASCII85Decode', 'A85')
 
 def decode(data, *_):
     """
-    >>> from base64 import b85encode
-    >>> data = b85encode(b'sample data') + b'~>'
+    >>> from base64 import a85encode
+    >>> data = a85encode(b'sample data') + b'~>'
     >>> decode(data)
     b'sample data'
 
@@ -23,7 +23,7 @@ def decode(data, *_):
     data = bytes([n for n in data if n not in ws])
     try:
         if data.endswith(b'~>'):
-            res = b85decode(data[:-2])
+            res = a85decode(data[:-2])
         else:
             raise ValueError("EOD ~> expected")
     except (TypeError, ValueError):
