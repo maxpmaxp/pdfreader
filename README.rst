@@ -32,7 +32,7 @@ Features
 * Extracts images and image masks as `Pillow/PIL Images <https://pillow.readthedocs.io/en/stable/reference/Image.html>`_
 * Supports encrypted and password-protected PDF documents
 * Allows browse any document objects, resources and extract any data you need (fonts, annotations, metadata, multimedia, etc.)
-* Follows `PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_
+* Follows `PDF-1.7 specification <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf>`_
 * Lazy objects access allows to process huge PDF documents quite fast
 
 Installation
