@@ -119,6 +119,6 @@ Here we are!
 Useful links
 ------------
 
-  - Detailed description of PDF texts is `here (see sec. 9) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=237>`_
-  - Conforming reader graphical state reading is `here (see sec. 8.4) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=121>`_
+  - Detailed description of PDF texts is `here (see sec. 9) <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=237>`_
+  - Conforming reader graphical state reading is `here (see sec. 8.4) <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=121>`_
 

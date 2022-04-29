@@ -39,7 +39,7 @@ We already discussed there how to locate document catalog.
 
 To walk through the document you need to know object attributes and possible values.
 It can be found on
-`PDF-1.7 specification <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf>`_.
+`PDF-1.7 specification <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf>`_.
 Then simply use attribute names in your python code.
 
 .. doctest::

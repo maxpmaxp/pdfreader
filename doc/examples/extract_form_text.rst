@@ -67,4 +67,4 @@ As Form is a kind of "sub-document" every entry in *viewer.canvas.forms* diction
 
 Here we are!
 
-More on PDF Form objects: `see sec. 8.10 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=217>`_
+More on PDF Form objects: `see sec. 8.10 <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=217>`_

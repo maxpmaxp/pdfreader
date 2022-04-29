@@ -7,9 +7,9 @@ from copy import deepcopy
 class GraphicsState(object):
     """ Viewer's graphics state. See PDF 1.7 specification
 
-    `sec. 8.4 - Graphics state <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=121>`_
+    `sec. 8.4 - Graphics state <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=121>`_
 
-    `sec. 9.3 - Text State Parameters and Operators <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=243>`_
+    `sec. 9.3 - Text State Parameters and Operators <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=243>`_
 
     :param kwargs: dict of attributes to set
     """
@@ -68,7 +68,7 @@ class GraphicsState(object):
 class GraphicsStateStack(List[GraphicsState]):
     """ Graphics state stack.
     See PDF 1.7 specification
-    `sec. 8.4.2 - Graphics State Stack <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=124>`_
+    `sec. 8.4.2 - Graphics State Stack <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=124>`_
 
     """
 

@@ -98,7 +98,7 @@ the document: metadata, reference to pages tree, layout, outlines etc.
 
 
 For the full list of document root attributes see PDF-1.7 specification
-`section 7.7.2 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=73>`_
+`section 7.7.2 <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=73>`_
 
 
 How to browse document pages
@@ -162,7 +162,7 @@ instance, and all it's kids:
 Our example contains the only one Pages Tree Node. That is not always true.
 
 For the complete list Page and Pages attributes see PDF-1.7 specification
-`sections 7.7.3.2-7.7.3.3 <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=76>`_
+`sections 7.7.3.2-7.7.3.3 <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=76>`_
 
 .. _tutorial-content:
 
@@ -259,8 +259,8 @@ object and save!
 
 Voila! Enjoy opening it in your favorite editor!
 
-Check the complete list of `Image (sec. 8.9.5) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=206>`_
-and `InlineImage (sec. 8.9.7) <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=214>`_
+Check the complete list of `Image (sec. 8.9.5) <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=206>`_
+and `InlineImage (sec. 8.9.7) <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=214>`_
 attributes.
 
 
@@ -354,7 +354,7 @@ That's why you can't find linked URLs in text content:
   False
 
 Links can be found in `:class:`~pdfreader.types.objects.Page` annotations
-(see `12.5 Annotations <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=389>`_),
+(see `12.5 Annotations <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=389>`_),
 which help user to interact with document.
 
 Annotations for a current page are accessible through :meth:`~pdfreader.viewer.SimplePDFViewer.annotations`.

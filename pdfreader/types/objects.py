@@ -152,7 +152,7 @@ class ObjectStream(StreamBasedObject):
 class Catalog(DictBasedObject):
     """
     Dictionary based object. (Type = Catalog)
-    See PDF 1.7 specification `sec. 7.7.2 - DocumentCatalog <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=71>`_
+    See PDF 1.7 specification `sec. 7.7.2 - DocumentCatalog <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=71>`_
     """
     pass
 
@@ -160,7 +160,7 @@ class Catalog(DictBasedObject):
 class PageTreeNode(DictBasedObject):
     """
         Dictionary based object. (Type = Pages)
-        See PDF 1.7 specification `sec. 7.7.3.2 - Page Tree Nodes <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=76>`_
+        See PDF 1.7 specification `sec. 7.7.3.2 - Page Tree Nodes <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=76>`_
     """
 
     def pages(self, node=None):
@@ -182,14 +182,14 @@ class PageTreeNode(DictBasedObject):
 class Page(DictBasedObject):
     """
     Dictionary based Page object. (Type = Page)
-    See PDF 1.7 specification `sec. 7.7.3.3 - Page Objects <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=77>`_
+    See PDF 1.7 specification `sec. 7.7.3.3 - Page Objects <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=77>`_
     """
 
 
 class XObject(StreamBasedObject):
     """
     Stream based XObject object. (Type = XObject)
-    See PDF 1.7 specification `sec. 8.8 - External Objects <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=201>`_
+    See PDF 1.7 specification `sec. 8.8 - External Objects <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=201>`_
     """
 
 
@@ -207,14 +207,14 @@ class Metadata(StreamBasedObject):
 class Image(PILImageMixin, XObject):
     """
     Stream based XObject object. (Type = XObject, Subtype = Image)
-    See PDF 1.7 specification `sec. 8.9 - Images <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=203>`_
+    See PDF 1.7 specification `sec. 8.9 - Images <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=203>`_
     """
 
 
 class Form(XObject):
     """
     Stream based XObject object. (Type = XObject, Subtype = Form)
-    See PDF 1.7 specification `sec. 8.10 - Form XObjects <https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf#page=217>`_
+    See PDF 1.7 specification `sec. 8.10 - Form XObjects <https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf#page=217>`_
     """
 
     stream_content = XObject.filtered
