@@ -1,3 +1,7 @@
+pdfreader - current
+---------------------------
+ - a85decode correctly handles the adobe ascii85 alphabet.
+
 pdfreader 0.1.10
 ---------------------------
  - Issue #77: Codecs issue
