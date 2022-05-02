@@ -68,8 +68,8 @@ feature requests, etc.
 Related Projects
 ================
 
-* `pdfminer <https://github.com/euske/pdfminer>`_ (cool stuff)
-* `pyPdf <http://pybrary.net/pyPdf/>`_
+* `pdfminer <https://github.com/euske/pdfminer>`_ 
+* `pyPdf2 <https://github.com/py-pdf/PyPDF2>`_
 * `xpdf <http://www.foolabs.com/xpdf/>`_
 * `pdfbox <http://pdfbox.apache.org/>`_
 * `mupdf <http://mupdf.com/>`_
