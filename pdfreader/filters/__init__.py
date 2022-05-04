@@ -13,8 +13,7 @@ def apply_filter(name, binary, params=None):
         raise NotImplementedError(decoder)
     return decoder.decode(binary, params or {})
 
-# ToDo: implement more filters:
-# - ccittfax
+# Not implemented:
 # - dct
 # - jbig2
 # - jpx
