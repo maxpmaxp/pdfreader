@@ -41,6 +41,12 @@ class PDFDocument(object):
 
         self.root = self.obj_by_ref(self.trailer.root)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        return
+
     @cached_property
     def encrypt(self):
         """
