@@ -282,7 +282,7 @@ class PDFParser(BasicTypesParser):
         elif self.current == b't':
             obj = self.trailer()
         else:
-            self.on_parser_error("Indirect object,  or trailer expected")
+            self.on_parser_error("Indirect object, startxref or trailer expected")
         return obj
 
     def xref_range(self):

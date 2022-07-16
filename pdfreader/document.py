@@ -111,13 +111,9 @@ class PDFDocument(object):
             but the indirect object comes right before the xref stream.
         """
         obj = self.parser.locate_object_in_registry(objref.num, objref.gen) \
-              or self.parser.locate_object_by_xref(objref.num, objref.gen)
-
-        if not obj:
-            obj = self.parser.locate_backwards_from_trailer(objref.num, objref.gen)
-
-        if not obj:
-            obj = self.parser.locate_object(objref.num, objref.gen)
+              or self.parser.locate_object_by_xref(objref.num, objref.gen) \
+              or self.parser.locate_backwards_from_trailer(objref.num, objref.gen) \
+              or self.parser.locate_object(objref.num, objref.gen)
 
         return obj_factory(self, obj)
 
