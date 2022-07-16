@@ -447,29 +447,13 @@ class RegistryPDFParser(PDFParser):
             res = obj
         return res
 
-    def locate_object(self, num, gen):
-        """
-        Locates an object by it's number and generation.
-
-        Objects lookup order:
-          #. Known objects in registry (located before)
-          #. XRef tables lookups
-          #. Brute-force reading objects one by one from file start
-
-        :param num: object number
-        :type num: int
-
-        :param gen: object generation
-        :type gen: int
-
-        :return: instance of one of supported PDF types (incl. null object) if found, null object otherwise.
-                 Doesn't resolve indirect references.
-        """
-        # locate in registry
+    def locate_object_in_registry(self, num, gen):
+        """ locate in registry """
         if self.registry.is_registered(num, gen):
             return self.registry.get(num, gen)
 
-        # Locate by xref
+    def locate_object_by_xref(self, num, gen):
+        """ Locate by xref """
         for xref in self.trailer.xrefs:
             # try to find in-use object
             xre = xref.in_use.get(num)
@@ -491,6 +475,32 @@ class RegistryPDFParser(PDFParser):
                     self.locate_object(xre.number, xre.generation)
                     if self.registry.is_registered(num, gen):
                         break
+
+        return self.registry.get(num, gen)
+
+
+    def locate_object(self, num, gen):
+        """
+        Locates an object by it's number and generation.
+
+        Objects lookup order:
+          #. Known objects in registry (located before)
+          #. XRef tables lookups
+          #. Brute-force reading objects one by one from file start
+
+        :param num: object number
+        :type num: int
+
+        :param gen: object generation
+        :type gen: int
+
+        :return: instance of one of supported PDF types (incl. null object) if found, null object otherwise.
+                 Doesn't resolve indirect references.
+        """
+        # locate in registry
+        obj = self.locate_object_in_registry(num, gen) or self.locate_object_by_xref(num, gen)
+        if obj:
+            return obj
 
         while not self.registry.is_registered(num, gen):
             if (num, gen) in self.brute_force_lookup_stack:
@@ -537,13 +547,59 @@ class RegistryPDFParser(PDFParser):
         self.brute_force_state = deepest_state or self.get_state() # save state for the next BF
         return obj
 
+    def locate_backwards_from_trailer(self, num, gen):
+        """ Locates object backwards starting from trailer.
+        """
+        saved_state = self.get_state()
+
+        self.reset(self.xref_offset())
+
+        expected_obj = "{} {} obj".format(num, gen).encode()
+        chunk_len = len(expected_obj)
+        obj_header = self.read(chunk_len)
+
+        while obj_header != expected_obj:
+            self.skip_backwards_until(b"endobj")
+            self.skip_backwards_until(b"endobj")
+            self.read(6)
+            self.maybe_spaces_or_comments()
+            obj_header = self.read(chunk_len)
+            if len(obj_header) < chunk_len:
+                return
+
+        self.read_backward(chunk_len)
+        obj = self.indirect_object()
+        self.registry.register(obj)
+        self.set_state(saved_state)
+        return obj.val
+
     def skip_until_next_indirect_object(self):
         """ This method is just an attempt to locate end of the current object, and may get broken by some
-            specific example. Makes sense for brute-force objetcs lookup only
+            specific example. Makes sense for brute-force objects lookup only
         """
         token = self.read(6)
         while token != b"endobj":
             token = token[1:] + self.read(1)
+        self.maybe_spaces_or_comments()
+
+    def skip_backwards_until(self, s):
+        self.prev()
+        l = len(s)
+        token = self.read_backward(l)
+        while token != s:
+            token = self.prev() + token[:-1]
+        self.next()
+
+    def skip_until_prev_indirect_object(self):
+        """ This method is just an attempt to locate end of the current object, and may get broken by some
+            specific example. Makes sense for brute-force objetcs lookup only
+        """
+        self.prev()
+        token = self.read_backward(6)
+        while token != b"endobj":
+            token = self.prev() + token[:-1]
+        self.next()
+        self.read(6)
         self.maybe_spaces_or_comments()
 
     def _stream(self, d):

@@ -165,6 +165,11 @@ class Buffer(object):
     def read(self, n):
         return b''.join([self.next() for _ in range(n)])
 
+    def read_backward(self, n):
+        res = b''
+        for _ in range(n): res = self.prev() + res
+        return res
+
     @property
     def is_eof(self):
         return self.current is None
