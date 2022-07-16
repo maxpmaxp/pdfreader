@@ -2,6 +2,7 @@ pdfreader 0.1.12dev
 ---------------------------
  - issue #70 - Encrypt value as a reference
  - issue #91 - broken links in the docs
+ - issue #92 - make PDFDocuments and SimplePDFViewers context managers
 
 pdfreader 0.1.11
 ---------------------------

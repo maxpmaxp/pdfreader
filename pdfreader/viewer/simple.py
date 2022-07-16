@@ -193,6 +193,12 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
         self._canvas_cache = {} # canvas cache
         super(SimplePDFViewer, self).__init__(*args, **kwargs)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        return
+
     def render(self):
         if self.current_page_number not in self._canvas_cache:
             super(SimplePDFViewer, self).render()
