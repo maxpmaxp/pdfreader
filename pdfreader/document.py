@@ -35,11 +35,11 @@ class PDFDocument(object):
         if self.encrypt and self.encrypt.Filter != "Standard":
             raise ValueError("Unsupported encryption handler {}".format(self.encrypt.Filter))
 
-        self.root = self.obj_by_ref(self.trailer.root)
-
         if self.encrypt:
             sec_handler = security_handler_factory(self.trailer.id, self.encrypt, password)
             self.parser.set_security_handler(sec_handler)
+
+        self.root = self.obj_by_ref(self.trailer.root)
 
     @cached_property
     def encrypt(self):
@@ -51,7 +51,7 @@ class PDFDocument(object):
         res = None
         obj = self.trailer.encrypt
         if obj:
-            res = self.obj_by_ref(obj) if isinstance(obj, IndirectReference) else obj
+            res = self.locate_encrypt_by_ref(obj) if isinstance(obj, IndirectReference) else obj
         return res
 
     def build(self, obj, visited=None, lazy=True):
@@ -103,6 +103,22 @@ class PDFDocument(object):
 
     def obj_by_ref(self, objref):
         obj = self.parser.locate_object(objref.num, objref.gen)
+        return obj_factory(self, obj)
+
+    def locate_encrypt_by_ref(self, objref):
+        """ Locates Encrypt object by ref from a stream-style xref.
+            In some cases for encrypted files this reference is missing from Xref table
+            but the indirect object comes right before the xref stream.
+        """
+        obj = self.parser.locate_object_in_registry(objref.num, objref.gen) \
+              or self.parser.locate_object_by_xref(objref.num, objref.gen)
+
+        if not obj:
+            obj = self.parser.locate_backwards_from_trailer(objref.num, objref.gen)
+
+        if not obj:
+            obj = self.parser.locate_object(objref.num, objref.gen)
+
         return obj_factory(self, obj)
 
     def deep_obj_by_ref(self, obj, maxdepth=100):

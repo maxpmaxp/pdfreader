@@ -34,6 +34,9 @@ class BasicTypesParser(object):
     def read(self, n):
         return self.buffer.read(n)
 
+    def read_backward(self, n):
+        return self.buffer.read_backward(n)
+
     def get_state(self):
         return self.buffer.get_state()
 
