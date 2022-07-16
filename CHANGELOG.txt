@@ -1,3 +1,7 @@
+pdfreader 0.1.12dev
+---------------------------
+ - issue #70 - Encrypt value as a reference
+
 pdfreader 0.1.11
 ---------------------------
  - broken links to PDF spec fixed
