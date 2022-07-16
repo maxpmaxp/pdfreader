@@ -234,7 +234,7 @@ Every one is represented by its own class
 (:class:`~pdfreader.types.objects.Image` and :class:`~pdfreader.types.content.InlineImage`)
 
 Let's extract some pictures now! They are accessible through :attr:`~pdfreader.viewer.SimplePDFViewer.canvas`
-attribute. Have a look at :download:`page 8 <examples/pdfs/tutorial-example.pdf#page=8>`_
+attribute. Have a look at :download:`page 8 <examples/pdfs/tutorial-example.pdf>`
 of the sample document. It contains a fax message, and is is available
 on :attr:`~pdfreader.viewer.SimpleCanvas.inline_images` list.
 
@@ -272,7 +272,7 @@ Extracting texts
 Getting texts from a page is super easy. They are available on :attr:`~pdfreader.viewer.SimpleCanvas.strings` and
 :attr:`~pdfreader.viewer.SimpleCanvas.text_content` attributes.
 
-Let's go to the previous page (:download:`#7 <examples/pdfs/tutorial-example.pdf#page=7>`_) and extract some data.
+Let's go to the previous page (:download:`#7 <examples/pdfs/tutorial-example.pdf>`) and extract some data.
 
 .. doctest::
 
@@ -299,7 +299,7 @@ Let's render the page and see the texts.
 
 As you see every character comes as an individual string in the page content stream here. Which is not usual.
 
-Let's go to the very :download:`first page <examples/pdfs/tutorial-example.pdf#page=1>`_
+Let's go to the very :download:`first page <examples/pdfs/tutorial-example.pdf>`
 
 .. doctest::
 

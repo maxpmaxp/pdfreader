@@ -1,6 +1,7 @@
 pdfreader 0.1.12dev
 ---------------------------
  - issue #70 - Encrypt value as a reference
+ - issue #91 - broken links in the docs
 
 pdfreader 0.1.11
 ---------------------------
