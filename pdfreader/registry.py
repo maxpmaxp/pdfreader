@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from .parsers import ObjStmParser
 from .types import Stream
@@ -23,11 +24,11 @@ class Registry(object):
             key = obj.num, obj.gen
             self.known_indirect_objects[key] = obj.val
             self.indirect_object_offsets[key] = (b_offset, e_offset)
-            logging.debug("Indirect object registered: {key} -> {val}".format(key=key, val=obj.val))
+            log.debug("Indirect object registered: {key} -> {val}".format(key=key, val=obj.val))
 
             if isinstance(obj.val, Stream):
                 if obj.val.get("Type") == "ObjStm":
-                    logging.debug("Registering ObjStm {}".format(key))
+                    log.debug("Registering ObjStm {}".format(key))
                     self.register_object_stream(obj.val)
 
     def get(self, n, gen):
@@ -43,5 +44,5 @@ class Registry(object):
         for obj in parser.objects(objstm["First"], objstm["N"]):
             # generation is always 0 for compressed objects
             self.register(obj)
-            logging.debug("Compressed object registered {} {}".format(obj.num, obj.gen))
+            log.debug("Compressed object registered {} {}".format(obj.num, obj.gen))
 

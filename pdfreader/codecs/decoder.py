@@ -1,5 +1,6 @@
 import codecs
 import logging
+log = logging.getLogger(__name__)
 import pkg_resources
 
 from io import BytesIO
@@ -37,7 +38,7 @@ def _guess_encoding_by_font_name(name):
     encoding = None
     if name == 'Symbol':
         # ToDo: It must be cp1038 decoder, which is missing now. it's one of predefined PostScript fonts
-        logging.warning("Symbol (aka cp1038) codec not implemented")
+        log.warning("Symbol (aka cp1038) codec not implemented")
         encoding = 'Identity-H'
     elif name in ('Times-Roman', 'Helvetica', 'Courier', 'Symbol', 'Times-Bold', 'Helvetica-Bold', 'Courier-Bold',
                   'Times-Italic', 'Helvetica-Qblique', 'Courier-Oblique', 'Times-BoldItalic', 'Helvetica-BoldOblique',
@@ -159,7 +160,7 @@ class EncodingDecoder(BaseDecoder):
             try:
                 codec = codecs.lookup(self.encoding)
             except LookupError:
-                logging.warning("Unsupported encoding {}. Using default {}".format(self.encoding, DEFAULT_ENCODING))
+                log.warning("Unsupported encoding {}. Using default {}".format(self.encoding, DEFAULT_ENCODING))
                 codec = codecs.lookup(DEFAULT_ENCODING)
         elif isinstance(self.encoding, DictBasedObject):
             # Encoding object - See PDF spec PDF32000_2008.pdf p.255 sec 9.6.1
@@ -184,7 +185,7 @@ def Decoder(font):
     else:
         # Encoding can be defined as a part of PostScript Font program, which is not supported.
         # Anyway, let's try do decode somehow.
-        logging.warning("Can't build Decoder for font {}. Trying to use default.".format(font))
+        log.warning("Can't build Decoder for font {}. Trying to use default.".format(font))
         decoder = default_decoder
     return decoder
 

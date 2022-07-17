@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from base64 import  a85decode
 
@@ -27,7 +28,7 @@ def decode(data, *_):
         else:
             raise ValueError("EOD ~> expected")
     except (TypeError, ValueError):
-        logging.exception("Skipping broken stream")
+        log.exception("Skipping broken stream")
         res = b''
     return res
 

@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from ..types.native import Dictionary, Array, Name
 from ..types.objects import Page
@@ -57,7 +58,7 @@ class Resources(object):
                         else:
                             kwargs[entry].update(pname)
                 else:
-                    logging.warning("Skipping unexpected resources entry type: {} -> {}"
+                    log.warning("Skipping unexpected resources entry type: {} -> {}"
                                     .format(entry, type(dict_or_array)))
 
         return Resources(**kwargs)

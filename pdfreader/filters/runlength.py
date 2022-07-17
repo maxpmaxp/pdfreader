@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 
 filter_names = ('RunLengthDecode', 'RL')
@@ -43,7 +44,7 @@ def decode(data, *_):
                 state = 'need_length'
 
     if state != 'done':
-        logging.error("Skipping broken stream")
+        log.error("Skipping broken stream")
         res = b''
 
     return res

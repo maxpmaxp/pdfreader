@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from decimal import Decimal
 
@@ -55,7 +56,7 @@ def apply_filter_multi(filters, binary, params):
             binary = apply_filter(fname, binary, params)
             filters_applied.append(fname)
         except NotImplementedError:
-            logging.exception("Partially decoded. Filters applied: {}".format(filters_applied))
+            log.exception("Partially decoded. Filters applied: {}".format(filters_applied))
             raise
 
     return binary
@@ -81,7 +82,7 @@ class Stream(object):
             raise KeyError("Missing stream length")
 
         if info_dict["Length"] != len(binary_stream):
-            logging.warning("Inconsistent stream: defined length {}, real length {}"
+            log.warning("Inconsistent stream: defined length {}, real length {}"
                             .format(info_dict["Length"], len(binary_stream)))
 
         self.dictionary = info_dict

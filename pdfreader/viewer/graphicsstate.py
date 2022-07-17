@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from typing import List
 from copy import deepcopy
@@ -81,7 +82,7 @@ class GraphicsStateStack(List[GraphicsState]):
         if self:
             self.pop()
         else:
-            logging.warning("Can't reset empty state")
+            log.warning("Can't reset empty state")
 
     def _get_state(self):
         if not self:

@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from ..exceptions import ParserException
 from ..types.native import Name, Token, Integer, HexString, Array
@@ -165,7 +166,7 @@ class CMapParser(BasicTypesParser):
             cmapname = self.cmap_name()
         except ParserException:
             # see cmap-sample-4.txt (page 9 samples/tyler-or-inline-image.pdf) - missing /CMapName
-            logging.debug("Missing /CMapName")
+            log.debug("Missing /CMapName")
             cmapname = None
             self.set_state(state)
 

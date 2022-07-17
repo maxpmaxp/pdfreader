@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 from base64 import b85encode
 
 from pdfreader.constants import DEFAULT_ENCODING
@@ -54,7 +55,7 @@ def object_to_string(obj):
         entries += " /Filter [{}]".format(str_filters)
         val = "\nBI\n{entries}\nID\n{content}\nEI".format(entries=entries, content=content.decode('ascii'))
     elif isinstance(obj, bytes):
-        logging.warning("Binary data. Using default encoding. Possibly arg of unsupported operator: {}"
+        log.warning("Binary data. Using default encoding. Possibly arg of unsupported operator: {}"
                         .format(repr(bytes)))
         val = obj.decode(DEFAULT_ENCODING, 'replace')
     else:

@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from .registry import Registry
 from .parsers import RegistryPDFParser
@@ -67,7 +68,7 @@ class PDFDocument(object):
         :param visited: Shouldn't be used. Internal param containing already resolved objects
                         to not fall into infinite loops
         """
-        logging.debug("Buliding {}".format(obj))
+        log.debug("Buliding {}".format(obj))
         if visited is None:
             visited = []
 
@@ -91,7 +92,7 @@ class PDFDocument(object):
             obj = obj_factory(self, obj)
         elif isinstance(obj, IndirectObject):
             # normally this shouldn't happen, but ponentially we can build it
-            logging.warning("Attempt to build an indirect object. Possibly a bug.")
+            log.warning("Attempt to build an indirect object. Possibly a bug.")
             obj = self.build(obj.val, visited, lazy)
 
         if on_return:
