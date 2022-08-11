@@ -1,7 +1,7 @@
 pdfreader 0.1.13dev
 ---------------------------
 - issue #93 - logging issue
-
+- issue #99 - color space lookups issue fixed
 
 pdfreader 0.1.12
 ---------------------------

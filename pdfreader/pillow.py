@@ -6,7 +6,7 @@ from io import BytesIO
 from bitarray import bitarray
 from PIL import Image
 
-from .types.native import Array
+from .types.native import Array, Stream, HexString
 
 
 class PILImageMixin(object):
@@ -69,7 +69,12 @@ class PILImageMixin(object):
             # FlateDecode and others
             if isinstance(self.ColorSpace, Array):
                 cs = self.ColorSpace
-                my_cs, base_cs, hival, lookup = cs[0], cs[1], cs[2], cs[3].filtered
+                my_cs, base_cs, hival, lookup = cs[0], cs[1], cs[2], cs[3]
+
+                if isinstance(lookup, Stream):
+                    lookup = lookup.filtered
+                elif isinstance(lookup, HexString):
+                    lookup = lookup.to_bytes()
 
                 if my_cs == 'Indexed':
                     img = Image.new("P", size)
