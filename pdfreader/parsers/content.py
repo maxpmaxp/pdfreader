@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from .base import BasicTypesParser
 from ..types.content import Operator, InlineImage
@@ -25,7 +26,7 @@ class ContentParser(BasicTypesParser):
             obj = self.object()
             if isinstance(obj, InlineImage):
                 if operands:
-                    logging.warning("Skipping heading operands for inline image: {}".format(operands))
+                    log.warning("Skipping heading operands for inline image: {}".format(operands))
                 operands = []
                 yield obj
             elif self.is_operator(obj):
@@ -36,7 +37,7 @@ class ContentParser(BasicTypesParser):
                 operands.append(obj)
             self.maybe_spaces_or_comments()
         if operands:
-            logging.warning("Skipping trailing operands at the end of stream: {}".format(operands))
+            log.warning("Skipping trailing operands at the end of stream: {}".format(operands))
 
     @staticmethod
     def is_operator(obj):

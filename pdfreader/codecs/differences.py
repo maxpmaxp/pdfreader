@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from . import winansi, pdfdoc, macroman, standard
 from .codec import Codec
@@ -46,7 +47,7 @@ def DifferencesCodec(encoding_obj):
         # There are usecases when BaseEncoding is None, Differences exists and all this makes sense as
         # content contains Differences characters only.
         # Anyway we have to try decode.
-        logging.warning("Unknown BaseEncoding {}. Trying {}".format(encoding_obj.BaseEncoding, implicit_base_encoding))
+        log.warning("Unknown BaseEncoding {}. Trying {}".format(encoding_obj.BaseEncoding, implicit_base_encoding))
         codec = base_encodings_map[implicit_base_encoding]
 
     dt = dict(codec.decode_table)

@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from io import BytesIO
 
@@ -75,7 +76,7 @@ class PILImageMixin(object):
                     img.putpalette(lookup, self.get_pil_colorspace(base_cs))
                     img.frombytes(self.filtered)
                 else:
-                    logging.debug("Unexpected colorspace: {}".format(my_cs))
+                    log.debug("Unexpected colorspace: {}".format(my_cs))
                     img = Image.frombytes(self.get_pil_colorspace(base_cs), size, self.data)
             else:
                 cs = self.get_pil_colorspace(self.ColorSpace)

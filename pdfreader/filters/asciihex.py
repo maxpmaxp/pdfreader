@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from ..constants import WHITESPACES, DEFAULT_ENCODING
 
@@ -44,7 +45,7 @@ def decode(data, *_):
             res += bytes.fromhex(buffer.decode(DEFAULT_ENCODING))
     except ValueError:
         # invalid characters on stream
-        logging.exception("Skipping broken stream")
+        log.exception("Skipping broken stream")
     return res
 
 

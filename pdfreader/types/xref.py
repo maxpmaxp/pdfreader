@@ -1,4 +1,5 @@
 import logging
+log = logging.getLogger(__name__)
 
 from collections import OrderedDict
 
@@ -17,7 +18,7 @@ class BaseXrefEntry(object):
         assert isinstance(generation, int) and generation >= 0
 
         if generation > MAX_GEN:
-            logging.warning("Incorrect generation {} for entry {}".format(generation, number))
+            log.warning("Incorrect generation {} for entry {}".format(generation, number))
 
         self.number = number
         self.generation = generation
@@ -155,7 +156,7 @@ class XRef(object):
             else:
                 # PDF 1.5-1.7 defines any other reference types as references to null objects.
                 # so we just skip those
-                logging.debug("Undefined xref col type (index 0): {}".format(cols))
+                log.debug("Undefined xref col type (index 0): {}".format(cols))
 
             if entry is not None:
                 self.add_entry(entry)

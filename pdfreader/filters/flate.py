@@ -1,4 +1,6 @@
-import logging, zlib
+import zlib
+import logging
+log = logging.getLogger(__name__)
 
 from .predictors import _remove_predictors
 
@@ -20,7 +22,7 @@ def decode(data, params):
         data = zlib.decompress(data)
         data = _remove_predictors(data, params.get("Predictor"), params.get("Columns"))
     except zlib.error:
-        logging.exception("Skipping broken stream")
+        log.exception("Skipping broken stream")
         data = b''
     return data
 
