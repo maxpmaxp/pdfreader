@@ -577,7 +577,7 @@ class CCITTG3Parser(BitParser):
                 for m in (128, 64, 32, 16, 8, 4, 2, 1):
                     self._parse_bit(b & m)
             except ByteSkip:
-                continue
+                pass
 
     def reset(self):
         self._y = -1
@@ -591,7 +591,7 @@ class CCITTG3Parser(BitParser):
         self._run_length = 0
         self._curline = array.array('b', [])
         self._state = self.WHITE
-        self._color = 0
+        self._color = 1
 
     def _flush_line(self):
         self._y += 1
@@ -610,12 +610,12 @@ class CCITTG3Parser(BitParser):
     def _terminate(self):
         self._curline += array.array('b', [self._color] * self._run_length)
         self._run_length = 0
-        if self._color == 0:
+        if self._color == 1:
             self._state = self.BLACK
-            self._color = 1
+            self._color = 0
         else:
             self._state = self.WHITE
-            self._color = 0
+            self._color = 1
 
     def _accept(self, v):
         if v is None:
@@ -624,21 +624,14 @@ class CCITTG3Parser(BitParser):
             self._flush_line()
         elif v <= 63:
             # terminating word
-            if self._run_length > 0:
-                self._run_length -= v
-            else:
-                self._run_length = v
+            self._run_length += v
             self._terminate()
             # if EOL is not required
             if not self.is_eol_required and len(self._curline) >= self.width:
                 self._flush_line()
         else:
-            # Makeup code
-            if v == 2560:
-                self._run_length += v
-            else:
-                self._run_length = v
-            self._state = self.WHITE if self._color == 0 else self.BLACK
+            self._run_length += v
+            self._state = self.WHITE if self._color == 1 else self.BLACK
         return self._state
 
 ##  CCITTG3FaxDecoder
@@ -694,3 +687,11 @@ decode = ccittfaxdecode
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
+"""
+from pdfreader import SimplePDFViewer, PageDoesNotExist
+fd = open("111.pdf", "rb")
+viewer = SimplePDFViewer(fd)
+viewer.render()
+viewer.canvas.images['Im1'].to_Pillow().save("fax-g3.jpg")
+"""
