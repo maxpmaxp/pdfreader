@@ -1,4 +1,4 @@
 bitarray==1.1.0
 pillow>=7.1.0
-pycryptodome==3.9.9
+pycryptodome==3.19.1
 python-dateutil==2.8.1
