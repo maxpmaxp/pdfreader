@@ -1,7 +1,7 @@
 import codecs
 import logging
 log = logging.getLogger(__name__)
-import pkg_resources
+from importlib import resources
 
 from io import BytesIO
 
@@ -21,7 +21,7 @@ class PredefinedCmaps(object):
     def _load(name):
         from ..parsers import CMapParser
         fname = predefined_cmap_names[name]
-        with pkg_resources.resource_stream('pdfreader.codecs', 'cmaps/{}'.format(fname)) as fd:
+        with resources.open_binary('pdfreader.codecs', 'cmaps/{}'.format(fname)) as fd:
             return CMapParser(fd).cmap()
 
     @staticmethod
