@@ -1,6 +1,5 @@
 import codecs
 import logging
-
 log = logging.getLogger(__name__)
 from importlib import resources
 
@@ -21,9 +20,8 @@ class PredefinedCmaps(object):
     @staticmethod
     def _load(name):
         from ..parsers import CMapParser
-
         fname = predefined_cmap_names[name]
-        with resources.open_binary("pdfreader.codecs", "cmaps/{}".format(fname)) as fd:
+        with resources.open_binary('pdfreader.codecs', 'cmaps/{}'.format(fname)) as fd:
             return CMapParser(fd).cmap()
 
     @staticmethod
@@ -34,43 +32,27 @@ class PredefinedCmaps(object):
 
 
 def _guess_encoding_by_font_name(name):
-    """Try to guess encoding from font name if it is one of 14 PostScript predefined or some other
-    PDF can recognize.
+    """ Try to guess encoding from font name if it is one of 14 PostScript predefined or some other
+        PDF can recognize.
     """
     encoding = None
-    if name == "Symbol":
+    if name == 'Symbol':
         # ToDo: It must be cp1038 decoder, which is missing now. it's one of predefined PostScript fonts
         log.warning("Symbol (aka cp1038) codec not implemented")
-        encoding = "Identity-H"
-    elif name in (
-        "Times-Roman",
-        "Helvetica",
-        "Courier",
-        "Symbol",
-        "Times-Bold",
-        "Helvetica-Bold",
-        "Courier-Bold",
-        "Times-Italic",
-        "Helvetica-Qblique",
-        "Courier-Oblique",
-        "Times-BoldItalic",
-        "Helvetica-BoldOblique",
-        "Courier-BoldOblique",
-        "ZapfDingbats",
-    ):
+        encoding = 'Identity-H'
+    elif name in ('Times-Roman', 'Helvetica', 'Courier', 'Symbol', 'Times-Bold', 'Helvetica-Bold', 'Courier-Bold',
+                  'Times-Italic', 'Helvetica-Qblique', 'Courier-Oblique', 'Times-BoldItalic', 'Helvetica-BoldOblique',
+                  'Courier-BoldOblique', 'ZapfDingbats'):
         # Predefined PostScript fonts
-        encoding = "Identity-H"
+        encoding = 'Identity-H'
     return encoding
 
 
 def _get_cmap_encoding(font):
     cmap = encoding = None
     explicit_cmap = font.get("ToUnicode")
-    explicit_encoding = font.get("Encoding")
-    is_predefined_cmap = (
-        isinstance(explicit_encoding, Name)
-        and explicit_encoding in predefined_cmap_names
-    )
+    explicit_encoding = font.get('Encoding')
+    is_predefined_cmap = isinstance(explicit_encoding, Name) and explicit_encoding in predefined_cmap_names
     if bool(explicit_cmap):
         cmap = CMapParser(BytesIO(explicit_cmap.filtered)).cmap()
     elif is_predefined_cmap:
@@ -81,7 +63,7 @@ def _get_cmap_encoding(font):
         encoding = explicit_encoding
 
     if cmap is None and encoding is None:
-        encoding = _guess_encoding_by_font_name(font.get("BaseFont"))
+        encoding = _guess_encoding_by_font_name(font.get('BaseFont'))
 
     return cmap, encoding
 
@@ -136,7 +118,7 @@ class CMAPDecoder(BaseDecoder):
 
     def decode_hexstring(self, s: HexString):
         res, code = "", ""
-        codes = [s[i : i + 2] for i in range(0, len(s), 2)]
+        codes = [s[i:i + 2] for i in range(0, len(s), 2)]
 
         while codes:
             code += codes.pop(0)
@@ -147,12 +129,10 @@ class CMAPDecoder(BaseDecoder):
                     continue
                 else:
                     # leave as is
-                    if code[:2] == "00":
-                        ch = ""
+                    if code[:2] == '00':
+                        ch = ''
                     else:
-                        ch = self._encoding_decoder.decode_hexstring(
-                            HexString(code[:2])
-                        )
+                        ch = self._encoding_decoder.decode_hexstring(HexString(code[:2]))
                     codes = [HexString(code[2:])] + codes
             res += ch
             code = ""
@@ -180,11 +160,7 @@ class EncodingDecoder(BaseDecoder):
             try:
                 codec = codecs.lookup(self.encoding)
             except LookupError:
-                log.warning(
-                    "Unsupported encoding {}. Using default {}".format(
-                        self.encoding, DEFAULT_ENCODING
-                    )
-                )
+                log.warning("Unsupported encoding {}. Using default {}".format(self.encoding, DEFAULT_ENCODING))
                 codec = codecs.lookup(DEFAULT_ENCODING)
         elif isinstance(self.encoding, DictBasedObject):
             # Encoding object - See PDF spec PDF32000_2008.pdf p.255 sec 9.6.1
@@ -193,11 +169,7 @@ class EncodingDecoder(BaseDecoder):
             codec = DifferencesCodec(self.encoding)
         else:
             # This should never happen
-            raise TypeError(
-                "Unexpected type. Probably a bug: {} type of {}".format(
-                    self.encoding, type(self.encoding)
-                )
-            )
+            raise TypeError("Unexpected type. Probably a bug: {} type of {}".format(self.encoding, type(self.encoding)))
         return codec.decode(s)[0]
 
 
@@ -213,14 +185,11 @@ def Decoder(font):
     else:
         # Encoding can be defined as a part of PostScript Font program, which is not supported.
         # Anyway, let's try do decode somehow.
-        log.warning(
-            "Can't build Decoder for font {}. Trying to use default.".format(font)
-        )
+        log.warning("Can't build Decoder for font {}. Trying to use default.".format(font))
         decoder = default_decoder
     return decoder
 
 
 if __name__ == "__main__":
     import doctest
-
     doctest.testmod()
