@@ -1,4 +1,4 @@
-pdfreader 0.1.13dev
+pdfreader 0.1.13
 ---------------------------
 - issue #109 - work around unexpected predictors and corrupted images
 - Bump pycryptodome from 3.9.9 to 3.19.1
