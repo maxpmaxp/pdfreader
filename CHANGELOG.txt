@@ -1,5 +1,8 @@
 pdfreader 0.1.13dev
 ---------------------------
+- issue #109 - work around unexpected predictors and corrupted images
+- Bump pycryptodome from 3.9.9 to 3.19.1
+- issue #113 - get rid of `pkg_resources`
 - issue #93 - logging issue
 - issue #99 - color space lookups issue fixed
 

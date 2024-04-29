@@ -21,7 +21,7 @@ class PredefinedCmaps(object):
     def _load(name):
         from ..parsers import CMapParser
         fname = predefined_cmap_names[name]
-        with resources.open_binary('pdfreader.codecs', 'cmaps/{}'.format(fname)) as fd:
+        with resources.files('pdfreader.codecs').joinpath('cmaps/{}'.format(fname)).open('rb') as fd:
             return CMapParser(fd).cmap()
 
     @staticmethod
@@ -82,13 +82,13 @@ class BaseDecoder(object):
 class CMAPDecoder(BaseDecoder):
     """
 
+    >>> import pdfreader.codecs.decoder
     >>> font = dict(Encoding=Name("Identity-V"))
     >>> decoder = CMAPDecoder(font)
     >>> decoder.decode_hexstring('004100420043003100320033')
     'ABC123'
 
     >>> from unittest.mock import Mock, patch
-    >>> import pdfreader.codecs.decoder
     >>> cmap = Mock()
     >>> cmap.bf_ranges = {'0001': 'A', '0002': 'B', '0003': 'C', '0004': '1',  '0005': '2',  '0006': '3'}
     >>> with patch.object(pdfreader.codecs.decoder, '_get_cmap_encoding', return_value=(cmap, None)) as _:

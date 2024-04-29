@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 def _remove_predictors(data, predictor=None, columns=None):
     """ Remove LZW/Flate predictors
     1 - No prediction
@@ -20,9 +23,11 @@ def _remove_predictors(data, predictor=None, columns=None):
         row_size = columns + 1
         res = b''
         for i in range(0, len(data), row_size):
-            if data[0] + 10 != predictor:
-                raise ValueError("Unexpected predictor {}".format(data[0]))
+            if data[i] + 10 != predictor:
+                log.debug("Unexpected predictor {} in row {}. Expected value {}, columns {}"
+                          .format(data[0] + 10, i, predictor, columns))
             res += data[i + 1:i + row_size]  # skip leading predictor byte
+
     else:
         raise ValueError("Unknown predictor type {}".format(predictor))
     return res
