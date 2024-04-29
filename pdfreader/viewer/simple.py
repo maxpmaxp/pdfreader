@@ -55,8 +55,7 @@ def object_to_string(obj):
         entries += " /Filter [{}]".format(str_filters)
         val = "\nBI\n{entries}\nID\n{content}\nEI".format(entries=entries, content=content.decode('ascii'))
     elif isinstance(obj, bytes):
-        log.warning("Binary data. Using default encoding. Possibly arg of unsupported operator: {}"
-                        .format(repr(bytes)))
+        log.debug("Binary data. Using default encoding. Possibly arg of unsupported operator: {}".format(repr(bytes)))
         val = obj.decode(DEFAULT_ENCODING, 'replace')
     else:
         raise ValueError("Unexpected object: {}. Possibly a bug.".format(obj))
