@@ -85,5 +85,29 @@ class PILImageMixin(object):
                     img = Image.frombytes(self.get_pil_colorspace(base_cs), size, self.data)
             else:
                 cs = self.get_pil_colorspace(self.ColorSpace)
-                img = Image.frombytes(cs, size, bytes(self.filtered))
+                raw = self._recover_broken_image_if_necessary(cs, size, bytes(self.filtered))
+                img = Image.frombytes(cs, size, raw)
+
         return img
+
+    def _recover_broken_image_if_necessary(self, cs, size, raw):
+        n_pixels = size[0] * size[1]
+        if cs == 'RGB':
+            expected_size = n_pixels * 3
+        elif cs == 'CMYK':
+            expected_size = n_pixels * 4
+        elif cs == 'L' or cs == 'P':
+            expected_size = n_pixels
+        else:
+            raise "Unsupported image mode: {}".format(cs)
+
+        n_bytes = len(raw)
+        # Try to work around broken images
+        if n_bytes > expected_size:
+            log.debug("Too many bytes fir the image. Truncating.")
+            raw = raw[:expected_size]
+        elif n_bytes < expected_size:
+            log.debug("not enough bytes for the image. Appending zeros.")
+            raw += bytes(expected_size - len(raw))
+
+        return raw
