@@ -79,10 +79,23 @@ class MapRange(Range):
         Traceback (most recent call last):
         ...
         KeyError: '05'
+        >>> r = MapRange("00", "04", 0x10FFFF)
+        >>> r["00"]
+        '\U0010ffff'
+        >>> r["01"], r["02"], r["03"], r["04"]
+        ('�', '�', '�', '�')
         """
         if item not in self:
             raise KeyError(item)
-        return chr(self.map_to_start + (HexString(item).as_int - self.int_begin))
+
+        code = self.map_to_start + (HexString(item).as_int - self.int_begin)
+        if 0 <= code <= 0x10FFFF:
+            # valid unicode range
+            val = chr(code)
+        else:
+            val = chr(0xFFFD) # unicode REPLACEMENT CHARACTER
+
+        return val
 
     def get(self, item, default=None):
         """
