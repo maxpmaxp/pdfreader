@@ -450,7 +450,7 @@ class BasicTypesParser(object):
         if ch == CR:
             ch = self.next()
         if ch != LF:
-            logging.warning("Missing LF after `stream` token - [CR]LF expected. Trying to proceed.")
+            logging.debug("Missing LF after `stream` token - [CR]LF expected. Trying to proceed.")
             self.prev()
 
         state = self.get_state()
@@ -467,7 +467,7 @@ class BasicTypesParser(object):
         if token != b'endstream':
             # Work around wrong length. See https://github.com/maxpmaxp/pdfreader/issues/68
             err_state = self.get_state()
-            logging.warning("Wrong stream length: {}. Trying to work around the issue.".format(length))
+            logging.debug("Wrong stream length: {}. Trying to work around the issue.".format(length))
             self.set_state(state)
             data = self.read(9)
             while not data.endswith(b'endstream'):

@@ -1,5 +1,6 @@
 pdfreader 0.1.15dev
 ---------------------------
+- reduced warnings logs noise
 - timezone issue in tests fixed
 - bitarray version bump to 2.9.2
 

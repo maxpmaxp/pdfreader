@@ -26,7 +26,7 @@ class ContentParser(BasicTypesParser):
             obj = self.object()
             if isinstance(obj, InlineImage):
                 if operands:
-                    log.warning("Skipping heading operands for inline image: {}".format(operands))
+                    log.debug("Skipping heading operands for inline image: {}".format(operands))
                 operands = []
                 yield obj
             elif self.is_operator(obj):
@@ -37,7 +37,7 @@ class ContentParser(BasicTypesParser):
                 operands.append(obj)
             self.maybe_spaces_or_comments()
         if operands:
-            log.warning("Skipping trailing operands at the end of stream: {}".format(operands))
+            log.debug("Skipping trailing operands at the end of stream: {}".format(operands))
 
     @staticmethod
     def is_operator(obj):

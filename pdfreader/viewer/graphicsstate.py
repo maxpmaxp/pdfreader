@@ -82,7 +82,7 @@ class GraphicsStateStack(List[GraphicsState]):
         if self:
             self.pop()
         else:
-            log.warning("Can't reset empty state")
+            log.debug("Can't reset empty state")
 
     def _get_state(self):
         if not self:

@@ -58,7 +58,7 @@ class Resources(object):
                         else:
                             kwargs[entry].update(pname)
                 else:
-                    log.warning("Skipping unexpected resources entry type: {} -> {}"
-                                    .format(entry, type(dict_or_array)))
+                    log.debug("Skipping unexpected resources entry type: {} -> {}"
+                              .format(entry, type(dict_or_array)))
 
         return Resources(**kwargs)

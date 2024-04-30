@@ -215,7 +215,7 @@ class SimplePDFViewer(TextOperatorsMixin, PDFViewer):
         name = op.args[0]
         xobj = self.resources.XObject.get(name)
         if not xobj:
-            logging.warning("Can't locate XObject {}".format(name))
+            log.debug("Can't locate XObject {}".format(name))
         else:
             if isinstance(xobj, Image) and name not in self.canvas.forms:
                 self.canvas.images[name] = xobj

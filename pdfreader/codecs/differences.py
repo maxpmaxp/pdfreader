@@ -47,7 +47,7 @@ def DifferencesCodec(encoding_obj):
         # There are usecases when BaseEncoding is None, Differences exists and all this makes sense as
         # content contains Differences characters only.
         # Anyway we have to try decode.
-        log.warning("Unknown BaseEncoding {}. Trying {}".format(encoding_obj.BaseEncoding, implicit_base_encoding))
+        log.debug("Unknown BaseEncoding {}. Trying {}".format(encoding_obj.BaseEncoding, implicit_base_encoding))
         codec = base_encodings_map[implicit_base_encoding]
 
     dt = dict(codec.decode_table)

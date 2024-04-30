@@ -84,7 +84,7 @@ class ContextualViewer(object):
         elif isinstance(obj, InlineImage):
             name = "{stage}_inline_image".format(stage=stage)
         else:
-            log.warning("Unexpected content object type {}".format(type(obj)))
+            log.debug("Unexpected content object type {}".format(type(obj)))
         return name
 
     def get_resources(self):
@@ -180,7 +180,7 @@ class ContextualViewer(object):
         if state:
             self.gss.state.update(GraphicsState(**state))
         else:
-            log.warning("Graphics state {} was not found on resources".format(name))
+            log.debug("Graphics state {} was not found on resources".format(name))
 
     # *Do* operator state manipulations
     def before_Do(self, op):
@@ -292,7 +292,7 @@ class PDFViewer(ContextualViewer):
         elif isinstance(obj, InlineImage):
             name = "{stage}_inline_image".format(stage=stage)
         else:
-            logging.warning("Unexpected content object type {}".format(type(obj)))
+            log.debug("Unexpected content object type {}".format(type(obj)))
         return name
 
     def get_resources(self):
