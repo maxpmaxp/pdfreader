@@ -1,5 +1,6 @@
 pdfreader 0.1.15dev
 ---------------------------
+- issue #130 - PDF date regular expression fixed
 - issue #62 - work around unbalanced BT/ET
 - reduced warnings logs noise
 - timezone issue in tests fixed
