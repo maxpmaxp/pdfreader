@@ -6,7 +6,7 @@ from dateutil.parser import parse as parse_date, parserinfo
 from .constants import ESCAPED_CHARS
 
 
-RE_PDF_DATETIME = re.compile("^D:(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)([+-Zz])(\d\d)'(\d\d)'$")
+RE_PDF_DATETIME = re.compile("^D:(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)([+\-Zz])(\d\d)'(\d\d)'$")
 
 
 class cached_property(object):
@@ -45,6 +45,11 @@ def from_pdf_datetime(s):
 
     >>> from_pdf_datetime("D:20210212014204-01'00'")
     datetime.datetime(2021, 2, 12, 1, 42, 4, tzinfo=tzoffset(None, -3600))
+
+    >>> from_pdf_datetime("D:20210212014204?01'00'")
+    Traceback (most recent call last):
+    ...
+    ValueError: Incorrect pdf time value D:20210212014204?01'00'. Expected D:YYYYMMDDHHmmSSOHH'mm'
 
     >>> from_pdf_datetime("blablabla")
     Traceback (most recent call last):
