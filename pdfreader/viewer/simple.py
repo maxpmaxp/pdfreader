@@ -109,13 +109,15 @@ class TextOperatorsMixin(object):
 
     def on_BT(self, op):
         if self.mode == "BT":
-            raise ValueError("BT operator without enclosing ET")
+            log.debug("BT operator without enclosing ET. Trying to recover.")
+            self.bracket_commands_stack.pop()
         self.bracket_commands_stack.append(op)
 
     def on_ET(self, op):
         if self.mode != "BT":
-            raise ValueError("ET operator without corresponding BT")
-        self.bracket_commands_stack.pop()
+            log.debug("ET operator without corresponding BT. Trying to recover.")
+        else:
+            self.bracket_commands_stack.pop()
 
     # Text handlers
     def on_Tf(self, op):
