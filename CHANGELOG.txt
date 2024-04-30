@@ -1,3 +1,7 @@
+pdfreader 0.1.15dev
+---------------------------
+- timezone issue in tests fixed
+
 pdfreader 0.1.14
 ---------------------------
 - issue #106 - use Unicode replace character when codes are out of Unicode range

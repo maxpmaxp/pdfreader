@@ -1,6 +1,7 @@
 import re
 
-from dateutil.parser import parse as parse_date
+from dateutil import tz
+from dateutil.parser import parse as parse_date, parserinfo
 
 from .constants import ESCAPED_CHARS
 
@@ -53,5 +54,7 @@ def from_pdf_datetime(s):
     """
     if not RE_PDF_DATETIME.match(s):
         raise ValueError("Incorrect pdf time value {}. Expected D:YYYYMMDDHHmmSSOHH'mm'".format(s))
+    tzinfos = {x: tz.tzutc() for x in parserinfo().UTCZONE}
+
     iso6801 = RE_PDF_DATETIME.sub(r"\1-\2-\3T\4:\5:\6\7\8:\9", s).replace("Z", "+")
-    return parse_date(iso6801)
+    return parse_date(iso6801, tzinfos=tzinfos)
