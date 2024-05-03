@@ -1,4 +1,4 @@
-pdfreader 0.1.15dev
+pdfreader 0.1.15
 ---------------------------
 - don't raise error on unsupported stream filters, return raw unfiltered data instead
 - issue #101 - DCT stream data encoding support
