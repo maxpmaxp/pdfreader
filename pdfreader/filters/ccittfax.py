@@ -12,6 +12,8 @@
 
 
 import array
+import logging
+log = logging.getLogger(__name__)
 
 filter_names = ('CCITTFaxDecode', 'CCF')
 
@@ -545,7 +547,8 @@ def ccittfaxdecode(data, params):
     if K == -1:
         parser = CCITTFaxDecoder(cols, bytealign=bytealign, reversed=reversed)
     else:
-        raise ValueError(K)
+        log.warning("CCITT 1d and 2d decoders are not implemented. Returning raw unfiltered data.")
+        return data
     parser.feedbytes(data)
     return parser.close()
 
