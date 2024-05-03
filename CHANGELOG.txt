@@ -1,5 +1,6 @@
 pdfreader 0.1.15dev
 ---------------------------
+- don't raise error on unsupported stream filters, return raw unfiltered data instead
 - issue #101 - DCT stream data encoding support
 - issue #130 - PDF date regular expression fixed
 - issue #62 - work around unbalanced BT/ET
