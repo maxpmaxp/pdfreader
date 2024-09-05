@@ -14,9 +14,7 @@ version = '0.1.16dev'
 
 import os.path
 
-from setuptools import setup, find_packages
-from distutils.cmd import Command
-
+from setuptools import setup, find_packages, Command
 
 with open("README.rst") as f:
     try:
@@ -100,8 +98,6 @@ class test(Command):
         if self.distribution.install_requires:
             self.distribution.fetch_build_eggs(
                 self.distribution.install_requires)
-        if self.distribution.tests_require:
-            self.distribution.fetch_build_eggs(self.distribution.tests_require)
         self.run_command('egg_info')
 
         import unittest
@@ -140,7 +136,11 @@ setup(name="pdfreader",
       package_data={'doc': ['doc/*'],
                     'pdfreader.codecs': ['cmaps/*']},
       zip_safe=False,
-      install_requires=['bitarray>=1.1.0', 'pillow>=7.1.0', 'pycryptodome>=3.9.9', 'python-dateutil>=2.8.1'],
+      install_requires=['bitarray>=2.9.2',
+                        'pillow>=7.1.0',
+                        'pycryptodome>=3.19.1',
+                        'python-dateutil>=2.8.1',
+                        'setuptools>=68.2.0'],
       entry_points={
         'console_scripts':
                 [],
