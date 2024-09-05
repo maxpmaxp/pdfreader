@@ -1,6 +1,8 @@
 pdfreader 0.1.16dev
 ---------------------------
+ - issue #138 - python 3.12 support
  - issue #135 - trailer parsing issue for linearized PDFs
+
 
 pdfreader 0.1.15
 ---------------------------

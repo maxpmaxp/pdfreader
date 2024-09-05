@@ -2,3 +2,4 @@ bitarray>=2.9.2
 pillow>=7.1.0
 pycryptodome==3.19.1
 python-dateutil==2.8.1
+setuptools>=68.2.0
