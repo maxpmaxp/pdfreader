@@ -1,3 +1,7 @@
+pdfreader 0.1.16dev
+---------------------------
+ - issue #135 - trailer parsing issue for linearized PDFs
+
 pdfreader 0.1.15
 ---------------------------
 - don't raise error on unsupported stream filters, return raw unfiltered data instead
