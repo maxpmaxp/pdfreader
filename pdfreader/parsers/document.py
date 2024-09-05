@@ -1,3 +1,4 @@
+import logging
 import re
 
 from ..constants import WHITESPACE_CODES, EOL, SP
@@ -558,14 +559,19 @@ class RegistryPDFParser(PDFParser):
         chunk_len = len(expected_obj)
         obj_header = self.read(chunk_len)
 
-        while obj_header != expected_obj:
-            self.skip_backwards_until(b"endobj")
-            self.skip_backwards_until(b"endobj")
-            self.read(6)
-            self.maybe_spaces_or_comments()
-            obj_header = self.read(chunk_len)
-            if len(obj_header) < chunk_len:
-                return
+        try:
+            while obj_header != expected_obj:
+                self.skip_backwards_until(b"endobj")
+                self.skip_backwards_until(b"endobj")
+                self.read(6)
+                self.maybe_spaces_or_comments()
+                obj_header = self.read(chunk_len)
+                if len(obj_header) < chunk_len:
+                    return
+        except TypeError:
+            # Issue 135: https://github.com/maxpmaxp/pdfreader/issues/135
+            logging.debug("Failed to locate backwards from trailer")
+            return
 
         self.read_backward(chunk_len)
         obj = self.indirect_object()
