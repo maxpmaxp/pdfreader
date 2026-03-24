@@ -73,7 +73,7 @@ class BasicTypesParser(object):
 
     def eol(self):
         """ EOL is either CR or LF or the both """
-        if self.current not in EOL:
+        if not self.is_eol:
             self.on_parser_error("EOL expected")
         self.maybe_eol()
 
@@ -88,7 +88,7 @@ class BasicTypesParser(object):
 
     @property
     def is_eol(self):
-        return self.current is not None and self.current in EOL
+        return self.is_eof or self.current in EOL
 
     @property
     def is_whitespace(self):
