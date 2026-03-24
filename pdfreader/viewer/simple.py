@@ -137,11 +137,13 @@ class TextOperatorsMixin(object):
     def on_TJ(self, op):
         """ Show one or more text strings  """
         arr = op.args[0]
+        string=""
         for i in range(len(arr)):
             if isinstance(arr[i], (HexString, String)):
                 s = self.decode_string(arr[i])
-                self.canvas.strings.append(s)
                 arr[i] = "({})".format(pdf_escape_string(s))
+                string = string + s
+        self.canvas.strings.append(string)
 
     on_quotation = on_TJ
 
